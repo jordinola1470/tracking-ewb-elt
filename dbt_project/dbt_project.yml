@@ -26,4 +26,6 @@ models:
     diamond:
       materialized: table
       schema: public
+      # RLS + lectura solo para el rol ewb_tablero (no hace nada si el rol no existe)
+      +post-hook: "{{ permitir_lectura_tablero() }}"
     

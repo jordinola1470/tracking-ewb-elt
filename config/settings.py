@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     postgres_user: str      = Field(...,alias='DB_USER', description="Usuario de PostgreSQL")
     postgres_password: str  = Field(...,alias='DB_PASS', description="Contraseña de PostgreSQL")
     postgres_db:   str      = Field(...,alias='DB_NAME', description="Nombre de la base de datos")
+    # Cifrado de la conexión: 'prefer' en local/Docker; 'require' en Supabase (exige SSL)
+    postgres_sslmode: str   = Field(default="prefer", alias='DB_SSLMODE', description="Modo SSL de PostgreSQL")
 
 
 
@@ -41,6 +43,7 @@ class Settings(BaseSettings):
         return (
             f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+            f"?sslmode={self.postgres_sslmode}"
         )
     
 # Implementación de Singleton mediante caché de nivel de función.

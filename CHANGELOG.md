@@ -10,6 +10,18 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado
+- Entornos `entorno_staging` (datos ficticios) y `entorno_prod` en Supabase, con GitHub Environments
+  (6 secretos cada uno; prod requiere aprobación y solo despliega desde `main`).
+- `sql/roles_supabase.sql`: roles `ewb_pipeline` (dueño de raw, staging y marts) y `ewb_tablero` (solo
+  lectura de `public`, transacciones de solo lectura).
+- Macro dbt `permitir_lectura_tablero`: RLS y política de solo lectura para `ewb_tablero` en cada tabla
+  de `public` (no hace nada si el rol no existe, como en Docker local y CI).
+- Variable `DB_SSLMODE` (`prefer` en local, `require` en Supabase) en la configuración y en dbt.
+
+### Cambiado
+- `cargar` solo crea el esquema `raw` si no existe (el rol de mínimo privilegio no puede crear esquemas).
+
 ## [0.4.0] - 2026-11-13
 
 ### Agregado

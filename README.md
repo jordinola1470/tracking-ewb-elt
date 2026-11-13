@@ -190,6 +190,31 @@ docker compose down                            # apaga todo; los datos quedan en
 
 ---
 
+## ☁️ Entornos en Supabase
+
+El mismo código corre en tres entornos; solo cambian las variables `DB_*`:
+
+| Entorno | Dónde | Datos | Credenciales |
+| :--- | :--- | :--- | :--- |
+| dev | Docker en el Mac (`docker compose`) | Reales (respaldo local) | `.env` |
+| `entorno_staging` | Supabase `ewb-entorno-staging` | **Ficticios** | `.env.entorno_staging` · GitHub Environment `entorno_staging` |
+| `entorno_prod` | Supabase `ewb-entorno-prod` | Reales | `.env.entorno_prod` · GitHub Environment `entorno_prod` (requiere aprobación) |
+
+> No confundir: `entorno_staging` es un **entorno** completo (con raw, staging, marts y public); `staging` es el **esquema** de la capa plata.
+
+**Seguridad en Supabase**
+- Data API desactivada: las tablas no se publican en internet. RLS automático en `public`.
+- Conexión por *Session pooler* (IPv4) con `DB_SSLMODE=require`.
+- Roles de mínimo privilegio creados con [`sql/roles_supabase.sql`](sql/roles_supabase.sql) (las contraseñas se fijan con `\password` en `psql`, nunca en archivos):
+  - `ewb_pipeline`: dueño de `raw`, `staging` y `marts`; construye `public`.
+  - `ewb_tablero`: solo lectura de `public` (política RLS creada por la macro `permitir_lectura_tablero` en cada `transformar`).
+
+```bash
+# Ejecutar contra un entorno desde el Mac (en staging, solo con Excel ficticios)
+docker run --rm --env-file .env.entorno_staging -v <carpeta_excel>:/app/data:ro tracking-ewb-elt:local cargar
+docker run --rm --env-file .env.entorno_staging tracking-ewb-elt:local transformar
+```
+
 ## 🧪 Pruebas y CI
 
 Cada Pull Request y cada cambio en `main` ejecuta el flujo [CI](.github/workflows/ci.yml) en GitHub Actions, **solo con datos ficticios**:

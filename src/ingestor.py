@@ -74,7 +74,10 @@ class Ingestor:
 
     # ------------------------------------------------------------------ bitácora
     def _asegurar_registro(self, conn) -> None:
-        conn.execute(text("CREATE SCHEMA IF NOT EXISTS raw;"))
+        # Solo se crea el esquema si falta: en Supabase ya existe y el rol del pipeline
+        # (mínimo privilegio) no tiene permiso para crear esquemas en la base.
+        if conn.execute(text("SELECT 1 FROM pg_namespace WHERE nspname = 'raw'")).scalar() is None:
+            conn.execute(text("CREATE SCHEMA raw;"))
         conn.execute(text(f"""
             CREATE TABLE IF NOT EXISTS {self.REGISTRO} (
                 id             BIGSERIAL PRIMARY KEY,
