@@ -1,0 +1,20 @@
+version: 2
+
+# Pruebas de calidad de las tablas finales que consume el tablero.
+# Si fallan, dbt reporta solo la CANTIDAD de filas con problema, nunca sus valores.
+
+models:
+  - name: consolidado_historico
+    columns:
+      - name: anio_lectivo
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [2023, 2024, 2025, 2026]
+                quote: false
+
+  - name: trazabilidad_historica
+    columns:
+      - name: docente_id
+        data_tests: [unique, not_null]

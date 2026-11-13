@@ -2,7 +2,6 @@ import pandas as pd
 import re
 import yaml
 from pathlib import Path
-from config.constants import data_config
 from src.exceptions import MappingFileNotFoundError, InvalidMappingFileError, MissingMappingYearError
 
 

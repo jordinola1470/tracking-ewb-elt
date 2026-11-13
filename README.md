@@ -190,6 +190,25 @@ docker compose down                            # apaga todo; los datos quedan en
 
 ---
 
+## 🧪 Pruebas y CI
+
+Cada Pull Request y cada cambio en `main` ejecuta el flujo [CI](.github/workflows/ci.yml) en GitHub Actions, **solo con datos ficticios**:
+
+| Revisión | Qué comprueba |
+| :--- | :--- |
+| `ruff` | Errores evidentes en el código (imports o variables sin usar, nombres no definidos) |
+| Pruebas unitarias | Cada pieza por separado, sin base de datos (`pytest -m "not integracion"`) |
+| `dbt parse` | Que los modelos SQL estén bien escritos |
+| Punta a punta | Imagen Docker + PostgreSQL 17 temporal + Excel ficticios: `cargar` dos veces (idempotencia), `transformar` con pruebas de datos dbt y verificación de totales |
+
+Los Excel ficticios se generan con `tests/fixtures/generar_excel_ficticios.py` (mismos encabezados que los reales, docentes inventados). Las pruebas de datos dbt (`_marts.yml`, `_diamond.yml`, `tests/`) reportan solo cantidades, nunca valores.
+
+```bash
+uv run ruff check .                  # lint
+uv run pytest -m "not integracion"   # pruebas unitarias
+uv run pytest                        # + integración (requiere la base encendida)
+```
+
 ## 🔀 Cómo contribuir
 
 `main` está protegida: los cambios entran **solo por Pull Request** desde ramas cortas.
