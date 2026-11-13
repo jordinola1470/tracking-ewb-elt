@@ -152,12 +152,18 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
 
 2. **Coloca los Excel en `data/`** con los nombres definidos en `config/sources.yaml` (se obtienen por canal interno, no desde el repositorio).
 
-3. **Ejecuta el Pipeline de orquestación:**
-   Manda extraer los Excel limpios, inyectarlos a raw transaccionalmente (`Ingestor`) y construir los modelos SQL por DBT en staging, marts y diamond (`DBTRunner`). Todo con un solo comando:
-   
+3. **Ejecuta el pipeline en dos órdenes separadas:**
+
    ```bash
-   uv run python main.py
+   uv run python main.py cargar                      # carga a raw solo los años cuyo Excel cambió
+   uv run python main.py cargar --anio 2026          # revisa y carga solo ese año
+   uv run python main.py cargar --anio 2026 --forzar # recarga aunque el archivo no haya cambiado
+   uv run python main.py transformar                 # dbt build: staging -> marts -> public (solo desde raw)
    ```
+
+   - **`cargar`** calcula la huella SHA-256 de cada Excel y la compara con la última carga registrada en `raw._registro_cargas`. Si cambió, reemplaza la tabla `raw.base_docentes_AAAA` en una sola transacción y verifica que las filas del Excel coincidan con las de raw; si no cuadran, deshace la carga. Correrlo varias veces seguidas da el mismo resultado.
+   - **`transformar`** no necesita los Excel: reconstruye todo desde `raw`.
+   - **Errores:** los del proyecto se muestran como un mensaje corto (sin datos personales) y el programa termina con código 1.
 
 ---
 
@@ -180,3 +186,4 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
 - **`.env.example`:** plantilla de configuración con marcadores.
 - **Hook `pre-commit`:** segunda barrera que bloquea Excel, CSV y `.env` aunque se fuerce `git add -f`.
 - **Dependencias separadas:** `pytest` y `pre-commit` pasan al grupo `dev`; producción se instala con `uv sync --no-dev`.
+- **Carga y transformación separadas:** `main.py cargar` (por año, con detección de cambios por huella, totales de control y bitácora `raw._registro_cargas`) y `main.py transformar` (`dbt build` desde raw). Reemplaza la ejecución única anterior.

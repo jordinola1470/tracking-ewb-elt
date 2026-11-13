@@ -44,3 +44,8 @@ class DatabaseLoadError(BaseProjectException):
 class DBTExecutionError(BaseProjectException):
     """Excepción lanzada cuando falla de forma imprevista la ejecución o compilación de un modelo de dbt."""
     pass
+
+
+class TotalesNoCuadranError(BaseProjectException):
+    """Se lanza cuando las filas leídas del Excel no coinciden con las filas cargadas en raw. La carga se deshace."""
+    pass
