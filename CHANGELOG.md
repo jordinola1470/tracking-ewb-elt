@@ -10,6 +10,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+## [0.5.0] - 2026-11-13
+
 ### Agregado
 - Entornos `entorno_staging` (datos ficticios) y `entorno_prod` en Supabase, con GitHub Environments
   (6 secretos cada uno; prod requiere aprobación y solo despliega desde `main`).
