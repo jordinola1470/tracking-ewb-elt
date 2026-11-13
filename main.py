@@ -9,6 +9,7 @@ Punto de entrada del pipeline tracking-ewb-elt.
 Código de salida: 0 si todo salió bien, 1 si hubo error (GitHub Actions lo marca en rojo).
 """
 import argparse
+import os  # ERROR A PROPÓSITO: import sin usar (prueba de fuego del CI)
 import sys
 
 from src.exceptions import BaseProjectException
