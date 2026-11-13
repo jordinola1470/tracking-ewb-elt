@@ -1,6 +1,6 @@
 [project]
 name = "tracking-ewb-elt"
-version = "0.2.0"
+version = "0.3.0"
 description = "Pipeline ELT (Python + dbt + PostgreSQL) de seguimiento docente del programa English without Borders"
 readme = "README.md"
 requires-python = ">=3.11"
