@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw_tracking_ewb
+    schema: raw
+    tables:
+      - name: base_docentes_2023
+      - name: base_docentes_2024
+      - name: base_docentes_2025
+      - name: base_docentes_2026

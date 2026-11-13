@@ -1,0 +1,10 @@
+# Registro de las bases de datos docentes (.xlsx)
+sources:
+  base_docentes_2023: "090525 Base 2023.xlsx"
+  base_docentes_2024: "090525 Base 2024.xlsx"
+  base_docentes_2025: "110226 Base 2025.xlsx"
+  base_docentes_2026: "131026 Base 2026.xlsx"
+
+# Hoja a leer por fuente (opcional). Si una fuente no aparece aquí se lee la primera hoja.
+sheets:
+  base_docentes_2026: "base"
