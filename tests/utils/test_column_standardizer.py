@@ -45,9 +45,10 @@ def test_standardizer_year_2023():
     assert "cargo_rol" in columns
     assert "tipo_nombramiento" in columns
     assert "jornada_laboral" in columns
-    assert "grado_dicta" in columns
+    # En 2023 "CURSO-NIVEL" es el nivel asignado (2023 no trae grado_dicta) y "REMOTE" se mapea a rt_remoto
+    assert "nivel_asignado" in columns
     assert "grupo_id" in columns
-    assert "es_remoto" in columns
+    assert "rt_remoto" in columns
     
     # Test _clean_string in action for non-mapped columns
     assert "columna_extra_con_espacios" in columns
@@ -105,11 +106,11 @@ def test_standardizer_missing_year():
     # Arrange
     df = pd.DataFrame({"ID": [1]})
     
-    # Act / Assert
+    # Act / Assert (2099: un año que nunca tendrá mapeo; 2026 ya está definido)
     with pytest.raises(MissingMappingYearError) as excinfo:
-        ColumnStandardizer.standardize(df, 2026)
-        
-    assert "2026" in str(excinfo.value)
+        ColumnStandardizer.standardize(df, 2099)
+
+    assert "2099" in str(excinfo.value)
     assert "no está definido en" in str(excinfo.value)
 
 def test_clean_string_nulls():

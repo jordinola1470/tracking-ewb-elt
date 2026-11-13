@@ -10,6 +10,20 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado
+- CI con GitHub Actions (`.github/workflows/ci.yml`): lint con ruff, pruebas unitarias, `dbt parse` y
+  prueba de punta a punta con la imagen Docker, PostgreSQL 17 temporal y Excel ficticios.
+- Generador de Excel ficticios (`tests/fixtures/generar_excel_ficticios.py`) con los encabezados reales.
+- Pruebas de integración de punta a punta (`tests/integracion/`), activas solo con `EWB_E2E=1`.
+- Pruebas de datos en dbt: unicidad y no nulos en dimensiones, relación hechos-docentes, años aceptados
+  y asistencia en rango 0-1 (aviso).
+- Marcadores de pytest `integracion` y `e2e`; `ruff` en dependencias de desarrollo.
+
+### Corregido
+- Dos pruebas unitarias desactualizadas respecto al mapeo real (2023 usa `nivel_asignado` y `rt_remoto`;
+  el año sin mapeo de prueba pasa a 2099).
+- Dos imports sin usar detectados por ruff.
+
 ## [0.3.0] - 2026-11-13
 
 ### Agregado

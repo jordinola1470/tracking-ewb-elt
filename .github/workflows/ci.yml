@@ -1,0 +1,101 @@
+# Integración continua: revisa cada Pull Request y cada cambio en main.
+# Usa SOLO datos ficticios. Las credenciales de abajo son de una base temporal que
+# nace y muere en cada ejecución: no son secretos ni dan acceso a nada real.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DB_HOST: localhost
+  DB_PORT: "5432"
+  DB_USER: ci_user
+  DB_PASS: ci_password
+  DB_NAME: ewb_ci
+
+jobs:
+  calidad:
+    name: Lint, pruebas unitarias y dbt parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Instalar dependencias (exactas de uv.lock)
+        run: uv sync --frozen
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Pruebas unitarias (sin base de datos)
+        run: uv run pytest -m "not integracion"
+
+      - name: Validar modelos dbt (dbt parse)
+        run: uv run dbt parse --project-dir dbt_project --profiles-dir dbt_project
+
+  e2e:
+    name: Prueba de punta a punta (Docker + datos ficticios)
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ewb_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci_user -d ewb_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Instalar dependencias (exactas de uv.lock)
+        run: uv sync --frozen
+
+      - name: Generar Excel ficticios
+        run: uv run python tests/fixtures/generar_excel_ficticios.py "$RUNNER_TEMP/data"
+
+      - name: Construir la imagen del pipeline
+        run: docker build -t tracking-ewb-elt:ci .
+
+      - name: cargar
+        run: |
+          docker run --rm --network host \
+            -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME \
+            -v "$RUNNER_TEMP/data:/app/data:ro" tracking-ewb-elt:ci cargar
+
+      - name: cargar de nuevo (idempotencia, los 4 años sin cambios)
+        run: |
+          salida=$(docker run --rm --network host \
+            -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME \
+            -v "$RUNNER_TEMP/data:/app/data:ro" tracking-ewb-elt:ci cargar)
+          echo "$salida"
+          test "$(echo "$salida" | grep -c 'sin cambios')" -eq 4
+
+      - name: transformar (dbt build con pruebas de datos)
+        run: |
+          docker run --rm --network host \
+            -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME \
+            tracking-ewb-elt:ci transformar
+
+      - name: Verificar resultados (pytest de integración)
+        env:
+          EWB_E2E: "1"
+        run: uv run pytest -m integracion

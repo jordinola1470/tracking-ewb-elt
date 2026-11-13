@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import patch
-from pathlib import Path
 from infrastructure.database import get_connection
 from config.constants import data_config,DataConfig
 
