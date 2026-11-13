@@ -190,16 +190,13 @@ docker compose down                            # apaga todo; los datos quedan en
 
 ---
 
-## 📝 Cambios recientes (v0.2.0)
+## 🔀 Cómo contribuir
 
-- **Repositorio nuevo y limpio:** historial reiniciado sin archivos de datos; `.gitignore` bloquea Excel, CSV, `.env` y respaldos.
-- **Alcance enfocado en el ELT:** se eliminaron el agente de IA (LangChain, Groq, Ollama, FAISS), la API y la app del tablero (FastAPI, Streamlit) y sus dependencias. El tablero se reconstruirá en una fase posterior sobre las tablas de `public`.
-- **`main.py`:** el mensaje de éxito se muestra al terminar la capa Diamond (paso 4).
-- **`sources.yaml`:** nueva sección opcional `sheets` para indicar la hoja de Excel por fuente (2026 lee la hoja `base`).
-- **`dim_mcer`:** incluye `PRE_A1` (id 0) y `fct_docentes` normaliza sus variantes (`Pre A1`, `PRE-A1`).
-- **`trazabilidad_historica`:** agrega `mcer_salida_2026` y documenta el criterio real: docentes con A2 o superior.
-- **`.env.example`:** plantilla de configuración con marcadores.
-- **Hook `pre-commit`:** segunda barrera que bloquea Excel, CSV y `.env` aunque se fuerce `git add -f`.
-- **Dependencias separadas:** `pytest` y `pre-commit` pasan al grupo `dev`; producción se instala con `uv sync --no-dev`.
-- **Carga y transformación separadas:** `main.py cargar` (por año, con detección de cambios por huella, totales de control y bitácora `raw._registro_cargas`) y `main.py transformar` (`dbt build` desde raw). Reemplaza la ejecución única anterior.
-- **Docker:** `Dockerfile` en dos etapas (sin dependencias de desarrollo, usuario no-root), `.dockerignore` y `docker-compose.yml` con PostgreSQL 17 + volumen y el pipeline como trabajo.
+`main` está protegida: los cambios entran **solo por Pull Request** desde ramas cortas.
+
+1. Crea una rama desde `main` actualizada: `feat/…` (nuevo), `fix/…` (corrección), `docs/…` (documentación) o `chore/…` (mantenimiento).
+2. Haz commits pequeños; el hook `pre-commit` bloquea Excel, CSV y `.env`.
+3. Sube la rama y abre un Pull Request; completa la plantilla.
+4. Fusiona cuando las verificaciones estén en verde y borra la rama.
+
+Las versiones siguen **versionado semántico** (`vMAYOR.MENOR.PARCHE`) y se registran en el [CHANGELOG](CHANGELOG.md).
