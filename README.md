@@ -165,6 +165,21 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
    - **`transformar`** no necesita los Excel: reconstruye todo desde `raw`.
    - **Errores:** los del proyecto se muestran como un mensaje corto (sin datos personales) y el programa termina con código 1.
 
+### 🐳 Ejecutar con Docker (forma recomendada)
+
+Requiere Docker Desktop. La base de datos corre como **servicio** (PostgreSQL 17, igual que producción) con sus datos en el volumen `pgdata`; el pipeline corre como **trabajo** que ejecuta una orden y termina.
+
+```bash
+docker compose up -d db                        # enciende la base (puerto 5433 del Mac)
+docker compose run --rm pipeline cargar        # carga los Excel de data/ (montada en solo lectura)
+docker compose run --rm pipeline transformar   # dbt build: staging -> marts -> public
+docker compose down                            # apaga todo; los datos quedan en el volumen
+```
+
+- La imagen **no contiene** Excel, `.env` ni herramientas de desarrollo, y corre con un usuario sin privilegios.
+- Las credenciales se toman del `.env` local al ejecutar; dentro de Docker la base se llama `db` (puerto 5432).
+- Para conectarte desde el Mac (pgAdmin, DBeaver): host `localhost`, puerto `5433`, con el usuario y la base de tu `.env`.
+
 ---
 
 ## 🧩 Patrones de Ingeniería Aplicados
@@ -187,3 +202,4 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
 - **Hook `pre-commit`:** segunda barrera que bloquea Excel, CSV y `.env` aunque se fuerce `git add -f`.
 - **Dependencias separadas:** `pytest` y `pre-commit` pasan al grupo `dev`; producción se instala con `uv sync --no-dev`.
 - **Carga y transformación separadas:** `main.py cargar` (por año, con detección de cambios por huella, totales de control y bitácora `raw._registro_cargas`) y `main.py transformar` (`dbt build` desde raw). Reemplaza la ejecución única anterior.
+- **Docker:** `Dockerfile` en dos etapas (sin dependencias de desarrollo, usuario no-root), `.dockerignore` y `docker-compose.yml` con PostgreSQL 17 + volumen y el pipeline como trabajo.

@@ -1,0 +1,35 @@
+# Lo que NUNCA entra a la imagen (segunda barrera; el Dockerfile además copia solo carpetas explícitas)
+
+# Datos y secretos
+data/
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+~$*
+.env*
+
+# Entornos y control de versiones
+.git
+.gitignore
+.venv
+.python-version
+**/__pycache__
+*.pyc
+
+# Resultados y archivos locales de dbt
+dbt_project/target/
+dbt_project/logs/
+dbt_project/.user.yml
+**/*.log
+
+# Desarrollo y documentación (no se usan en producción)
+tests/
+docs/
+.claude/
+.pre-commit-config.yaml
+README.md
+LICENSE
+docker-compose.yml
+Dockerfile
+.dockerignore

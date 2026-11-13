@@ -1,0 +1,50 @@
+# Entorno local de desarrollo: base de datos (servicio) + pipeline (trabajo que corre y termina).
+#
+#   docker compose up -d db                        # enciende la base
+#   docker compose run --rm pipeline cargar        # carga los Excel de data/ a raw
+#   docker compose run --rm pipeline transformar   # dbt build: staging -> marts -> public
+#   docker compose down                            # apaga todo (los datos quedan en el volumen)
+#
+# Las credenciales se leen del .env local (DB_USER, DB_PASS, DB_NAME); nunca se copian a la imagen.
+
+name: tracking-ewb-elt
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      # Puerto 5433 del Mac -> 5432 del contenedor. Solo accesible desde este Mac (127.0.0.1).
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline:
+    build: .
+    image: tracking-ewb-elt:local
+    environment:
+      # Dentro de la red de Docker la base se llama "db" y escucha en 5432
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      # Excel en solo lectura: el contenedor puede leerlos, nunca modificarlos
+      - ./data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    # No se enciende con `docker compose up`; solo cuando se llama con `run`
+    profiles: ["pipeline"]
+
+volumes:
+  pgdata:
