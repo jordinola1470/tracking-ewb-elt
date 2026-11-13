@@ -10,6 +10,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+## [0.4.0] - 2026-11-13
+
 ### Agregado
 - CI con GitHub Actions (`.github/workflows/ci.yml`): lint con ruff, pruebas unitarias, `dbt parse` y
   prueba de punta a punta con la imagen Docker, PostgreSQL 17 temporal y Excel ficticios.
@@ -18,6 +20,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Pruebas de datos en dbt: unicidad y no nulos en dimensiones, relación hechos-docentes, años aceptados
   y asistencia en rango 0-1 (aviso).
 - Marcadores de pytest `integracion` y `e2e`; `ruff` en dependencias de desarrollo.
+- Regla `proteger-main` exige las revisiones del CI para fusionar (verificado con una prueba de fuego).
 
 ### Corregido
 - Dos pruebas unitarias desactualizadas respecto al mapeo real (2023 usa `nivel_asignado` y `rt_remoto`;
