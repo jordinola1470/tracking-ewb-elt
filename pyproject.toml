@@ -14,7 +14,6 @@ dependencies = [
     "pathlib>=1.0.1",
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.12.0",
-    "pytest>=9.0.2",
     "python-dotenv>=1.2.1",
     "pyyaml>=6.0.3",
     "sqlalchemy>=2.0.46",
@@ -23,4 +22,10 @@ dependencies = [
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.7.0",
+    "pytest>=9.2.0",
+]
 

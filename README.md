@@ -145,8 +145,9 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
 
 1. **Clona el repositorio y configura `.env`** a partir de la plantilla (el `.env` nunca se sube):
    ```bash
-   cp .env.example .env   # luego reemplaza TU_USUARIO y TU_CONTRASEÑA
-   uv sync
+   cp .env.example .env       # luego reemplaza TU_USUARIO y TU_CONTRASEÑA
+   uv sync                    # instala dependencias del pipeline + herramientas de desarrollo
+   uv run pre-commit install  # activa el revisor que bloquea Excel, CSV y .env antes de cada commit
    ```
 
 2. **Coloca los Excel en `data/`** con los nombres definidos en `config/sources.yaml` (se obtienen por canal interno, no desde el repositorio).
@@ -177,3 +178,5 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
 - **`dim_mcer`:** incluye `PRE_A1` (id 0) y `fct_docentes` normaliza sus variantes (`Pre A1`, `PRE-A1`).
 - **`trazabilidad_historica`:** agrega `mcer_salida_2026` y documenta el criterio real: docentes con A2 o superior.
 - **`.env.example`:** plantilla de configuración con marcadores.
+- **Hook `pre-commit`:** segunda barrera que bloquea Excel, CSV y `.env` aunque se fuerce `git add -f`.
+- **Dependencias separadas:** `pytest` y `pre-commit` pasan al grupo `dev`; producción se instala con `uv sync --no-dev`.

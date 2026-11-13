@@ -1,0 +1,18 @@
+# Revisor automático que se ejecuta ANTES de cada commit.
+# Segunda barrera después de .gitignore: bloquea datos y secretos aunque se fuerce `git add -f`.
+# Instalación (una vez por clon):  uv run pre-commit install
+
+repos:
+  - repo: local
+    hooks:
+      - id: bloquear-archivos-de-datos
+        name: Bloquear Excel y CSV (datos personales)
+        language: fail
+        entry: "Archivo de datos detectado. Los Excel/CSV nunca se suben al repositorio público"
+        files: '\.(xlsx|xlsm|xls|csv)$'
+
+      - id: bloquear-env
+        name: Bloquear archivos .env (credenciales)
+        language: fail
+        entry: "Archivo .env detectado. Las credenciales nunca se suben; usa .env.example con marcadores"
+        files: '(^|/)\.env($|\.(?!example$))'
