@@ -10,6 +10,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Eliminado
+- Dependencias sobrantes: `dotenv` (atajo de `python-dotenv`), `pathlib` (incluido en Python) y `numpy`
+  como dependencia directa (no se usa en el código; llega a través de `pandas`).
+
 ## [0.6.0] - 2026-11-16
 
 ### Corregido
