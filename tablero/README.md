@@ -54,7 +54,7 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 ## Paleta de colores
 
 Mezcla de los dos colores institucionales, **siempre sobre fondo blanco** (sin modo oscuro).
-Color principal azul petróleo `#0C343D` y verde de la barra institucional `#40984C` y viven en `src/app/globals.css`.
+Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las variables viven en `src/app/globals.css`.
 
 | Variable | Color | Uso |
 | :--- | :--- | :--- |
