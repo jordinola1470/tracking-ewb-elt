@@ -1,17 +1,17 @@
 /* Diseño del tablero: variables (colores, tipografía, espacios) y clases de los componentes. */
 /* ── Paleta institucional (ver tablero/README.md → "Paleta de colores") ──────────────
-   Base: morado British Council #200C4C + verde #40984C, siempre sobre fondo blanco. */
+   Base: azul petróleo #0C343D + verde #40984C, siempre sobre fondo blanco. */
 .tablero {
   /* Colores base */
-  --marca-morado: #200C4C; --marca-verde: #40984C; --marca-texto: #141C28;
-  /* Mezclas: tintes con blanco y mezcla morado-verde */
-  --morado-medio: #72618B; --morado-claro: #DEDAE4; --morado-suave: #F4F2F7;
-  --verde-medio: #8CC194; --verde-claro: #D9EBDB; --mezcla: #30524C;
+  --marca-principal: #0C343D; --marca-verde: #40984C; --marca-texto: #141C28;
+  /* Mezclas: tintes con blanco y mezcla principal-verde */
+  --principal-medio: #617B81; --principal-claro: #DBE1E2; --principal-suave: #F3F5F5;
+  --verde-medio: #8CC194; --verde-claro: #D9EBDB; --mezcla: #266644;
 
   /* Uso en la interfaz (fondo siempre blanco) */
-  --color-fg: var(--marca-texto); --color-fg-muted: #5A5670; --color-bg: #ffffff; --color-panel: #ffffff;
-  --color-border-line: var(--morado-claro); --color-ok: var(--marca-verde); --color-warn: #B7791F; --color-bad: #C0392B;
-  --color-acento: var(--marca-morado);
+  --color-fg: var(--marca-texto); --color-fg-muted: #4F6468; --color-bg: #ffffff; --color-panel: #ffffff;
+  --color-border-line: var(--principal-claro); --color-ok: var(--marca-verde); --color-warn: #B7791F; --color-bad: #C0392B;
+  --color-acento: var(--marca-principal);
   --font-anthropic-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-anthropic-serif: Georgia, "Times New Roman", serif;
   --cds-font-size-caption: 12px; --cds-font-size-body: 14px; --cds-font-size-heading: 16px; --cds-font-size-title: 26px;
@@ -21,11 +21,11 @@
   --cds-radius: 8px;
 
   /* Gráficos: orden de uso de los colores */
-  --chart-1: var(--marca-morado); --chart-2: var(--marca-verde); --chart-3: var(--morado-medio);
+  --chart-1: var(--marca-principal); --chart-2: var(--marca-verde); --chart-3: var(--principal-medio);
   --chart-4: var(--verde-medio); --chart-5: var(--mezcla);
-  --cds-chart-muted: var(--morado-claro); --cds-chart-grid: var(--morado-suave); --cds-chart-axis: var(--morado-claro);
-  --cds-chart-reference: #8A85A0; --cds-text-secondary: #5A5670;
-  --cds-surface-popover: #ffffff; --cds-border: var(--morado-claro); --cds-shadow-popover: 0 4px 14px rgba(32, 12, 76, .12);
+  --cds-chart-muted: var(--principal-claro); --cds-chart-grid: var(--principal-suave); --cds-chart-axis: var(--principal-claro);
+  --cds-chart-reference: #7F9498; --cds-text-secondary: #4F6468;
+  --cds-surface-popover: #ffffff; --cds-border: var(--principal-claro); --cds-shadow-popover: 0 4px 14px rgba(12, 52, 61, .12);
 
   max-width: 1280px; margin: 0 auto; padding: 24px; color: var(--color-fg); background: var(--color-bg);
   font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-body); line-height: 1.45;
@@ -68,7 +68,7 @@ html, body { margin: 0; background: #ffffff; color-scheme: light; }
 .mk-table th{text-align:left;color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);border-bottom:1px solid var(--color-border-line);padding:6px;position:sticky;top:0;background:var(--color-panel)}
 .mk-table td{padding:6px;border-bottom:1px solid var(--color-border-line)}
 .mk-table tbody tr{cursor:pointer}
-.mk-table tbody tr.sel{background:var(--morado-suave)}
+.mk-table tbody tr.sel{background:var(--principal-suave)}
 .mk-dl{display:grid;grid-template-columns:auto 1fr;gap:6px var(--cds-gap-md);font-size:var(--cds-font-size-body);margin:var(--cds-gap-md) 0}
 .mk-dl dt{color:var(--color-fg-muted)}
 .mk-dl dd{margin:0;font-variant-numeric:tabular-nums}

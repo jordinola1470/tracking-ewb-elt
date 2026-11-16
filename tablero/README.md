@@ -54,21 +54,21 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 ## Paleta de colores
 
 Mezcla de los dos colores institucionales, **siempre sobre fondo blanco** (sin modo oscuro).
-Los colores se toman de los logos (British Council y barra verde) y viven en `src/app/globals.css`.
+Color principal azul petróleo `#0C343D` y verde de la barra institucional `#40984C` y viven en `src/app/globals.css`.
 
 | Variable | Color | Uso |
 | :--- | :--- | :--- |
-| `--marca-morado` | `#200C4C` | Color principal: títulos, KPIs, pestaña activa, primera serie de los gráficos |
+| `--marca-principal` | `#0C343D` | Color principal: títulos, KPIs, pestaña activa, primera serie de los gráficos |
 | `--marca-verde` | `#40984C` | Color secundario: borde superior de las tarjetas, segunda serie de los gráficos |
 | `--marca-texto` | `#141C28` | Texto general |
-| `--morado-medio` | `#72618B` | Tercera serie de los gráficos (morado con blanco) |
+| `--principal-medio` | `#617B81` | Tercera serie de los gráficos (principal con blanco) |
 | `--verde-medio` | `#8CC194` | Cuarta serie de los gráficos (verde con blanco) |
-| `--mezcla` | `#30524C` | Quinta serie (mitad morado, mitad verde) |
-| `--morado-claro` | `#DEDAE4` | Bordes, ejes y "sin prueba" en barras apiladas |
-| `--morado-suave` | `#F4F2F7` | Líneas de cuadrícula y fila seleccionada |
+| `--mezcla` | `#266644` | Quinta serie (mitad principal, mitad verde) |
+| `--principal-claro` | `#DBE1E2` | Bordes, ejes y "sin prueba" en barras apiladas |
+| `--principal-suave` | `#F3F5F5` | Líneas de cuadrícula y fila seleccionada |
 | `--verde-claro` | `#D9EBDB` | Reservado para fondos suaves de estado "bien" |
 
-Orden de uso en gráficos: `--chart-1` (morado) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
+Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.
 
 ## Desarrollo local
