@@ -18,6 +18,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - CI: job *Tablero (lint y build)*.
 
 ### Corregido
+- Tablero: soporta 100 usuarios simultáneos. Las consultas van una por una por el puerto 6543
+  (transaction pooler); el 5432 solo admite 15 conexiones y en la prueba fallaban 85 de 100.
+  Prueba de carga: 100 de 100 visitas simultáneas correctas (promedio 2,4 s).
 - CD: filas de despliegue separadas por entorno; una aprobación pendiente de prod ya no bloquea staging.
 - Tablero: el puerto 6543 de Supabase (transaction pooler) dejaba la página cargando hasta el límite
   de 300 s de Vercel; se usa el 5432 (session pooler). Además, la lectura de datos tiene un límite

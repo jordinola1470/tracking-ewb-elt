@@ -57,32 +57,32 @@ export async function cargarDatosTablero(): Promise<DatosTablero> {
 async function leerTablas(): Promise<DatosTablero> {
   const sql = db();
 
+  // Las consultas van UNA POR UNA (no con Promise.all): el puerto 6543 de Supabase (transaction pooler)
+  // se cuelga si se envían varias a la vez por la misma conexión. Una por una soporta 100 usuarios simultáneos.
   // Conteos a int y porcentajes a float8 para que lleguen como números (no como texto).
-  const [kpis, niveles, cargos, permanencia, perfiles, historial] = await Promise.all([
-    sql<KpiAnio[]>`
+  const kpis = await sql<KpiAnio[]>`
       select anio_lectivo, participaciones::int, docentes_unicos::int, con_entrada_salida::int,
              con_constancia::int, con_dato_constancia::int, pct_constancia::float8,
              asistencia_promedio::float8, retirados::int
-      from public.tab_kpis_anio order by anio_lectivo`,
-    sql<NivelAnio[]>`
+      from public.tab_kpis_anio order by anio_lectivo`;
+  const niveles = await sql<NivelAnio[]>`
       select anio_lectivo, nivel_formacion, orden_nivel, matriculados::int, con_entrada_salida::int,
              solo_entrada::int, sin_entrada::int, pct_entrada_salida::float8, pct_constancia::float8
-      from public.tab_pruebas_nivel_anio order by anio_lectivo, orden_nivel, nivel_formacion`,
-    sql<CargoAnio[]>`
+      from public.tab_pruebas_nivel_anio order by anio_lectivo, orden_nivel, nivel_formacion`;
+  const cargos = await sql<CargoAnio[]>`
       select anio_lectivo, cargo, participaciones::int, con_dato_constancia::int, pct_constancia::float8
-      from public.tab_constancia_cargo_anio order by anio_lectivo, pct_constancia desc nulls last`,
-    sql<Permanencia[]>`
+      from public.tab_constancia_cargo_anio order by anio_lectivo, pct_constancia desc nulls last`;
+  const permanencia = await sql<Permanencia[]>`
       select permanencia, anios_participados::int, es_continuo, docentes::int
-      from public.tab_permanencia order by anios_participados desc, es_continuo desc`,
-    sql<Perfil[]>`
+      from public.tab_permanencia order by anios_participados desc, es_continuo desc`;
+  const perfiles = await sql<Perfil[]>`
       select docente_id, docente_nombre, genero, cargo, colegio, nivel_formacion_actual, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia_promedio::float8
-      from public.tab_perfiles order by docente_nombre nulls last`,
-    sql<Historial[]>`
+      from public.tab_perfiles order by docente_nombre nulls last`;
+  const historial = await sql<Historial[]>`
       select docente_id, anio_lectivo, grupo, nivel_formacion, orden_nivel, prueba_entrada,
              prueba_salida, constancia, asistencia::float8, es_retirado
-      from public.tab_historial order by docente_id, anio_lectivo`,
-  ]);
+      from public.tab_historial order by docente_id, anio_lectivo`;
 
   const datos: DatosTablero = {
     kpis: [...kpis], niveles: [...niveles], cargos: [...cargos],
