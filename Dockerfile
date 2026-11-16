@@ -24,6 +24,11 @@ RUN uv sync --frozen --no-dev --no-install-project
 # ---------- Etapa 2: imagen final, delgada y sin herramientas de build ----------
 FROM python:3.11-slim
 
+# Vincula la imagen publicada en GHCR con el repositorio
+LABEL org.opencontainers.image.source="https://github.com/jordinola1470/tracking-ewb-elt" \
+      org.opencontainers.image.description="Pipeline ELT tracking-ewb-elt (cargar / transformar). Sin datos ni credenciales." \
+      org.opencontainers.image.licenses="MIT"
+
 # Usuario sin privilegios de administrador
 RUN useradd --create-home --uid 1000 pipeline
 

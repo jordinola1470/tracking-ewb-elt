@@ -10,6 +10,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado
+- Despliegue continuo (`.github/workflows/cd.yml`): tras CI en verde sobre `main` publica una imagen por
+  commit en GHCR, despliega automáticamente en `entorno_staging` (Excel ficticios) y en `entorno_prod`
+  con aprobación, usando la misma imagen; salta `transformar` si `raw` está vacío.
+- Despliegue manual / reversa con *Run workflow* (entorno + etiqueta de imagen).
+- Etiquetas OCI en la imagen que la vinculan al repositorio.
+
 ## [0.5.0] - 2026-11-13
 
 ### Agregado

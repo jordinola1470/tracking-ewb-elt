@@ -1,0 +1,202 @@
+# Despliegue continuo (CD).
+#
+# Automático: cuando el flujo CI termina en verde sobre `main`:
+#   1. Publica UNA imagen en GHCR etiquetada con el commit (7 caracteres).
+#   2. entorno_staging: cargar (Excel FICTICIOS) + transformar.        → automático
+#   3. entorno_prod:    transformar con LA MISMA imagen.               → espera tu aprobación
+#
+# Manual (reversa): Actions → CD → Run workflow → elige entorno y etiqueta de una imagen anterior.
+#
+# Los datos reales NUNCA pasan por aquí: se cargan desde el Mac con `cargar`.
+# Las credenciales vienen de los GitHub Environments (entorno_staging / entorno_prod).
+
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      entorno:
+        description: "Entorno a desplegar"
+        type: choice
+        options: [entorno_staging, entorno_prod]
+        required: true
+      etiqueta:
+        description: "Etiqueta de la imagen (7 caracteres del commit, ej. 53fcdb2)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+# Un despliegue a la vez; nunca se cancela uno en curso
+concurrency:
+  group: cd
+  cancel-in-progress: false
+
+env:
+  IMAGEN: ghcr.io/jordinola1470/tracking-ewb-elt
+
+jobs:
+  # ---------------------------------------------------------------- 1. Imagen
+  publicar-imagen:
+    name: Publicar imagen en GHCR
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      etiqueta: ${{ steps.etiqueta.outputs.valor }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Calcular etiqueta (commit de 7 caracteres)
+        id: etiqueta
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: echo "valor=${HEAD_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Iniciar sesión en GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Construir y publicar la imagen
+        run: |
+          docker build -t "$IMAGEN:${{ steps.etiqueta.outputs.valor }}" .
+          docker push "$IMAGEN:${{ steps.etiqueta.outputs.valor }}"
+          echo "::notice::Imagen publicada: $IMAGEN:${{ steps.etiqueta.outputs.valor }}"
+
+  # ---------------------------------------------------------------- 2. Staging
+  desplegar-staging:
+    name: Desplegar en entorno_staging (datos ficticios)
+    needs: publicar-imagen
+    runs-on: ubuntu-latest
+    environment: entorno_staging
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMG: ghcr.io/jordinola1470/tracking-ewb-elt:${{ needs.publicar-imagen.outputs.etiqueta }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_SSLMODE: ${{ secrets.DB_SSLMODE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Generar Excel ficticios
+        run: |
+          uv sync --frozen
+          uv run python tests/fixtures/generar_excel_ficticios.py "$RUNNER_TEMP/data"
+
+      - name: Descargar la imagen
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMG"
+
+      - name: cargar (Excel ficticios)
+        run: |
+          docker run --rm -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE \
+            -v "$RUNNER_TEMP/data:/app/data:ro" "$IMG" cargar
+
+      - name: transformar
+        run: docker run --rm -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE "$IMG" transformar
+
+  # ---------------------------------------------------------------- 3. Prod
+  desplegar-prod:
+    name: Desplegar en entorno_prod (requiere aprobación)
+    needs: [publicar-imagen, desplegar-staging]
+    runs-on: ubuntu-latest
+    environment: entorno_prod
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMG: ghcr.io/jordinola1470/tracking-ewb-elt:${{ needs.publicar-imagen.outputs.etiqueta }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_SSLMODE: ${{ secrets.DB_SSLMODE }}
+    steps:
+      - name: Descargar la imagen
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMG"
+
+      - name: Revisar si prod ya tiene datos en raw
+        id: datos
+        run: |
+          n=$(docker run --rm -i -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE \
+            --entrypoint python "$IMG" - <<'PY'
+          from sqlalchemy import text
+          from infrastructure.database import get_connection
+          with get_connection() as c:
+              print(c.execute(text("select count(*) from pg_tables where schemaname='raw' and tablename like 'base_docentes_%'")).scalar())
+          PY
+          )
+          echo "tablas_raw=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Saltar (prod aún sin datos)
+        if: steps.datos.outputs.tablas_raw == '0'
+        run: echo "::notice::raw está vacío en prod. Haz la carga inicial desde el Mac (paso 9); no se transforma nada."
+
+      - name: transformar
+        if: steps.datos.outputs.tablas_raw != '0'
+        run: docker run --rm -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE "$IMG" transformar
+
+  # ---------------------------------------------------------------- Reversa / manual
+  desplegar-manual:
+    name: Despliegue manual (${{ inputs.entorno }} ← ${{ inputs.etiqueta }})
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.entorno }}
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMG: ghcr.io/jordinola1470/tracking-ewb-elt:${{ inputs.etiqueta }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_SSLMODE: ${{ secrets.DB_SSLMODE }}
+    steps:
+      - name: Descargar la imagen elegida
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMG"
+
+      - name: Revisar si el entorno tiene datos en raw
+        id: datos
+        run: |
+          n=$(docker run --rm -i -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE \
+            --entrypoint python "$IMG" - <<'PY'
+          from sqlalchemy import text
+          from infrastructure.database import get_connection
+          with get_connection() as c:
+              print(c.execute(text("select count(*) from pg_tables where schemaname='raw' and tablename like 'base_docentes_%'")).scalar())
+          PY
+          )
+          echo "tablas_raw=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Saltar (entorno sin datos)
+        if: steps.datos.outputs.tablas_raw == '0'
+        run: echo "::notice::raw está vacío; no se transforma nada."
+
+      - name: transformar con la imagen elegida
+        if: steps.datos.outputs.tablas_raw != '0'
+        run: docker run --rm -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASS -e DB_NAME -e DB_SSLMODE "$IMG" transformar
