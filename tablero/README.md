@@ -51,6 +51,26 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` | `tab_perfiles` |
 | `per_tabla_historial` | `tab_historial` |
 
+## Paleta de colores
+
+Mezcla de los dos colores institucionales, **siempre sobre fondo blanco** (sin modo oscuro).
+Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las variables viven en `src/app/globals.css`.
+
+| Variable | Color | Uso |
+| :--- | :--- | :--- |
+| `--marca-principal` | `#0C343D` | Color principal: títulos, KPIs, pestaña activa, primera serie de los gráficos |
+| `--marca-verde` | `#40984C` | Color secundario: borde superior de las tarjetas, segunda serie de los gráficos |
+| `--marca-texto` | `#141C28` | Texto general |
+| `--principal-medio` | `#617B81` | Tercera serie de los gráficos (principal con blanco) |
+| `--verde-medio` | `#8CC194` | Cuarta serie de los gráficos (verde con blanco) |
+| `--mezcla` | `#266644` | Quinta serie (mitad principal, mitad verde) |
+| `--principal-claro` | `#DBE1E2` | Bordes, ejes y "sin prueba" en barras apiladas |
+| `--principal-suave` | `#F3F5F5` | Líneas de cuadrícula y fila seleccionada |
+| `--verde-claro` | `#D9EBDB` | Reservado para fondos suaves de estado "bien" |
+
+Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
+Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.
+
 ## Desarrollo local
 
 ```bash
