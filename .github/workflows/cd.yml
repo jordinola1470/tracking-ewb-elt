@@ -32,11 +32,6 @@ on:
 permissions:
   contents: read
 
-# Un despliegue a la vez; nunca se cancela uno en curso
-concurrency:
-  group: cd
-  cancel-in-progress: false
-
 env:
   IMAGEN: ghcr.io/jordinola1470/tracking-ewb-elt
 
@@ -77,6 +72,10 @@ jobs:
     needs: publicar-imagen
     runs-on: ubuntu-latest
     environment: entorno_staging
+    # Fila propia: una aprobación pendiente de prod no bloquea staging
+    concurrency:
+      group: cd-entorno_staging
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: read
@@ -119,6 +118,10 @@ jobs:
     needs: [publicar-imagen, desplegar-staging]
     runs-on: ubuntu-latest
     environment: entorno_prod
+    # Fila propia: si llega un despliegue nuevo mientras otro espera aprobación, queda solo el más reciente
+    concurrency:
+      group: cd-entorno_prod
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: read
@@ -163,6 +166,9 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: ${{ inputs.entorno }}
+    concurrency:
+      group: cd-${{ inputs.entorno }}
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: read

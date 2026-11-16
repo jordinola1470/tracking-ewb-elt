@@ -1,0 +1,15 @@
+{
+  "name": "tablero-docentes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tablero de formación docente en inglés (analítica + perfiles). Versión inicial: mock con datos ficticios.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "datos": "cd data && python3 ../scripts/generar_datos_base.py && python3 ../scripts/agregar_campos.py",
+    "capturas": "python3 scripts/capturas.py"
+  },
+  "dependencies": {
+    "d3": "7.9.0"
+  }
+}
