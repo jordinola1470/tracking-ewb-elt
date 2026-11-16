@@ -28,4 +28,9 @@ models:
       schema: public
       # RLS + lectura solo para el rol ewb_tablero (no hace nada si el rol no existe)
       +post-hook: "{{ permitir_lectura_tablero() }}"
+    # Tablas que consume el tablero (una por grupo de componentes), construidas sobre consolidado_historico
+    tablero:
+      materialized: table
+      schema: public
+      +post-hook: "{{ permitir_lectura_tablero() }}"
     

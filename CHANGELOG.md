@@ -10,6 +10,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado
+- Modelos dbt del tablero en `models/tablero/` (esquema `public`, prefijo `tab_`) construidos sobre
+  `consolidado_historico`: `tab_kpis_anio`, `tab_pruebas_nivel_anio`, `tab_constancia_cargo_anio`,
+  `tab_permanencia`, `tab_perfiles` y `tab_historial` (+ intermedio `int_permanencia_docente`).
+  Cada modelo indica los componentes del tablero que alimenta.
+- Macros `reglas_tablero.sql`: constancia, retirado, prueba presentada y orden de la escala de
+  nivel de formación (`nivel_estandar`), en un solo lugar.
+- Pruebas: llaves únicas, relación historial→perfiles y coherencia entre tablas; la prueba de punta
+  a punta verifica también las tablas del tablero.
+
 ## [0.7.0] - 2026-11-16
 
 ### Agregado
