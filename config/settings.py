@@ -10,7 +10,9 @@ class Settings(BaseSettings):
         env_file = ".env",
         env_file_encoding = "utf-8",
         case_sensitive = False,
-        extra = "ignore"
+        extra = "ignore",
+        # Quita espacios y saltos de línea sobrantes (ej. un Enter pegado en un secreto de GitHub)
+        str_strip_whitespace = True
     )
 
     # --- 1. Configuracipn de la Fuente (Archivos / API) ---

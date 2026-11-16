@@ -4,11 +4,12 @@ tracking_ewb_ia:
     dev:
       type: postgres
       threads: 4
-      host: "{{ env_var('DB_HOST') }}"
-      port: "{{ env_var('DB_PORT') | as_number }}"
-      user: "{{ env_var('DB_USER') }}"
-      password: "{{ env_var('DB_PASS') }}"
-      dbname: "{{ env_var('DB_NAME') }}"
+      # `| trim` quita espacios y saltos de línea sobrantes (ej. un Enter pegado en un secreto de GitHub)
+      host: "{{ env_var('DB_HOST') | trim }}"
+      port: "{{ env_var('DB_PORT') | trim | as_number }}"
+      user: "{{ env_var('DB_USER') | trim }}"
+      password: "{{ env_var('DB_PASS') | trim }}"
+      dbname: "{{ env_var('DB_NAME') | trim }}"
       # 'prefer' en local/Docker; 'require' en Supabase
-      sslmode: "{{ env_var('DB_SSLMODE', 'prefer') }}"
+      sslmode: "{{ env_var('DB_SSLMODE', 'prefer') | trim }}"
       schema: public

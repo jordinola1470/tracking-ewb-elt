@@ -10,7 +10,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+## [0.6.0] - 2026-11-16
+
+### Corregido
+- La configuración (Python y perfil de dbt) quita espacios y saltos de línea sobrantes de las
+  variables `DB_*`: un secreto de GitHub pegado con un Enter de más rompía la conexión en el CD.
+
 ### Agregado
+- Prueba unitaria de limpieza de la configuración.
 - Despliegue continuo (`.github/workflows/cd.yml`): tras CI en verde sobre `main` publica una imagen por
   commit en GHCR, despliega automáticamente en `entorno_staging` (Excel ficticios) y en `entorno_prod`
   con aprobación, usando la misma imagen; salta `transformar` si `raw` está vacío.
