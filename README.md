@@ -36,6 +36,18 @@ Este repositorio fomenta la **Medallion Architecture**, garantizando niveles gra
   - Tablas finales listas para consumo (tablero y analítica), materializadas por **dbt** en el esquema `public`:
     - `trazabilidad_historica` (MCER de salida por año, 2023-2026, de cada docente que alcanzó el nivel A2 o uno superior).
     - **`consolidado_historico`** (una sola tabla con el *append* `UNION ALL` de las bases 2023, 2024, 2025 y 2026, construida desde `staging`, sin deduplicar).
+  - **Tablas del tablero** (`models/tablero/`, prefijo `tab_`), construidas sobre `consolidado_historico`. El tablero solo filtra y dibuja; todos los cálculos están aquí:
+
+    | Tabla | Grano | Componentes del tablero |
+    | :--- | :--- | :--- |
+    | `tab_kpis_anio` | Año | `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio` |
+    | `tab_pruebas_nivel_anio` | Año × nivel de formación | `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` |
+    | `tab_constancia_cargo_anio` | Año × cargo | `ana_graf_constancia_cargo` |
+    | `tab_permanencia` | Grupo de permanencia | `ana_graf_permanencia` |
+    | `tab_perfiles` | Docente | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` |
+    | `tab_historial` | Docente × año | `per_tabla_historial` |
+
+    **Nivel de formación** = `nivel_estandar` (nivel del grupo asignado cada año). Las reglas de lectura (constancia, retirado, prueba presentada y orden de niveles) están en un solo lugar: `macros/reglas_tablero.sql`.
 
 ### 📋 Tabla `public.consolidado_historico`
 

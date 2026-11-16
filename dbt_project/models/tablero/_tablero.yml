@@ -1,0 +1,48 @@
+version: 2
+
+# Tablas que consume el tablero. Cada modelo indica en su encabezado qué componentes alimenta.
+# Si una prueba falla, dbt reporta solo la CANTIDAD de filas con problema, nunca sus valores.
+
+models:
+  - name: tab_kpis_anio
+    description: "Indicadores por año (ana_filtro_anio, ana_texto_resumen, ana_kpi_*, ana_graf_constancia_anio)."
+    columns:
+      - name: anio_lectivo
+        data_tests: [unique, not_null]
+
+  - name: tab_pruebas_nivel_anio
+    description: "Pruebas y constancia por año y nivel de formación (ana_graf_pruebas_nivel, ana_graf_constancia_nivel, ana_graf_nivel_formacion)."
+    columns:
+      - name: anio_lectivo
+        data_tests: [not_null]
+      - name: nivel_formacion
+        data_tests: [not_null]
+
+  - name: tab_constancia_cargo_anio
+    description: "% con constancia por año y cargo (ana_graf_constancia_cargo)."
+    columns:
+      - name: anio_lectivo
+        data_tests: [not_null]
+
+  - name: tab_permanencia
+    description: "Docentes por grupo de permanencia, todos los años (ana_graf_permanencia)."
+    columns:
+      - name: permanencia
+        data_tests: [unique, not_null]
+
+  - name: tab_perfiles
+    description: "Una fila por docente (per_buscador, per_tabla_docentes, per_ficha_docente)."
+    columns:
+      - name: docente_id
+        data_tests: [unique, not_null]
+
+  - name: tab_historial
+    description: "Una fila por participación del docente (per_tabla_historial)."
+    columns:
+      - name: docente_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('tab_perfiles')
+                field: docente_id

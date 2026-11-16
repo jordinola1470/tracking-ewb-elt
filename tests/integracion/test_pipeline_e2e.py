@@ -52,6 +52,26 @@ def test_trazabilidad_historica(db_conn):
     assert _contar(db_conn, "select count(*) from public.trazabilidad_historica") == TRAZABILIDAD_ESPERADA
 
 
+def test_tablero_kpis_y_niveles(db_conn):
+    # Una fila por año, y en cada año la suma por nivel cuadra con las participaciones
+    assert _contar(db_conn, "select count(*) from public.tab_kpis_anio") == 4
+    assert _contar(db_conn, "select min(participaciones) from public.tab_kpis_anio") == FILAS_POR_ANIO
+    assert _contar(
+        db_conn,
+        "select count(*) from (select anio_lectivo from public.tab_pruebas_nivel_anio "
+        "group by anio_lectivo having sum(matriculados) = %d) t" % FILAS_POR_ANIO,
+    ) == 4
+
+
+def test_tablero_perfiles_y_permanencia(db_conn):
+    # Los 5 docentes ficticios participan los 4 años seguidos
+    assert _contar(db_conn, "select count(*) from public.tab_perfiles") == FILAS_POR_ANIO
+    assert _contar(
+        db_conn, "select docentes from public.tab_permanencia where permanencia = '4 años seguidos'"
+    ) == FILAS_POR_ANIO
+    assert _contar(db_conn, "select count(*) from public.tab_historial") == TOTAL_FILAS
+
+
 def test_pre_a1_se_normaliza(db_conn):
     # 'Pre A1' de los Excel debe mapearse al id 0 de dim_mcer
     assert _contar(db_conn, "select count(*) from marts.fct_docentes where mcer_salida_id = 0") > 0
