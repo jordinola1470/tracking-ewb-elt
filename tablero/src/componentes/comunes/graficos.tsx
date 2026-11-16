@@ -140,7 +140,7 @@ export function Torta<T>(props: { filas: T[]; categoria: (d: T) => string; valor
     const arcos = d3.pie<T>().sort(null).value(valor)(filas);
     const arco = d3.arc<d3.PieArcDatum<T>>().innerRadius(0).outerRadius(R - 2);
     svg.selectAll("path").data(arcos).join("path").attr("d", arco).style("fill", (_d, i) => colores[i % colores.length])
-      .style("stroke", "var(--color-panel)").style("stroke-width", 2)
+      .style("stroke", "var(--color-panel)").style("stroke-width", 3)
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d.data)}: ${entero(valor(d.data))} (${pct(valor(d.data) / tot)})`)).on("pointerleave", tip.ocultar);
     const centro = d3.arc<d3.PieArcDatum<T>>().innerRadius(R * 0.55).outerRadius(R * 0.55);
     svg.selectAll("text").data(arcos.filter((d) => d.endAngle - d.startAngle > 0.35)).join("text")

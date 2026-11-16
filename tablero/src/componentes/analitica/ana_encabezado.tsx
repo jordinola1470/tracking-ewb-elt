@@ -12,7 +12,7 @@ export function AnaFiltroAnio({ anios, valor, cambiar }: { anios: number[]; valo
           {anios.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
       </label>
-      <span>Los indicadores y gráficos marcados “del año” usan este filtro.</span>
+      <span>Todo lo de esta sección usa este filtro.</span>
     </div>
   );
 }

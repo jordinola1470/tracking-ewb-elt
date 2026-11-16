@@ -38,7 +38,6 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       <div className="mk-head">
         <div>
           <h1>Formación docente en inglés</h1>
-          <AnaTextoResumen kpi={kpi} />
         </div>
         <form action={salir} className="mk-user">
           <span>{usuario}</span>
@@ -55,18 +54,30 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       </div>
 
       {pestana === "analitica" && (
-        <section>
-          <AnaFiltroAnio anios={anios} valor={anio} cambiar={setAnio} />
-          <AnaKpis kpi={kpi} />
-          <div className="mk-grid">
-            <AnaGrafPruebasNivel niveles={nivelesAnio} />
-            <AnaGrafConstanciaAnio kpis={datos.kpis} />
-            <AnaGrafPermanencia permanencia={datos.permanencia} />
-            <AnaGrafConstanciaNivel niveles={nivelesAnio} />
-            <AnaGrafConstanciaCargo cargos={cargosAnio} />
-            <AnaGrafNivelFormacion niveles={nivelesAnio} />
-          </div>
-        </section>
+        <>
+          {/* 1. Histórico: no usa filtros (todos los años) */}
+          <section className="mk-seccion" data-seccion="historico">
+            <h2 className="mk-seccion-titulo">Histórico · todos los años</h2>
+            <div className="mk-grid">
+              <AnaGrafConstanciaAnio kpis={datos.kpis} />
+              <AnaGrafPermanencia permanencia={datos.permanencia} />
+            </div>
+          </section>
+
+          {/* 2. Por año: todo lo de esta sección responde al filtro */}
+          <section className="mk-seccion" data-seccion="por_anio">
+            <h2 className="mk-seccion-titulo">Por año</h2>
+            <AnaFiltroAnio anios={anios} valor={anio} cambiar={setAnio} />
+            <AnaTextoResumen kpi={kpi} />
+            <AnaKpis kpi={kpi} />
+            <div className="mk-grid">
+              <AnaGrafPruebasNivel niveles={nivelesAnio} />
+              <AnaGrafConstanciaNivel niveles={nivelesAnio} />
+              <AnaGrafConstanciaCargo cargos={cargosAnio} />
+              <AnaGrafNivelFormacion niveles={nivelesAnio} />
+            </div>
+          </section>
+        </>
       )}
 
       {pestana === "perfiles" && (

@@ -53,7 +53,7 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 
 ## Paleta de colores
 
-Mezcla de los dos colores institucionales, **siempre sobre fondo blanco** (sin modo oscuro).
+Mezcla de los dos colores institucionales sobre **fondo gris claro** con **tarjetas blancas** (sin modo oscuro).
 Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las variables viven en `src/app/globals.css`.
 
 | Variable | Color | Uso |
@@ -67,9 +67,18 @@ Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las va
 | `--principal-claro` | `#DBE1E2` | Bordes, ejes y "sin prueba" en barras apiladas |
 | `--principal-suave` | `#F3F5F5` | Líneas de cuadrícula y fila seleccionada |
 | `--verde-claro` | `#D9EBDB` | Reservado para fondos suaves de estado "bien" |
+| `--color-fondo` | `#EEF1F2` | Fondo gris claro de la página (las tarjetas son blancas `#FFFFFF`) |
 
 Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.
+
+**Reglas de estilo**
+- **Título:** siempre en MAYÚSCULAS, **Arial Bold** (también los títulos de sección).
+- **Bordes:** todos de **3 px** (variable `--borde`); las esquinas redondeadas usan `--cds-radius`.
+
+**Orden de la vista Analítica**
+1. **Histórico · todos los años** (arriba, no usa filtros): `ana_graf_constancia_anio`, `ana_graf_permanencia`.
+2. **Por año** (abajo, todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_nivel_formacion`.
 
 ## Desarrollo local
 
