@@ -19,6 +19,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ### Corregido
 - CD: filas de despliegue separadas por entorno; una aprobación pendiente de prod ya no bloquea staging.
+- Tablero: el puerto 6543 de Supabase (transaction pooler) dejaba la página cargando hasta el límite
+  de 300 s de Vercel; se usa el 5432 (session pooler). Además, la lectura de datos tiene un límite
+  propio de 20 s y muestra "No se pudieron cargar los datos" en vez de cargar sin fin.
 - Tablero: `.gitignore` ignoraba `tablero/src/lib` (regla `lib/` de Python).
 - Tablero: la página quedaba cargando en Vercel; ahora espera la visita real (`await connection()`)
   antes de leer la sesión, como exige Next.js 16.

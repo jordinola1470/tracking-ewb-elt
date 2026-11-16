@@ -1,7 +1,7 @@
 // Lectura de las tablas finales del tablero (dbt: models/tablero/, prefijo tab_).
 // El tablero NO calcula: aquí solo se leen filas ya calculadas por dbt.
 import "server-only";
-import { db } from "./db";
+import { db, reiniciarDb } from "./db";
 
 export type KpiAnio = {
   anio_lectivo: number; participaciones: number; docentes_unicos: number; con_entrada_salida: number;
@@ -35,8 +35,26 @@ export type DatosTablero = {
 const DURACION_MS = 10 * 60 * 1000;
 let cache: { cuando: number; datos: DatosTablero } | null = null;
 
+// Límite propio: si la base no responde a tiempo, se corta con un error claro (no "cargando" eterno).
+const LIMITE_MS = 20 * 1000;
+
 export async function cargarDatosTablero(): Promise<DatosTablero> {
   if (cache && Date.now() - cache.cuando < DURACION_MS) return cache.datos;
+  let temporizador: ReturnType<typeof setTimeout> | undefined;
+  const limite = new Promise<never>((_, rechazar) => {
+    temporizador = setTimeout(() => rechazar(new Error(`La base de datos no respondió en ${LIMITE_MS / 1000} s`)), LIMITE_MS);
+  });
+  try {
+    return await Promise.race([leerTablas(), limite]);
+  } catch (error) {
+    reiniciarDb();
+    throw error;
+  } finally {
+    clearTimeout(temporizador);
+  }
+}
+
+async function leerTablas(): Promise<DatosTablero> {
   const sql = db();
 
   // Conteos a int y porcentajes a float8 para que lleguen como números (no como texto).

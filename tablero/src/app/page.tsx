@@ -11,9 +11,23 @@ export default async function Inicio() {
   const sesion = await obtenerSesion();
   if (!sesion) redirect("/login");
 
-  const datos = await cargarDatosTablero();
-
   const salir = async () => { "use server"; await signOut({ redirectTo: "/login" }); };
+
+  let datos;
+  try {
+    datos = await cargarDatosTablero();
+  } catch (error) {
+    // El detalle va al registro del servidor (Vercel → Logs); al usuario, un mensaje simple.
+    console.error("[tablero] error al cargar datos:", error);
+    return (
+      <main className="tablero">
+        <div className="mk-card" data-componente="error_datos">
+          <h2>No se pudieron cargar los datos</h2>
+          <p className="mk-note">Intenta de nuevo en unos minutos. Si continúa, revisa Vercel → Logs.</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="tablero">
