@@ -215,6 +215,20 @@ docker run --rm --env-file .env.entorno_staging -v <carpeta_excel>:/app/data:ro 
 docker run --rm --env-file .env.entorno_staging tracking-ewb-elt:local transformar
 ```
 
+## 🚀 Despliegue (CD)
+
+El flujo [CD](.github/workflows/cd.yml) se activa cuando **CI termina en verde sobre `main`**:
+
+1. Publica **una** imagen en GHCR: `ghcr.io/jordinola1470/tracking-ewb-elt:<commit de 7 caracteres>`.
+2. **`entorno_staging`** (automático): `cargar` con Excel **ficticios** + `transformar`.
+3. **`entorno_prod`** (espera aprobación en GitHub): `transformar` con **la misma imagen**. Si `raw` está vacío, lo salta con un aviso.
+
+**Cambios de datos vs. cambios de código**
+- **Datos** (Excel corregidos o nuevos): no pasan por CD. Desde el Mac: `cargar` y luego `transformar` contra `entorno_prod`.
+- **Código** (YAML, SQL de dbt, Python, Dockerfile): rama → PR → CI → CD (staging → prod con aprobación).
+
+**Reversa (volver a una versión anterior):** *Actions → CD → Run workflow*, elige el entorno y la etiqueta de una imagen anterior. El robot ejecuta `transformar` con esa imagen; `raw` no se modifica.
+
 ## 🧪 Pruebas y CI
 
 Cada Pull Request y cada cambio en `main` ejecuta el flujo [CI](.github/workflows/ci.yml) en GitHub Actions, **solo con datos ficticios**:
