@@ -35,6 +35,8 @@ tablero/
 | La lista, ficha o historial de **Perfiles** | `src/componentes/perfiles/per_componentes.tsx` |
 | Cómo se dibuja un tipo de gráfico (barras, torta) | `src/componentes/comunes/graficos.tsx` |
 | Colores, tipografía o espacios | `src/app/globals.css` |
+| Barra vertical, título superior, botones de arriba a la derecha | `src/componentes/Tablero.tsx` (estilos en `globals.css`, clases `mk-lateral`, `mk-cabecera`, `mk-acciones`) |
+| Ancho de la barra vertical | `globals.css`, regla `.mk-app` (`grid-template-columns`) |
 | Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
 | **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |
 
@@ -53,32 +55,39 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 
 ## Paleta de colores
 
-Mezcla de los dos colores institucionales sobre **fondo gris claro** con **tarjetas blancas** (sin modo oscuro).
+Mezcla de los dos colores institucionales sobre **fondo gris** con **paneles blancos** (sin modo oscuro).
 Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las variables viven en `src/app/globals.css`.
 
 | Variable | Color | Uso |
 | :--- | :--- | :--- |
 | `--marca-principal` | `#0C343D` | Color principal: títulos, KPIs, pestaña activa, primera serie de los gráficos |
-| `--marca-verde` | `#40984C` | Color secundario: borde superior de las tarjetas, segunda serie de los gráficos |
+| `--marca-verde` | `#40984C` | Color secundario: subcategoría activa, acentos, segunda serie de los gráficos |
 | `--marca-texto` | `#141C28` | Texto general |
 | `--principal-medio` | `#617B81` | Tercera serie de los gráficos (principal con blanco) |
 | `--verde-medio` | `#8CC194` | Cuarta serie de los gráficos (verde con blanco) |
 | `--mezcla` | `#266644` | Quinta serie (mitad principal, mitad verde) |
-| `--principal-claro` | `#DBE1E2` | Bordes, ejes y "sin prueba" en barras apiladas |
-| `--principal-suave` | `#F3F5F5` | Líneas de cuadrícula y fila seleccionada |
-| `--verde-claro` | `#D9EBDB` | Reservado para fondos suaves de estado "bien" |
-| `--color-fondo` | `#EEF1F2` | Fondo gris claro de la página (las tarjetas son blancas `#FFFFFF`) |
+| `--principal-claro` | `#DBE1E2` | Bordes, ejes y fondo del rayado "sin prueba" |
+| `--principal-suave` | `#F3F5F5` | Tarjetas dentro de los paneles, filas alternas de las tablas |
+| `--verde-claro` | `#D9EBDB` | Fila elegida, estado "Sí" y píldoras de permanencia |
+| `--color-fondo` | `#D5DCDE` | Fondo gris de la página (más oscuro para dar contraste a los paneles blancos) |
 
 Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.
 
 **Reglas de estilo**
 - **Título:** siempre en MAYÚSCULAS, **Arial Bold** (también los títulos de sección).
-- **Bordes:** todos de **3 px** (variable `--borde`); las esquinas redondeadas usan `--cds-radius`.
+- **Bordes:** de **1 px** (variable `--borde`); esquinas redondeadas y píldoras (`--radio-pildora`).
+- **Sombras (efecto 3D):** paneles, etiquetas, botones y píldoras usan `--sombra` / `--sombra-suave`.
+- **Rayado con contraste:** lo "sin dato" (sin prueba, sin constancia) va rayado oscuro sobre claro del mismo color.
+
+**Distribución de la página**
+- **Arriba:** contenedor del título (franja oscura en degradado) con botones buscar/avisos/información y el perfil del usuario.
+- **Izquierda:** barra vertical a la altura de la ventana: EwB, navegación (Analítica, Perfiles), usuario con botón salir y el sello "Desarrollado por TeseoDev · Medellín ©".
+- **Derecha:** la hoja elegida; es lo único que se desplaza. En Analítica, arriba van el resumen del año y Histórico / Por año.
 
 **Orden de la vista Analítica**
-1. **Histórico · todos los años** (arriba, no usa filtros): `ana_graf_constancia_anio`, `ana_graf_permanencia`.
-2. **Por año** (abajo, todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_nivel_formacion`.
+1. **Histórico · todos los años** (no usa filtros): `ana_graf_constancia_anio` (barras verticales apiladas con %), `ana_graf_permanencia`.
+2. **Por año** (todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_nivel_formacion`.
 
 ## Desarrollo local
 
