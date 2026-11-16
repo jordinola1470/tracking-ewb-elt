@@ -12,6 +12,8 @@ select
     count(*) filter (where {{ tiene_entrada() }} and {{ tiene_salida() }})      as con_entrada_salida,
     sum({{ tiene_constancia() }})                                               as con_constancia,
     count({{ tiene_constancia() }})                                             as con_dato_constancia,
+    -- Sin constancia = tienen el dato y es "No" (para la barra apilada de constancia por año)
+    count({{ tiene_constancia() }}) - coalesce(sum({{ tiene_constancia() }}), 0) as sin_constancia,
     -- % sobre quienes tienen el dato de constancia (vacío si el año aún no lo trae)
     round(avg({{ tiene_constancia() }})::numeric, 4)                            as pct_constancia,
     -- Asistencia promedio sin contar retirados (escala 0-1)

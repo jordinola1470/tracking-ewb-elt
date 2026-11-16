@@ -5,15 +5,12 @@ import { entero, pct } from "../comunes/graficos";
 
 export function AnaFiltroAnio({ anios, valor, cambiar }: { anios: number[]; valor: number; cambiar: (a: number) => void }) {
   return (
-    <div className="mk-filters" data-componente="ana_filtro_anio">
-      <label>
-        Año lectivo{" "}
-        <select className="dash-select" aria-label="Año lectivo" value={valor} onChange={(e) => cambiar(Number(e.target.value))}>
-          {anios.map((a) => <option key={a} value={a}>{a}</option>)}
-        </select>
-      </label>
-      <span>Todo lo de esta sección usa este filtro.</span>
-    </div>
+    <label className="mk-filtro" data-componente="ana_filtro_anio">
+      <span>Año lectivo</span>
+      <select className="dash-select" aria-label="Año lectivo" value={valor} onChange={(e) => cambiar(Number(e.target.value))}>
+        {anios.map((a) => <option key={a} value={a}>{a}</option>)}
+      </select>
+    </label>
   );
 }
 

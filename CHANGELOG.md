@@ -12,10 +12,22 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ### Cambiado (diseño del tablero)
 - Paleta institucional: principal azul petróleo `#0C343D` + verde `#40984C`, con mezclas; documentada en
-  `tablero/README.md`. Fondo de página gris claro `#EEF1F2` y tarjetas blancas; sin modo oscuro.
-- Todos los bordes de 3 px (variable `--borde`).
-- Título y títulos de sección en MAYÚSCULAS, Arial Bold.
-- Vista Analítica reordenada: **Histórico** (sin filtro) arriba y **Por año** (con filtro) abajo.
+  `tablero/README.md`. Fondo de página gris `#D5DCDE` y paneles blancos; sin modo oscuro.
+- Bordes de 1 px (variable `--borde`), sombras de efecto 3D y rayado con contraste para lo "sin dato".
+- Título en MAYÚSCULAS, Arial Bold, en un contenedor superior aparte (franja oscura en degradado) con
+  botones buscar / avisos / información y el perfil del usuario.
+- Barra vertical a la izquierda a la altura de la ventana (EwB, Analítica, Perfiles, salir y sello
+  "Desarrollado por TeseoDev · Medellín ©"); solo se desplaza la hoja de la derecha.
+- Analítica con subcategorías **Histórico** y **Por año**; "Constancia, año por año" en barras verticales
+  apiladas (con / sin constancia) y % arriba.
+- Perfiles con plantilla: tabla con encabezado de color y filas alternas; ficha con encabezado, secciones
+  y datos en casillas. Etiquetas "Último nivel de formación" y "Asistencia".
+
+### Cambiado (dbt)
+- `tab_kpis_anio`: nueva columna `sin_constancia` (para la barra apilada).
+- `tab_perfiles`: `nivel_formacion_actual` → `ultimo_nivel_formacion` (año más reciente en que participó
+  sin retirarse) y `asistencia_promedio` → `asistencia` (de esa misma participación, sin promedio).
+- Datos ficticios de prueba: la constancia varía por año para que se vean ambos casos.
 
 ### Agregado
 - Tablero en `tablero/`: Next.js 16 + Auth.js (Google y Microsoft) para Vercel, con los 17 componentes

@@ -1,5 +1,6 @@
 "use client";
-// Tablero completo: pestañas Analítica y Perfiles. Solo filtra filas ya calculadas por dbt y dibuja.
+// Tablero completo: pestañas Analítica (subcategorías Histórico y Por año) y Perfiles.
+// Solo filtra filas ya calculadas por dbt y dibuja.
 import { useMemo, useState } from "react";
 import type { DatosTablero } from "@/lib/datos";
 import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
@@ -11,10 +12,12 @@ import {
 import { PerBuscador, PerFichaDocente, PerTablaDocentes } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles";
+type VistaAnalitica = "historico" | "por_anio";
 
 export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero; usuario: string; salir: () => Promise<void> }) {
   const anios = useMemo(() => datos.kpis.map((k) => k.anio_lectivo), [datos.kpis]);
   const [pestana, setPestana] = useState<Pestana>("analitica");
+  const [vista, setVista] = useState<VistaAnalitica>("historico");
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
   const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
@@ -35,53 +38,116 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
 
   return (
     <div className="mk">
+      {/* Contenedor superior, aparte: solo el título y el perfil del usuario.
+          Debajo empiezan, a la misma altura, el botón EwB y la hoja elegida */}
+      <header className="mk-cabecera mk-bloque">
       <div className="mk-head">
-        <div>
-          <h1>Formación docente en inglés</h1>
-        </div>
-        <form action={salir} className="mk-user">
-          <span>{usuario}</span>
-          <button className="mk-btn" type="submit">Cerrar sesión</button>
-        </form>
-      </div>
-
-      <div className="mk-tabs" role="tablist">
-        {(["analitica", "perfiles"] as Pestana[]).map((p) => (
-          <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
-            {p === "analitica" ? "Analítica" : "Perfiles de docentes"}
+        <h1>English Without Borders</h1>
+        {/* Menú secundario arriba a la derecha: perfil del usuario (sin cerrar sesión) */}
+        <div className="mk-acciones">
+        {/* Botones de acción (modelo de la referencia): buscar · avisos · información */}
+        <div className="mk-iconos" data-componente="acciones_superiores">
+          <button type="button" className="mk-icono-sup" title="Buscar docente" aria-label="Buscar docente" onClick={() => setPestana("perfiles")}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
           </button>
-        ))}
+          <button type="button" className="mk-icono-sup" title="Avisos (próximamente)" aria-label="Avisos">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+            <span className="mk-punto" aria-hidden />
+          </button>
+          <button type="button" className="mk-icono-sup" title="Información (próximamente)" aria-label="Información">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+          </button>
+        </div>
+        <div className="mk-perfil-usuario" data-componente="perfil_usuario">
+          <span className="mk-avatar" aria-hidden>{(usuario || "?").charAt(0).toUpperCase()}</span>
+          <span className="mk-user-txt">
+            <b title={usuario}>{(usuario || "").split("@")[0]}</b>
+            <small title={usuario}>{usuario}</small>
+          </span>
+          {/* Flecha: aquí se abrirá el menú secundario del perfil */}
+          <svg className="mk-flecha" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
+        </div>
+        </div>
       </div>
+      </header>
 
+      <div className="mk-app">
+      {/* Barra lateral vertical: marca · navegación · usuario abajo */}
+      <aside className="mk-lateral">
+        <div className="mk-marca mk-bloque"><span className="mk-logo" aria-hidden>EwB</span></div>
+        <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
+          {(["analitica", "perfiles"] as Pestana[]).map((p) => (
+            <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
+              {p === "analitica" ? (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="9" cy="8" r="4" /><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a6 6 0 0 0-4-5.6" /></svg>
+              )}
+              <span>{p === "analitica" ? "Analítica" : "Perfiles"}</span>
+            </button>
+          ))}
+        </nav>
+        {/* Abajo: solo el círculo del usuario y el botón de salir */}
+        <form action={salir} className="mk-user mk-bloque mk-user-mini">
+          <span className="mk-avatar" aria-hidden title={usuario}>{(usuario || "?").charAt(0).toUpperCase()}</span>
+          <button className="mk-icono-btn" type="submit" title="Cerrar sesión" aria-label="Cerrar sesión">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" />
+            </svg>
+          </button>
+        </form>
+        {/* Sello al pie de la barra vertical */}
+        <small className="mk-sello">Desarrollado por TeseoDev · Medellín ©</small>
+      </aside>
+
+      <div className="mk-contenido">
       {pestana === "analitica" && (
         <>
-          {/* 1. Histórico: no usa filtros (todos los años) */}
-          <section className="mk-seccion" data-seccion="historico">
-            <h2 className="mk-seccion-titulo">Histórico · todos los años</h2>
-            <div className="mk-grid">
-              <AnaGrafConstanciaAnio kpis={datos.kpis} />
-              <AnaGrafPermanencia permanencia={datos.permanencia} />
-            </div>
-          </section>
-
-          {/* 2. Por año: todo lo de esta sección responde al filtro */}
-          <section className="mk-seccion" data-seccion="por_anio">
-            <h2 className="mk-seccion-titulo">Por año</h2>
-            <AnaFiltroAnio anios={anios} valor={anio} cambiar={setAnio} />
+          {/* Arriba de la hoja Analítica: resumen del año y subcategorías Histórico / Por año */}
+          <div className="mk-hoja-cab mk-bloque">
             <AnaTextoResumen kpi={kpi} />
-            <AnaKpis kpi={kpi} />
-            <div className="mk-grid">
-              <AnaGrafPruebasNivel niveles={nivelesAnio} />
-              <AnaGrafConstanciaNivel niveles={nivelesAnio} />
-              <AnaGrafConstanciaCargo cargos={cargosAnio} />
-              <AnaGrafNivelFormacion niveles={nivelesAnio} />
+            <div className="mk-subbarra">
+              <nav className="mk-subtabs" role="tablist" aria-label="Vista de analítica">
+                {(["historico", "por_anio"] as VistaAnalitica[]).map((v) => (
+                  <button key={v} className="mk-subtab" role="tab" aria-selected={vista === v} onClick={() => setVista(v)}>
+                    {v === "historico" ? "Histórico" : "Por año"}
+                  </button>
+                ))}
+              </nav>
+              {vista === "por_anio" && <AnaFiltroAnio anios={anios} valor={anio} cambiar={setAnio} />}
             </div>
-          </section>
+          </div>
+          {vista === "historico" && (
+            <section className="mk-panel" data-seccion="historico">
+              <div className="mk-grid">
+                <AnaGrafConstanciaAnio kpis={datos.kpis} />
+                <AnaGrafPermanencia permanencia={datos.permanencia} />
+              </div>
+            </section>
+          )}
+
+          {vista === "por_anio" && (
+            <>
+              <section className="mk-panel" data-seccion="por_anio_kpis">
+                <AnaKpis kpi={kpi} />
+              </section>
+              <section className="mk-panel" data-seccion="por_anio_pruebas">
+                <AnaGrafPruebasNivel niveles={nivelesAnio} />
+              </section>
+              <section className="mk-panel" data-seccion="por_anio_graficos">
+                <div className="mk-grid mk-grid-3">
+                  <AnaGrafConstanciaNivel niveles={nivelesAnio} />
+                  <AnaGrafConstanciaCargo cargos={cargosAnio} />
+                  <AnaGrafNivelFormacion niveles={nivelesAnio} />
+                </div>
+              </section>
+            </>
+          )}
         </>
       )}
 
       {pestana === "perfiles" && (
-        <section>
+        <section className="mk-panel">
           <div className="mk-perf">
             <div className="mk-card">
               <h2>Docentes</h2>
@@ -96,6 +162,8 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
           </div>
         </section>
       )}
+      </div>
+      </div>
     </div>
   );
 }

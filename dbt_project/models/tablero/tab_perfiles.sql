@@ -31,8 +31,13 @@ ultimo as (
         (array_agg(genero         order by anio_lectivo desc) filter (where genero is not null))[1]         as genero,
         (array_agg(cargo_estandar order by anio_lectivo desc) filter (where cargo_estandar is not null))[1] as cargo,
         (array_agg(colegio_nombre order by anio_lectivo desc) filter (where colegio_nombre is not null))[1] as colegio,
-        (array_agg(nivel_estandar order by anio_lectivo desc) filter (where nivel_estandar is not null))[1] as nivel_formacion_actual,
-        round(avg(asistencia_porcentaje_fix)::numeric, 4)                                                  as asistencia_promedio
+        -- Último nivel de formación: el del año más reciente en que participó SIN retirarse
+        -- (si se retiró en 2026 y participó en 2025, queda el nivel de 2025)
+        (array_agg(nivel_estandar order by anio_lectivo desc)
+            filter (where nivel_estandar is not null and not {{ es_retirado() }}))[1]                      as ultimo_nivel_formacion,
+        -- Asistencia de esa misma participación (no es un promedio)
+        (array_agg(asistencia_porcentaje_fix order by anio_lectivo desc)
+            filter (where nivel_estandar is not null and not {{ es_retirado() }}))[1]                      as asistencia
     from base
     group by docente_id
 )
@@ -43,12 +48,12 @@ select
     u.genero,
     u.cargo,
     u.colegio,
-    u.nivel_formacion_actual,
+    u.ultimo_nivel_formacion,
     r.anios,
     r.niveles_por_anio,
     p.permanencia,
     p.es_continuo,
-    u.asistencia_promedio
+    u.asistencia
 from ultimo u
 join resumen r using (docente_id)
 join {{ ref('int_permanencia_docente') }} p using (docente_id)

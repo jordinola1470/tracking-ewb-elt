@@ -61,7 +61,7 @@ def base_2023() -> pd.DataFrame:
             "CURSO-NIVEL": "Fundamentals - A1", "GRUPO EWB": f"G23-{d['n']}", "REMOTE": "No",
             "ENGLISH SCORE ENTRADA 2023": 40 + idx, "NIVEL MCER ENTRADA 2023": MCER_ENTRADA[idx],
             "ENGLISH SCORE SALIDA 2023": 50 + idx, "NIVEL MCER SALIDA 2023": MCER_SALIDA[2023][idx],
-            "% DE ASISTENCIA": 0.9, "RECIBE CONSTANCIA": "Si",
+            "% DE ASISTENCIA": 0.9, "RECIBE CONSTANCIA": "Si" if idx < 3 else "No",
         })
     return pd.DataFrame(filas)
 
@@ -78,7 +78,7 @@ def base_2024() -> pd.DataFrame:
             "JORNADA": "Mañana", "NIVEL DICTA": "Secundaria", "GRUPO": f"G24-{d['n']}", "NIVEL": "Progress - A2",
             "ENGLISH SCORE ENTRADA 2024": 45 + idx, "NIVEL MCER ENTRADA 2024": "A1",
             "ENGLISH SCORE SALIDA 2024": 55 + idx, "NIVEL MCER SALIDA 2024": MCER_SALIDA[2024][idx],
-            "% DE PARTICIPACION EWB 2024": "95.00%", "RECIBE CONSTANCIA": "Si",
+            "% DE PARTICIPACION EWB 2024": "95.00%", "RECIBE CONSTANCIA": "Si" if idx < 2 else "No",
         })
     return pd.DataFrame(filas)
 
@@ -97,7 +97,7 @@ def base_2025() -> pd.DataFrame:
             "GRUPO": f"G25-{d['n']}", "NIVEL": "Connections B - B1",
             "ENGLISH SCORE ENTRADA 2025": 50 + idx, "NIVEL MCER ENTRADA 2025": "A2",
             "ENGLISH SCORE SALIDA 2025": 60 + idx, "NIVEL MCER SALIDA 2025": MCER_SALIDA[2025][idx],
-            "PORCENTAJE FINAL": 0.85, "RECIBE CONSTANCIA": "Si",
+            "PORCENTAJE FINAL": 0.85, "RECIBE CONSTANCIA": "Si" if idx < 4 else "No",
         })
     return pd.DataFrame(filas)
 

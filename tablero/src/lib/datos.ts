@@ -5,7 +5,7 @@ import { db, reiniciarDb } from "./db";
 
 export type KpiAnio = {
   anio_lectivo: number; participaciones: number; docentes_unicos: number; con_entrada_salida: number;
-  con_constancia: number | null; con_dato_constancia: number; pct_constancia: number | null;
+  con_constancia: number | null; con_dato_constancia: number; sin_constancia: number; pct_constancia: number | null;
   asistencia_promedio: number | null; retirados: number;
 };
 export type NivelAnio = {
@@ -19,8 +19,8 @@ export type CargoAnio = {
 export type Permanencia = { permanencia: string; anios_participados: number; es_continuo: boolean; docentes: number };
 export type Perfil = {
   docente_id: string; docente_nombre: string | null; genero: string | null; cargo: string | null; colegio: string | null;
-  nivel_formacion_actual: string | null; anios: string; niveles_por_anio: string; permanencia: string;
-  es_continuo: boolean; asistencia_promedio: number | null;
+  ultimo_nivel_formacion: string | null; anios: string; niveles_por_anio: string; permanencia: string;
+  es_continuo: boolean; asistencia: number | null;
 };
 export type Historial = {
   docente_id: string; anio_lectivo: number; grupo: string | null; nivel_formacion: string; orden_nivel: number;
@@ -62,7 +62,7 @@ async function leerTablas(): Promise<DatosTablero> {
   // Conteos a int y porcentajes a float8 para que lleguen como números (no como texto).
   const kpis = await sql<KpiAnio[]>`
       select anio_lectivo, participaciones::int, docentes_unicos::int, con_entrada_salida::int,
-             con_constancia::int, con_dato_constancia::int, pct_constancia::float8,
+             con_constancia::int, con_dato_constancia::int, sin_constancia::int, pct_constancia::float8,
              asistencia_promedio::float8, retirados::int
       from public.tab_kpis_anio order by anio_lectivo`;
   const niveles = await sql<NivelAnio[]>`
@@ -76,8 +76,8 @@ async function leerTablas(): Promise<DatosTablero> {
       select permanencia, anios_participados::int, es_continuo, docentes::int
       from public.tab_permanencia order by anios_participados desc, es_continuo desc`;
   const perfiles = await sql<Perfil[]>`
-      select docente_id, docente_nombre, genero, cargo, colegio, nivel_formacion_actual, anios,
-             niveles_por_anio, permanencia, es_continuo, asistencia_promedio::float8
+      select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, anios,
+             niveles_por_anio, permanencia, es_continuo, asistencia::float8
       from public.tab_perfiles order by docente_nombre nulls last`;
   const historial = await sql<Historial[]>`
       select docente_id, anio_lectivo, grupo, nivel_formacion, orden_nivel, prueba_entrada,
