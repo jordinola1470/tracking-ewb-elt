@@ -10,6 +10,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Cambiado (diseño del tablero)
+- Paleta institucional: principal azul petróleo `#0C343D` + verde `#40984C`, con mezclas; documentada en
+  `tablero/README.md`. Fondo de página gris claro `#EEF1F2` y tarjetas blancas; sin modo oscuro.
+- Todos los bordes de 3 px (variable `--borde`).
+- Título y títulos de sección en MAYÚSCULAS, Arial Bold.
+- Vista Analítica reordenada: **Histórico** (sin filtro) arriba y **Por año** (con filtro) abajo.
+
 ### Agregado
 - Tablero en `tablero/`: Next.js 16 + Auth.js (Google y Microsoft) para Vercel, con los 17 componentes
   del inventario (`ana_*`, `per_*`) leyendo las tablas `tab_*` con el rol de solo lectura `ewb_tablero`.
