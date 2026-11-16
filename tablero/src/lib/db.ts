@@ -21,7 +21,8 @@ export function db(): postgres.Sql {
       password: leer("TABLERO_DB_PASS"),
       database: leer("TABLERO_DB_NAME"),
       ssl: (process.env.TABLERO_DB_SSLMODE?.trim() || "require") === "disable" ? false : "require",
-      // Puerto 5432 (session pooler de Supabase). El 6543 (transaction pooler) se colgaba con esta librería.
+      // Puerto 6543 (transaction pooler de Supabase): admite muchos usuarios a la vez (el 5432 solo 15).
+      // Requiere prepare:false y consultas una por una (ver datos.ts).
       prepare: false,
       max: 1,
       idle_timeout: 20,
