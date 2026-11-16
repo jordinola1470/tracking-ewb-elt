@@ -81,12 +81,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-fname{font-family:var(--font-anthropic-sans);font-size:22px;font-weight:700;color:var(--color-acento)}
 .mk-pill{display:inline-block;padding:4px 10px;font-weight:600;border-radius:999px;border:var(--borde) solid var(--color-border-line);font-size:var(--cds-font-size-caption)}
 
-/* Página de inicio de sesión */
-.login{min-height:100vh;display:grid;place-items:center}
-.login-card{max-width:400px;width:100%;text-align:center;padding:32px}
-.login-card h1{font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--color-acento);font-size:var(--cds-font-size-title);margin:0 0 var(--cds-gap-sm)}
-.login-btn{display:block;width:100%;margin-top:var(--cds-gap-md);padding:10px 14px;font:inherit;font-weight:var(--cds-font-weight-medium);border:var(--borde) solid var(--color-border-line);border-radius:var(--radio-pildora);background:var(--color-bg);color:var(--color-fg);cursor:pointer}
-.login-btn:hover{border-color:var(--marca-principal)}
+/* Página de inicio de sesión: ver el bloque al final del archivo */
 
 /* Secciones de la vista Analítica: Histórico (sin filtro) arriba, Por año (con filtro) abajo */
 .mk-seccion{margin-bottom:var(--cds-gap-xl)}
@@ -343,3 +338,23 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 /* Histórico: 4 gráficos en cuadrícula de 2 x 2; filtros de Perfiles en una fila */
 @media (min-width:1100px){.mk-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+
+/* ── Página de inicio de sesión (mismo estilo del tablero) ─────────────────────────
+   Izquierda: franja oscura en degradado con la marca. Derecha: tarjeta blanca con
+   botones de Google y Microsoft (logos oficiales), sombras 3D. */
+.login{min-height:100vh;box-sizing:border-box;display:grid;place-items:center;padding:20px}
+.login-marco{width:100%;max-width:960px;display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch}
+.login-marca{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:44px 40px;border-radius:28px;color:#fff;background:linear-gradient(120deg,var(--marca-principal) 0%,#145160 60%,var(--mezcla) 100%);box-shadow:0 2px 0 rgba(0,0,0,.12),0 10px 24px rgba(12,52,61,.28)}
+.login-marca::after{content:"";position:absolute;right:-80px;bottom:-110px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(64,152,76,.5),rgba(64,152,76,0) 70%);pointer-events:none}
+.login-logo{align-self:flex-start;display:inline-grid;place-items:center;padding:10px 22px;border-radius:var(--radio-pildora);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-weight:800;letter-spacing:.04em}
+.login-marca h1{position:relative;z-index:1;margin:0;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:34px;line-height:1.1;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;gap:14px}
+.login-marca h1::before{content:"";flex:none;width:6px;border-radius:3px;background:var(--marca-verde);box-shadow:0 0 0 3px rgba(64,152,76,.25)}
+.login-marca p{position:relative;z-index:1;margin:0;max-width:380px;color:rgba(255,255,255,.82);font-size:15px}
+.login-card{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:40px 36px;border-radius:28px;background:var(--color-panel);box-shadow:var(--sombra-suave);text-align:left;max-width:none}
+.login-card h2{margin:0;font-size:24px;font-weight:700;color:var(--marca-principal)}
+.login-card .mk-note{margin:4px 0 14px;font-size:14px}
+.login-card form{margin:0}
+.login-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-top:10px;padding:13px 18px;font:inherit;font-weight:600;font-size:15px;border:var(--borde) solid var(--color-border-line);border-radius:var(--radio-pildora);background:var(--color-panel);color:var(--color-fg);cursor:pointer;box-shadow:var(--sombra);transition:transform .12s ease,border-color .15s ease,box-shadow .15s ease}
+.login-btn:hover{transform:translateY(-1px);border-color:var(--marca-principal);box-shadow:0 2px 0 rgba(0,0,0,.08),0 8px 18px rgba(12,52,61,.18)}
+.login-sello{margin-top:22px}
+@media (max-width:760px){.login-marco{grid-template-columns:1fr}.login-marca{padding:32px 26px}.login-marca h1{font-size:26px}}
