@@ -10,6 +10,12 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado
+- `scripts/cargar_prod.sh`: carga a producción los Excel que cambiaron y transforma, con confirmación
+  (`SI`) y usando la imagen de GHCR del último commit de `main`.
+- Flujo `mantener_activo.yml`: consulta semanal de solo lectura (viernes 6:00 a. m. Colombia) con
+  `ewb_tablero` para que Supabase no pause los proyectos gratuitos.
+
 ## [0.6.0] - 2026-11-16
 
 ### Corregido

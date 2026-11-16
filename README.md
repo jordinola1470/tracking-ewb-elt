@@ -229,6 +229,28 @@ El flujo [CD](.github/workflows/cd.yml) se activa cuando **CI termina en verde s
 
 **Reversa (volver a una versión anterior):** *Actions → CD → Run workflow*, elige el entorno y la etiqueta de una imagen anterior. El robot ejecuta `transformar` con esa imagen; `raw` no se modifica.
 
+## 🛠️ Operación
+
+**Actualizar datos en producción** (Excel corregidos o nuevos en `data/`):
+
+```bash
+scripts/cargar_prod.sh                      # carga solo los años cuyo Excel cambió y transforma
+scripts/cargar_prod.sh --anio 2026          # solo ese año
+scripts/cargar_prod.sh --anio 2026 --forzar # recarga aunque no haya cambiado
+```
+
+El script pide escribir `SI` para confirmar y usa la imagen de GHCR del último commit de `main`
+(el mismo código que ya pasó CI y staging). Requiere Docker encendido y `.env.entorno_prod`.
+
+**Mantener Supabase activo:** el flujo [Mantener Supabase activo](.github/workflows/mantener_activo.yml)
+corre cada **viernes a las 6:00 a. m. (Colombia)** y hace una consulta mínima de solo lectura con
+`ewb_tablero` en staging y prod (el plan gratuito pausa los proyectos tras 1 semana sin actividad).
+Usa los secretos de repositorio `TABLERO_STAGING_USER/PASS` y `TABLERO_PROD_USER/PASS`.
+En repositorios públicos GitHub desactiva los flujos programados tras 60 días sin actividad en el
+repositorio: si llega el aviso, se reactiva en *Actions → Mantener Supabase activo → Enable workflow*.
+
+**Alertas:** GitHub envía un correo cuando falla cualquier flujo (CI, CD o el latido semanal).
+
 ## 🧪 Pruebas y CI
 
 Cada Pull Request y cada cambio en `main` ejecuta el flujo [CI](.github/workflows/ci.yml) en GitHub Actions, **solo con datos ficticios**:
