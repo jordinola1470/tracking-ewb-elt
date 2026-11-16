@@ -11,6 +11,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 ## [Sin publicar]
 
 ### Agregado
+- Tablero en `tablero/`: Next.js 16 + Auth.js (Google y Microsoft) para Vercel, con los 17 componentes
+  del inventario (`ana_*`, `per_*`) leyendo las tablas `tab_*` con el rol de solo lectura `ewb_tablero`.
+  El mock original queda en `tablero/mock/` como referencia de diseño.
+- CI: job *Tablero (lint y build)*.
+
+### Corregido
+- CD: filas de despliegue separadas por entorno; una aprobación pendiente de prod ya no bloquea staging.
+
+### Agregado (dbt)
 - Modelos dbt del tablero en `models/tablero/` (esquema `public`, prefijo `tab_`) construidos sobre
   `consolidado_historico`: `tab_kpis_anio`, `tab_pruebas_nivel_anio`, `tab_constancia_cargo_anio`,
   `tab_permanencia`, `tab_perfiles` y `tab_historial` (+ intermedio `int_permanencia_docente`).

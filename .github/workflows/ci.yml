@@ -44,6 +44,32 @@ jobs:
       - name: Validar modelos dbt (dbt parse)
         run: uv run dbt parse --project-dir dbt_project --profiles-dir dbt_project
 
+  tablero:
+    name: Tablero (lint y build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tablero
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tablero/package-lock.json
+
+      - name: Instalar dependencias (exactas de package-lock.json)
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npx eslint .
+
+      - name: Compilar (next build)
+        env:
+          AUTH_SECRET: solo_para_compilar_en_ci_no_es_real_0000000000
+        run: npm run build
+
   e2e:
     name: Prueba de punta a punta (Docker + datos ficticios)
     runs-on: ubuntu-latest

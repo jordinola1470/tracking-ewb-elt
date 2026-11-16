@@ -241,6 +241,12 @@ El flujo [CD](.github/workflows/cd.yml) se activa cuando **CI termina en verde s
 
 **Reversa (volver a una versión anterior):** *Actions → CD → Run workflow*, elige el entorno y la etiqueta de una imagen anterior. El robot ejecuta `transformar` con esa imagen; `raw` no se modifica.
 
+## 📊 Tablero
+
+Aplicación **Next.js** en [`tablero/`](tablero/README.md), con inicio de sesión de **Google (Gmail)** y **Microsoft (Outlook)**
+mediante Auth.js, publicada en **Vercel**. Lee las tablas `tab_*` de `public` con el rol de solo lectura `ewb_tablero`;
+no hace cálculos. El CI revisa en cada PR que compile (job *Tablero (lint y build)*).
+
 ## 🛠️ Operación
 
 **Actualizar datos en producción** (Excel corregidos o nuevos en `data/`):
