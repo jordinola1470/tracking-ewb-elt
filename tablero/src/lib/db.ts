@@ -21,11 +21,21 @@ export function db(): postgres.Sql {
       password: leer("TABLERO_DB_PASS"),
       database: leer("TABLERO_DB_NAME"),
       ssl: (process.env.TABLERO_DB_SSLMODE?.trim() || "require") === "disable" ? false : "require",
-      // Compatible con el "transaction pooler" de Supabase (recomendado para funciones serverless)
+      // Puerto 5432 (session pooler de Supabase). El 6543 (transaction pooler) se colgaba con esta librería.
       prepare: false,
       max: 1,
       idle_timeout: 20,
+      // Nunca esperar sin fin: si la base no responde, error claro en vez de "cargando" eterno
+      connect_timeout: 10,
+      connection: { statement_timeout: 15000 },
     });
   }
   return cliente;
+}
+
+/** Descarta la conexión actual (por ejemplo, tras un límite de tiempo) para que el siguiente intento empiece de cero. */
+export function reiniciarDb(): void {
+  const anterior = cliente;
+  cliente = null;
+  anterior?.end({ timeout: 0 }).catch(() => {});
 }
