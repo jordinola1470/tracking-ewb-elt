@@ -1,5 +1,5 @@
 "use client";
-// Gráficos d3 reutilizables, adaptados del mock (tablero/mock/src/dashboard.html). Solo dibujan: no calculan.
+// Gráficos d3 reutilizables. Solo dibujan: no calculan.
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 

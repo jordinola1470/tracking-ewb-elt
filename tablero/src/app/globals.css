@@ -1,4 +1,4 @@
-/* Diseño del tablero: tokens y clases tomados tal cual del mock (tablero/mock/src). */
+/* Diseño del tablero: variables (colores, tipografía, espacios) y clases de los componentes. */
 .tablero {
   --color-fg: #1d2330; --color-fg-muted: #5d6676; --color-bg: #ffffff; --color-panel: #f6f7f9;
   --color-border-line: #dfe3ea; --color-ok: #2e7d4f; --color-warn: #b7791f; --color-bad: #c0392b;

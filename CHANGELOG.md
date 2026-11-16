@@ -13,11 +13,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 ### Agregado
 - Tablero en `tablero/`: Next.js 16 + Auth.js (Google y Microsoft) para Vercel, con los 17 componentes
   del inventario (`ana_*`, `per_*`) leyendo las tablas `tab_*` con el rol de solo lectura `ewb_tablero`.
-  El mock original queda en `tablero/mock/` como referencia de diseño.
+  El diseño del mock se trasladó a `src/`; la carpeta del mock se eliminó por no usarse.
+- Guía "Cómo editar" en `tablero/README.md` (qué archivo cambiar para cada cosa).
 - CI: job *Tablero (lint y build)*.
 
 ### Corregido
 - CD: filas de despliegue separadas por entorno; una aprobación pendiente de prod ya no bloquea staging.
+- Tablero: `.gitignore` ignoraba `tablero/src/lib` (regla `lib/` de Python).
+- Tablero: la página quedaba cargando en Vercel; ahora espera la visita real (`await connection()`)
+  antes de leer la sesión, como exige Next.js 16.
 
 ### Agregado (dbt)
 - Modelos dbt del tablero en `models/tablero/` (esquema `public`, prefijo `tab_`) construidos sobre

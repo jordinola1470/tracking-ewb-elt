@@ -14,7 +14,7 @@ tablero/
 │   │   ├── page.tsx                    Página principal: sin sesión → /login; con sesión → datos + tablero
 │   │   ├── login/page.tsx              Botones "Iniciar sesión con Google / Microsoft"
 │   │   ├── api/auth/[...nextauth]/     Rutas internas del login
-│   │   └── globals.css                 Diseño (tokens y clases del mock)
+│   │   └── globals.css                 Diseño: variables de color/tipografía y clases
 │   ├── lib/
 │   │   ├── db.ts                       Conexión de solo lectura (servidor)
 │   │   └── datos.ts                    Lectura de las tablas tab_* (servidor)
@@ -23,8 +23,20 @@ tablero/
 │       ├── analitica/                  Componentes ana_*
 │       ├── perfiles/                   Componentes per_*
 │       └── comunes/graficos.tsx        Gráficos d3 reutilizables
-└── mock/                               Mock original (referencia de diseño; no se publica)
+├── .env.example                        Plantilla de variables (sin valores reales)
+└── package.json                        Dependencias y comandos (dev, build)
 ```
+
+## Cómo editar
+
+| Quiero cambiar… | Archivo |
+| :--- | :--- |
+| Un indicador, gráfico o tabla de **Analítica** | `src/componentes/analitica/` (busca el nombre `ana_*`) |
+| La lista, ficha o historial de **Perfiles** | `src/componentes/perfiles/per_componentes.tsx` |
+| Cómo se dibuja un tipo de gráfico (barras, torta) | `src/componentes/comunes/graficos.tsx` |
+| Colores, tipografía o espacios | `src/app/globals.css` |
+| Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
+| **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |
 
 ## Componentes y su fuente
 
