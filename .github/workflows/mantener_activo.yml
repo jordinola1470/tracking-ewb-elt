@@ -1,0 +1,45 @@
+# Mantiene activos los proyectos gratuitos de Supabase (se pausan tras 1 semana sin actividad).
+# Cada viernes a las 6:00 a. m. hora de Colombia hace una consulta mínima de SOLO LECTURA
+# con el rol ewb_tablero (no puede modificar nada). No lee datos de docentes: solo cuenta tablas.
+#
+# Secretos del repositorio (Settings → Secrets and variables → Actions):
+#   TABLERO_STAGING_USER, TABLERO_STAGING_PASS, TABLERO_PROD_USER, TABLERO_PROD_PASS
+
+name: Mantener Supabase activo
+
+on:
+  schedule:
+    - cron: "0 11 * * 5"   # viernes 11:00 UTC = 6:00 a. m. Colombia (UTC-5)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  latido:
+    name: Latido ${{ matrix.proyecto }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - proyecto: ewb-entorno-staging
+            secreto_usuario: TABLERO_STAGING_USER
+            secreto_clave: TABLERO_STAGING_PASS
+          - proyecto: ewb-entorno-prod
+            secreto_usuario: TABLERO_PROD_USER
+            secreto_clave: TABLERO_PROD_PASS
+    steps:
+      - name: Consulta mínima de solo lectura
+        env:
+          PGHOST: aws-0-sa-east-1.pooler.supabase.com
+          PGPORT: "5432"
+          PGDATABASE: postgres
+          PGSSLMODE: require
+          PGUSER: ${{ secrets[matrix.secreto_usuario] }}
+          PGPASSWORD: ${{ secrets[matrix.secreto_clave] }}
+        run: |
+          n=$(docker run --rm -e PGHOST -e PGPORT -e PGDATABASE -e PGSSLMODE -e PGUSER -e PGPASSWORD \
+            postgres:17 psql -v ON_ERROR_STOP=1 -tAc \
+            "select count(*) from information_schema.tables where table_schema = 'public'")
+          echo "::notice::${{ matrix.proyecto }} activo (tablas visibles en public: $n)"
