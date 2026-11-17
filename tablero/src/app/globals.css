@@ -409,3 +409,15 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-filtros-perfil{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px 14px}
 /* Máximo 2 columnas (2 x 2); si no caben, 1 columna */
 .mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(max(190px,calc(50% - 7px)),1fr))}
+
+/* Reporte (próximamente) */
+.mk-reporte-vacio{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:320px;text-align:center}
+.mk-reporte-vacio h2{margin:6px 0 0;font-size:20px;color:var(--marca-principal)}
+.mk-reporte-icono{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--principal-suave);color:var(--marca-principal);box-shadow:var(--sombra)}
+
+/* Indicadores por año: animación sutil al pasar el mouse */
+.mk-kpi-tono{transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.mk-kpi-tono .mk-kpi-icono{transition:transform .18s ease,background .18s ease}
+.mk-kpi-tono:hover{transform:translateY(-3px);box-shadow:0 4px 0 rgba(0,0,0,.08),0 12px 24px rgba(12,52,61,.28);filter:saturate(1.08)}
+.mk-kpi-tono:hover .mk-kpi-icono{transform:scale(1.08) rotate(-4deg);background:rgba(255,255,255,.28)}
+@media (prefers-reduced-motion:reduce){.mk-kpi-tono,.mk-kpi-tono .mk-kpi-icono{transition:none}.mk-kpi-tono:hover,.mk-kpi-tono:hover .mk-kpi-icono{transform:none}}

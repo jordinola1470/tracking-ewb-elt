@@ -65,8 +65,10 @@ export function BarrasHorizontales<T>(props: {
   formato: (v: number) => string; max?: number; alto?: number; etiqueta: string; color?: string;
   /** Opcional: color o rayado propio para cada barra */
   estilo?: (d: T) => { color?: string; rayado?: Rayado };
+  /** Opcional: texto a la derecha de la barra (por defecto, el valor con `formato`) */
+  etiquetaValor?: (d: T) => string;
 }) {
-  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0], estilo } = props;
+  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0], estilo, etiquetaValor } = props;
   const id = limpiarId(useId());
   const ref = useDibujo((el) => {
     const datos = filas.filter((d) => valor(d) != null);
@@ -78,7 +80,7 @@ export function BarrasHorizontales<T>(props: {
     const tip = crearTooltip(el);
     const med = svg.append("g"); datos.forEach((d) => med.append("text").attr("font-size", 12).text(categoria(d)));
     const lw = d3.max(med.selectAll<SVGTextElement, unknown>("text").nodes(), (n) => n.getComputedTextLength()) || 60; med.remove();
-    const L = lw + 14, R = 52;
+    const L = lw + 14, R = etiquetaValor ? 92 : 52;
     const y = d3.scaleBand(datos.map(categoria), [4, H - 4]).paddingInner(0.35);
     const x = d3.scaleLinear([0, max ?? (d3.max(datos, (d) => valor(d) as number) || 1)], [L, W - R]);
     svg.append("g").selectAll("text").data(datos).join("text").attr("x", L - 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
@@ -89,8 +91,8 @@ export function BarrasHorizontales<T>(props: {
       .attr("width", (d) => Math.max(RADIO, x(valor(d) as number) - L)).attr("rx", RADIO).style("fill", (d, i) => relleno(d, i))
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d)}: ${formato(valor(d) as number)}`)).on("pointerleave", tip.ocultar);
     svg.selectAll("text.v").data(datos).join("text").attr("x", W - R + 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
-      .attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700).style("fill", "var(--color-fg)").text((d) => formato(valor(d) as number));
-  }, [filas, max, alto, color, estilo]);
+      .attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700).style("fill", "var(--color-fg)").text((d) => (etiquetaValor ? etiquetaValor(d) : formato(valor(d) as number)));
+  }, [filas, max, alto, color, estilo, etiquetaValor]);
   return <div className="mk-chart" ref={ref} />;
 }
 

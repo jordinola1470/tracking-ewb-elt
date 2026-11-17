@@ -29,9 +29,10 @@ export type Historial = {
 };
 export type Totales = { ied_total: number; docentes_total: number; participaciones_total: number };
 export type CargoDocentes = { cargo: string; docentes: number };
+export type NivelUltimo = { nivel: string; orden_nivel: number; docentes: number; pct_docentes: number };
 export type DatosTablero = {
   kpis: KpiAnio[]; niveles: NivelAnio[]; cargos: CargoAnio[]; permanencia: Permanencia[];
-  perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[];
+  perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[]; nivelUltimo: NivelUltimo[];
 };
 
 // Los datos cambian pocas veces al año: se guardan en memoria 10 minutos por servidor.
@@ -83,6 +84,8 @@ async function leerTablas(): Promise<DatosTablero> {
       select ied_total::int, docentes_total::int, participaciones_total::int from public.tab_totales`;
   const cargoDocentes = await sql<CargoDocentes[]>`
       select cargo, docentes::int from public.tab_cargo_docentes order by docentes desc, cargo`;
+  const nivelUltimo = await sql<NivelUltimo[]>`
+      select nivel, orden_nivel::int, docentes::int, pct_docentes::float8 from public.tab_nivel_ultimo order by orden_nivel, nivel`;
   const perfiles = await sql<Perfil[]>`
       select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia::float8
@@ -95,7 +98,7 @@ async function leerTablas(): Promise<DatosTablero> {
   const datos: DatosTablero = {
     kpis: [...kpis], niveles: [...niveles], cargos: [...cargos],
     permanencia: [...permanencia], perfiles: [...perfiles], historial: [...historial],
-    totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes],
+    totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes], nivelUltimo: [...nivelUltimo],
   };
   cache = { cuando: Date.now(), datos };
   return datos;

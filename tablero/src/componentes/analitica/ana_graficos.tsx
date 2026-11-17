@@ -1,6 +1,6 @@
 "use client";
 // Componentes de gráficos de la vista Analítica. Cada uno indica su fuente (tabla dbt).
-import type { CargoAnio, CargoDocentes, KpiAnio, NivelAnio, Permanencia, Totales } from "@/lib/datos";
+import type { CargoAnio, CargoDocentes, KpiAnio, NivelAnio, NivelUltimo, Permanencia, Totales } from "@/lib/datos";
 import { BarrasHorizontales, BarrasVerticales, BarrasVerticalesApiladas, COLORES, COLORES_SERIE, Dona, RAYADO_PRINCIPAL, RAYADO_VERDE, entero, pct } from "../comunes/graficos";
 
 function Tarjeta({ nombre, titulo, nota, ancho, children }: { nombre: string; titulo: string; nota: React.ReactNode; ancho?: boolean; children: React.ReactNode }) {
@@ -132,6 +132,23 @@ export function AnaGrafCargoDocentes({ cargos }: { cargos: CargoDocentes[] }) {
       <div className="mk-total-grande"><b>{entero(total)}</b><span>docentes</span></div>
       <BarrasHorizontales filas={cargos} categoria={(d) => d.cargo} valor={(d) => d.docentes} formato={entero} color={COLORES[1]}
         etiqueta="Docentes por cargo (último cargo registrado)" />
+    </Tarjeta>
+  );
+}
+
+/** Estilo: niveles en color principal; "Sin nivel registrado" rayado */
+const ESTILO_NIVEL_ULTIMO = (d: NivelUltimo) => (d.orden_nivel >= 98 ? { rayado: RAYADO_PRINCIPAL } : { color: COLORES[0] });
+const ETIQUETA_NIVEL_ULTIMO = (d: NivelUltimo) => `${entero(d.docentes)} · ${pct(d.pct_docentes)}`;
+
+/** ana_graf_nivel_ultimo · fuente: tab_nivel_ultimo (último nivel cursado de cada docente, corte actual) */
+export function AnaGrafNivelUltimo({ niveles }: { niveles: NivelUltimo[] }) {
+  const total = niveles.reduce((s, d) => s + d.docentes, 0);
+  return (
+    <Tarjeta nombre="ana_graf_nivel_ultimo" ancho titulo="Nivel actual de los docentes"
+      nota="Toda la población, cada docente con su último nivel cursado (sin contar años en que se retiró). A la derecha, cantidad y % del total.">
+      <div className="mk-total-grande"><b>{entero(total)}</b><span>docentes en total</span></div>
+      <BarrasHorizontales filas={niveles} categoria={(d) => d.nivel} valor={(d) => d.docentes} formato={entero}
+        estilo={ESTILO_NIVEL_ULTIMO} etiquetaValor={ETIQUETA_NIVEL_ULTIMO} etiqueta="Docentes según su último nivel cursado" />
     </Tarjeta>
   );
 }

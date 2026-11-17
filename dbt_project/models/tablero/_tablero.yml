@@ -36,6 +36,12 @@ models:
       - name: cargo
         data_tests: [unique, not_null]
 
+  - name: tab_nivel_ultimo
+    description: "Docentes de toda la población según su último nivel cursado, con % sobre el total (ana_graf_nivel_ultimo)."
+    columns:
+      - name: nivel
+        data_tests: [unique, not_null]
+
   - name: tab_permanencia
     description: "Docentes por grupo de permanencia, todos los años (ana_graf_permanencia)."
     columns:

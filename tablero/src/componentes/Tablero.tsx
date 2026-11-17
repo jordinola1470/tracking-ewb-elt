@@ -7,11 +7,11 @@ import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
 import { AnaKpis } from "./analitica/ana_kpis";
 import {
   AnaGrafConstanciaAnio, AnaGrafConstanciaCargo, AnaGrafConstanciaNivel,
-  AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
+  AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafNivelUltimo, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
 } from "./analitica/ana_graficos";
 import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
-type Pestana = "analitica" | "perfiles";
+type Pestana = "analitica" | "perfiles" | "reporte";
 type VistaAnalitica = "historico" | "por_anio";
 
 export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero; usuario: string; salir: () => Promise<void> }) {
@@ -82,14 +82,18 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       <aside className="mk-lateral">
         <div className="mk-marca mk-bloque"><span className="mk-logo" aria-hidden>EwB</span></div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
-          {(["analitica", "perfiles"] as Pestana[]).map((p) => (
+          {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (
             <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
-              {p === "analitica" ? (
+              {p === "analitica" && (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
-              ) : (
+              )}
+              {p === "perfiles" && (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="9" cy="8" r="4" /><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a6 6 0 0 0-4-5.6" /></svg>
               )}
-              <span>{p === "analitica" ? "Analítica" : "Perfiles"}</span>
+              {p === "reporte" && (
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
+              )}
+              <span>{p === "analitica" ? "Analítica" : p === "perfiles" ? "Perfiles" : "Reporte"}</span>
             </button>
           ))}
         </nav>
@@ -131,6 +135,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
                 <AnaGrafPermanencia permanencia={datos.permanencia} />
                 <AnaGrafIedAtendidas totales={datos.totales} kpis={datos.kpis} />
                 <AnaGrafCargoDocentes cargos={datos.cargoDocentes} />
+                <AnaGrafNivelUltimo niveles={datos.nivelUltimo} />
               </div>
             </section>
           )}
@@ -154,6 +159,18 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
             </>
           )}
         </>
+      )}
+
+      {pestana === "reporte" && (
+        <section className="mk-panel mk-reporte" data-seccion="reporte">
+          <div className="mk-reporte-vacio">
+            <span className="mk-reporte-icono" aria-hidden>
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
+            </span>
+            <h2>Reporte</h2>
+            <p className="mk-note">Próximamente.</p>
+          </div>
+        </section>
       )}
 
       {pestana === "perfiles" && (
