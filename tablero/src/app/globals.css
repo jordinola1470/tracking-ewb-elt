@@ -404,3 +404,8 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 /* Ajustes: tildes visibles en la etiqueta pequeña y filtros de Perfiles en 2 columnas con aire */
 .mk-pildora-txt small{line-height:1.4;padding-top:1px}
 .mk-filtros-perfil{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+/* Filtros de Perfiles sin superposición: el ancho incluye relleno y borde, y pasan a 1 columna cuando no caben */
+.mk-pildora-filtro{box-sizing:border-box;max-width:100%}
+.mk-filtros-perfil{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px 14px}
+/* Máximo 2 columnas (2 x 2); si no caben, 1 columna */
+.mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(max(190px,calc(50% - 7px)),1fr))}
