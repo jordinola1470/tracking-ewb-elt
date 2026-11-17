@@ -63,7 +63,6 @@ export function BarraAvisos({ act }: { act: Actualizacion | null }) {
             <li><b>Perfiles:</b> lista de docentes con filtros y la ficha de cada uno.</li>
             <li><b>Reporte:</b> fact sheet del programa para descargar en PDF.</li>
           </ul>
-          {act && <p className="mk-popover-pie">{act.registros.toLocaleString("es-CO")} registros hasta {act.ultimo_anio}.</p>}
         </div>
       )}
 

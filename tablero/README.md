@@ -39,6 +39,8 @@ tablero/
 | Ancho de la barra vertical | `globals.css`, regla `.mk-app` (`grid-template-columns`) |
 | Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
 | Avisos (actualizado el) e Información de la barra superior | `src/componentes/comunes/barra_avisos.tsx` |
+| Menú del perfil (Cerrar sesión) | `src/componentes/comunes/menu_perfil.tsx` |
+| Logos de los aliados | `public/logos/` (título en `Tablero.tsx`, portada del fact sheet en `rep_fact_sheet.tsx`, inicio de sesión en `src/app/login/page.tsx`) |
 | Textos del ícono ⓘ de cada gráfico | `src/componentes/analitica/ana_graficos.tsx` (constante `INFO`) |
 | El fact sheet (pestaña Reporte) y su PDF | `src/componentes/reporte/rep_fact_sheet.tsx` (estilos de impresión en `globals.css`, `@media print`) |
 | **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |

@@ -2,12 +2,13 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python)
 ![dbt](https://img.shields.io/badge/dbt-1.11.4-FF694B?style=flat-square&logo=dbt)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0%2B-336791?style=flat-square&logo=postgresql)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=flat-square&logo=postgresql)
 ![Pandas](https://img.shields.io/badge/Pandas-2.0.0%2B-150458?style=flat-square&logo=pandas)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs)
 
-El proyecto **tracking-ewb-elt** es el núcleo de ingeniería de datos del programa _English without Borders_. Es una **arquitectura ELT** que carga las bases finales de docentes (2023 en adelante), las limpia y las organiza en un modelo dimensional para seguir el perfil de cada docente a lo largo del tiempo. Sus tablas finales alimentan el tablero de seguimiento.
+El proyecto **tracking-ewb-elt** es el núcleo de ingeniería de datos del programa _English without Borders_. Es una **arquitectura ELT** que carga las bases finales de docentes (2023 en adelante), las limpia y las organiza en un modelo dimensional para seguir el perfil de cada docente a lo largo del tiempo. Sus tablas finales alimentan el tablero de seguimiento, publicado en **https://tracking-ewb-elt.vercel.app**.
 
-> 🔒 **Política de datos:** los archivos Excel contienen datos personales y **nunca** se suben a este repositorio (`data/`, `*.xlsx`, `*.csv` y `.env` están excluidos en `.gitignore`). Las pruebas y la integración continua usan solo datos ficticios.
+> 🔒 **Política de datos:** los archivos Excel contienen datos personales y **nunca** se suben a este repositorio (`data/`, `*.xlsx`, `*.csv` y `.env` están excluidos en `.gitignore`; el hook `pre-commit` los bloquea). Las pruebas y la integración continua usan solo datos ficticios.
 
 ---
 
@@ -35,19 +36,28 @@ Este repositorio fomenta la **Medallion Architecture**, garantizando niveles gra
 - 💎 **Capa Diamond (`public`):**
   - Tablas finales listas para consumo (tablero y analítica), materializadas por **dbt** en el esquema `public`:
     - `trazabilidad_historica` (MCER de salida por año, 2023-2026, de cada docente que alcanzó el nivel A2 o uno superior).
-    - **`consolidado_historico`** (una sola tabla con el *append* `UNION ALL` de las bases 2023, 2024, 2025 y 2026, construida desde `staging`, sin deduplicar).
+    - **`consolidado_historico`** (una sola tabla con el *append* `UNION ALL` de las bases 2023, 2024, 2025 y 2026, construida desde `staging`, sin deduplicar). Aquí se unifica entre años:
+      - **Un solo nombre por docente:** el del año más reciente.
+      - **Nombre oficial de la IED** según su código DANE (lista oficial `raw.referencia_ied`). Si el nombre de una fila corresponde a otra IED oficial, se corrige también su DANE. Las IED que no están en la lista conservan el nombre tal cual aparece en 2023.
   - **Tablas del tablero** (`models/tablero/`, prefijo `tab_`), construidas sobre `consolidado_historico`. El tablero solo filtra y dibuja; todos los cálculos están aquí:
 
     | Tabla | Grano | Componentes del tablero |
     | :--- | :--- | :--- |
-    | `tab_kpis_anio` | Año | `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio` |
-    | `tab_pruebas_nivel_anio` | Año × nivel de formación | `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` |
+    | `tab_kpis_anio` | Año | `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*` (participaciones, IED únicas, constancia, asistencia), `ana_graf_constancia_anio`, `ana_graf_pruebas_presentadas` |
+    | `tab_pruebas_nivel_anio` | Año × nivel de formación | `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` |
     | `tab_constancia_cargo_anio` | Año × cargo | `ana_graf_constancia_cargo` |
     | `tab_permanencia` | Grupo de permanencia | `ana_graf_permanencia` |
-    | `tab_perfiles` | Docente | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` |
+    | `tab_totales` | Una fila | `ana_graf_ied_atendidas` (total de IED) |
+    | `tab_cargo_docentes` | Cargo (último de cada docente) | `ana_graf_cargo_docentes` |
+    | `tab_nivel_ultimo` | Último nivel cursado | `ana_graf_nivel_ultimo` |
+    | `tab_perfiles` | Docente | `per_buscador`, `per_filtros`, `per_tabla_docentes`, `per_ficha_docente` |
     | `tab_historial` | Docente × año | `per_tabla_historial` |
+    | `tab_fs_resumen`, `tab_fs_anio`, `tab_fs_distribucion` | Resumen / año / distribuciones | `rep_fact_sheet` (pestaña Reporte, PDF) |
+    | `tab_actualizacion` | Una fila | `barra_avisos` ("Actualizado el …") |
 
-    **Nivel de formación** = `nivel_estandar` (nivel del grupo asignado cada año). Las reglas de lectura (constancia, retirado, prueba presentada y orden de niveles) están en un solo lugar: `macros/reglas_tablero.sql`.
+    Modelos intermedios: `int_permanencia_docente` (años y continuidad de cada docente) e `int_fs_docente_anio` (una fila por docente y año para el fact sheet; si un docente aparece dos veces en un año, se usa la fila en la que no está retirado).
+
+    **Nivel de formación** = `nivel_estandar` (nivel del grupo asignado cada año). Las reglas de lectura (constancia, retirado, prueba presentada, orden de niveles y de MCER) están en un solo lugar: `macros/reglas_tablero.sql`.
 
 ### 📋 Tabla `public.consolidado_historico`
 
@@ -82,7 +92,13 @@ Este repositorio fomenta la **Medallion Architecture**, garantizando niveles gra
 | Docente de contenido | `Docente de Contenido` |
 | Cualquier otro valor | Se conserva el valor original |
 
-> **Limpieza en staging:** todas las columnas de texto de `stg_docentes_*` se normalizan con `trim()` (sin espacios al inicio/final), de modo que las capas gold ya reciben datos limpios.
+> **Limpieza y estandarización en staging:** las columnas de texto de `stg_docentes_*` se normalizan con `trim()`, y las macros de [`macros/estandarizar.sql`](dbt_project/macros/estandarizar.sql) dejan un solo formato, de modo que gold y diamond reciben datos limpios:
+> - **Nombres de docentes:** mayúsculas de título y partículas en minúscula ("María del Carmen Pérez").
+> - **Correos:** en minúscula.
+> - **Constancia:** "Si" / "No".
+> - **Nombres de IED:** con el formato de la lista oficial ("INSTITUCION EDUCATIVA DISTRITAL …").
+
+> **Código DANE y lista oficial de IED:** el DANE se lee del Excel **como texto**, para que no se redondee (por ejemplo, a `108001000000`). La lista oficial (`data/referencia_ied/ied_name.csv`, columnas `INSTITUCION` y `DANE`) **no se sube al repositorio**. `cargar` la lleva a `raw.referencia_ied`; si el archivo no existe, crea la tabla vacía y dbt usa los nombres estandarizados.
 
 > **Base 2026:** se lee la hoja `base` (concatenación de las hojas del Excel). No trae `genero`, `fecha_nacimiento`, `ubicacion_geo`, `jornada_laboral`, `grado_dicta`, `recibe_constancia` ni score/MCER de salida: esas columnas existen en el consolidado con valor NULL para 2026. `docente_nombre` se arma con `nombres` + `apellidos`, `tipo_documento` se reduce al código (`CC`, `CE`) y las columnas de entrada, que vienen con contenido mezclado, se separan por contenido (valor numérico → `score_entrada`, valor con forma de nivel → `mcer_entrada`). `dim_docentes` y `dim_ied` toman el último valor no nulo de cada campo para que el 2026 no borre datos de años anteriores.
 
@@ -122,7 +138,7 @@ El diseño de directorios respeta altamente el concepto Separation of Concerns (
 
 ```text
 tracking-ewb-elt/
-├── data/                       # [Landing Zone] Excel locales. NO se versiona (ver .gitignore).
+├── data/                       # [Landing Zone] Excel locales y referencia_ied/ied_name.csv. NO se versiona.
 ├── config/                     # [Contexto de Ejecución]
 │   ├── sources.yaml            # Archivos a procesar y hoja a leer por fuente (sección opcional `sheets`).
 │   ├── column_mapping.yaml     # Mapeos agnósticos leídos por Python para EL.
@@ -131,22 +147,28 @@ tracking-ewb-elt/
 ├── infrastructure/             # [Network]
 │   └── database.py             # Conector de PostgreSQL y gestor de Session Factory.
 ├── src/                        # [Capa EL]
-│   ├── ingestor.py             # Instanciador del bucle que lee fuentes -> estandariza -> vuelca a BD.
+│   ├── ingestor.py             # Lee fuentes -> estandariza -> vuelca a raw (+ lista oficial de IED).
 │   ├── transformer.py          # Clase que interconecta y spawnea DBT dentro de Python.
 │   ├── exceptions.py           # Centro de trazabilidad con Errores custom y controlados.
 │   └── utils/
 │       └── column_standardizer.py # Modulo de limpieza Regex de etiquetas estipuladas.
-├── dbt_project/                # [Capa T] 
+├── dbt_project/                # [Capa T]
 │   ├── dbt_project.yml         # Config de proyecto dbt, macros y perfiles.
 │   ├── profiles.yml            # Enlace abstracto a credenciales de Base de datos.
-│   └── models/                 
+│   ├── macros/                 # estandarizar.sql, reglas_tablero.sql, permitir_lectura_tablero.sql
+│   └── models/
 │       ├── staging/            # Staging schema (Silver Layer).
 │       ├── marts/              # Marts schema (Gold Layer).
-│       └── diamond/            # Public schema (tablas finales: trazabilidad_historica, consolidado_historico).
-├── tests/                      # Pruebas (pytest) y notebook de normalización (sin salidas guardadas).
+│       ├── diamond/            # Public schema (trazabilidad_historica, consolidado_historico).
+│       └── tablero/            # Public schema (tablas tab_* que lee el tablero).
+├── tablero/                    # [Tablero] App Next.js publicada en Vercel (ver tablero/README.md).
+├── scripts/cargar_prod.sh      # Carga de Excel a producción desde el Mac (con confirmación).
+├── sql/roles_supabase.sql      # Roles de mínimo privilegio en Supabase.
+├── .github/workflows/          # CI, CD y latido semanal de Supabase.
+├── tests/                      # Pruebas (pytest), generador de Excel ficticios y notebook de normalización.
 ├── docs/                       # Manual de consultas, fact sheet y documentación del modelo.
 ├── .env.example                # Plantilla de variables de entorno con marcadores.
-└── main.py                     # [Entrypoint] Orquestador secuencial E -> L -> T (raw, staging, marts, diamond).
+└── main.py                     # [Entrypoint] `cargar` (E-L) y `transformar` (T).
 ```
 
 ---
@@ -162,7 +184,7 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
    uv run pre-commit install  # activa el revisor que bloquea Excel, CSV y .env antes de cada commit
    ```
 
-2. **Coloca los Excel en `data/`** con los nombres definidos en `config/sources.yaml` (se obtienen por canal interno, no desde el repositorio).
+2. **Coloca los Excel en `data/`** con los nombres definidos en `config/sources.yaml`, y la lista oficial de IED en `data/referencia_ied/ied_name.csv`. Ambos se obtienen por canal interno, no desde el repositorio.
 
 3. **Ejecuta el pipeline en dos órdenes separadas:**
 
@@ -174,6 +196,7 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
    ```
 
    - **`cargar`** calcula la huella SHA-256 de cada Excel y la compara con la última carga registrada en `raw._registro_cargas`. Si cambió, reemplaza la tabla `raw.base_docentes_AAAA` en una sola transacción y verifica que las filas del Excel coincidan con las de raw; si no cuadran, deshace la carga. Correrlo varias veces seguidas da el mismo resultado.
+   - **`cargar`** también recarga la lista oficial de IED (`raw.referencia_ied`) en cada ejecución.
    - **`transformar`** no necesita los Excel: reconstruye todo desde `raw`.
    - **Errores:** los del proyecto se muestran como un mensaje corto (sin datos personales) y el programa termina con código 1.
 
@@ -216,7 +239,8 @@ El mismo código corre en tres entornos; solo cambian las variables `DB_*`:
 
 **Seguridad en Supabase**
 - Data API desactivada: las tablas no se publican en internet. RLS automático en `public`.
-- Conexión por *Session pooler* (IPv4) con `DB_SSLMODE=require`.
+- Pipeline: conexión por *Session pooler* (IPv4, puerto 5432) con `DB_SSLMODE=require`.
+- Tablero: *Transaction pooler* (puerto 6543), con las consultas una por una; soporta 100 usuarios simultáneos.
 - Roles de mínimo privilegio creados con [`sql/roles_supabase.sql`](sql/roles_supabase.sql) (las contraseñas se fijan con `\password` en `psql`, nunca en archivos):
   - `ewb_pipeline`: dueño de `raw`, `staging` y `marts`; construye `public`.
   - `ewb_tablero`: solo lectura de `public` (política RLS creada por la macro `permitir_lectura_tablero` en cada `transformar`).
@@ -243,9 +267,21 @@ El flujo [CD](.github/workflows/cd.yml) se activa cuando **CI termina en verde s
 
 ## 📊 Tablero
 
-Aplicación **Next.js** en [`tablero/`](tablero/README.md), con inicio de sesión de **Google (Gmail)** y **Microsoft (Outlook)**
-mediante Auth.js, publicada en **Vercel**. Lee las tablas `tab_*` de `public` con el rol de solo lectura `ewb_tablero`;
-no hace cálculos. El CI revisa en cada PR que compile (job *Tablero (lint y build)*).
+Aplicación **Next.js** en [`tablero/`](tablero/README.md), publicada en **Vercel**: **https://tracking-ewb-elt.vercel.app**.
+Lee las tablas `tab_*` de `public` con el rol de solo lectura `ewb_tablero` y **no hace cálculos**: solo filtra y dibuja.
+El CI revisa en cada PR que compile (job *Tablero (lint y build)*).
+
+| Pestaña | Qué muestra |
+| :--- | :--- |
+| **Analítica · Histórico** | Constancia año a año, permanencia, IED atendidas, docentes por cargo y nivel actual de toda la población |
+| **Analítica · Por año** | Indicadores del año (participaciones, IED únicas, constancia, asistencia), nivel de formación, constancia por nivel y cargo, pruebas presentadas |
+| **Perfiles** | Buscador y filtros (nivel, cargo, IED, permanencia), lista de docentes y ficha con su historial |
+| **Reporte** | Fact sheet del programa (8 secciones, 2023–2026) con descarga en PDF |
+
+- **Inicio de sesión:** Google (Gmail) y Microsoft (Outlook) con Auth.js. La app de Google solo pide nombre, correo y foto, así que **puede entrar cualquier cuenta de Google** que tenga el enlace (la lista de usuarios de prueba no restringe). Microsoft aún no está configurado.
+- **Avisos** (campana): "Actualizado el …", la fecha del último recálculo en la base (`tab_actualizacion`).
+- **Enlace con estado:** la pestaña, la vista, el año y los filtros quedan en la URL. Nunca se guardan el docente elegido ni la búsqueda.
+- Diseño, paleta y guía "qué archivo editar" en [`tablero/README.md`](tablero/README.md).
 
 ## 🛠️ Operación
 
@@ -259,6 +295,8 @@ scripts/cargar_prod.sh --anio 2026 --forzar # recarga aunque no haya cambiado
 
 El script pide escribir `SI` para confirmar y usa la imagen de GHCR del último commit de `main`
 (el mismo código que ya pasó CI y staging). Requiere Docker encendido y `.env.entorno_prod`.
+Monta la carpeta `data/` completa, así que también actualiza la lista oficial de IED.
+Si cambia la forma de leer los Excel (por ejemplo, el DANE como texto), usa `--forzar` para releerlos todos.
 
 **Mantener Supabase activo:** el flujo [Mantener Supabase activo](.github/workflows/mantener_activo.yml)
 corre cada **viernes a las 6:00 a. m. (Colombia)** y hace una consulta mínima de solo lectura con
@@ -287,6 +325,12 @@ uv run ruff check .                  # lint
 uv run pytest -m "not integracion"   # pruebas unitarias
 uv run pytest                        # + integración (requiere la base encendida)
 ```
+
+## 📌 Pendientes
+
+- **Rotar las contraseñas** de las bases y de los roles (`ewb_pipeline`, `ewb_tablero`, usuarios de Supabase), una por usuario y por proyecto, y actualizar los secretos de GitHub y las variables de Vercel.
+- **Restringir el acceso al tablero** a una lista de correos o dominios (variable en Vercel), si se decide.
+- **Configurar el inicio de sesión con Microsoft (Outlook).**
 
 ## 🔀 Cómo contribuir
 

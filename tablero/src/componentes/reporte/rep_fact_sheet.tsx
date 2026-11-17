@@ -3,6 +3,7 @@
 // Fact sheet con las 8 secciones de docs/FACT_SHEET_ANALITICA.md, con datos 2023–2026 y reglas actuales.
 // Fuentes: tab_fs_resumen, tab_fs_anio, tab_fs_distribucion (solo agregados; sin datos de personas).
 // "Descargar PDF" usa la impresión del navegador ("Guardar como PDF") con los estilos del tablero (ver @media print).
+import Image from "next/image";
 import type { FactSheet, FsAnio, FsDist } from "@/lib/datos";
 import { BarrasHorizontales, BarrasVerticalesApiladas, COLORES, RAYADO_VERDE, entero, pct } from "../comunes/graficos";
 
@@ -83,21 +84,27 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
 
   return (
     <div className="mk-fs" data-componente="rep_fact_sheet">
-      {/* Acciones (no se imprimen) */}
-      <div className="mk-fs-acciones mk-bloque">
-        <div>
-          <h2>Fact sheet del programa</h2>
-          <p className="mk-note">Vista previa con los estilos del tablero. Para el PDF: «Descargar PDF» → destino «Guardar como PDF».</p>
+      {/* Una sola tarjeta tipo visor de PDF: barra con título y descarga arriba; abajo, la hoja sobre fondo oscuro */}
+      <section className="mk-fs-visor">
+        <div className="mk-fs-acciones">
+          <div className="mk-fs-acciones-txt">
+            <span className="mk-fs-doc-icono" aria-hidden>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
+            </span>
+            <div>
+              <h2>Fact sheet del programa</h2>
+              <p className="mk-note">Vista previa de la hoja A4 · «Descargar PDF» → destino «Guardar como PDF».</p>
+            </div>
+          </div>
+          <button type="button" className="mk-fs-boton" onClick={() => window.print()}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+            </svg>
+            Descargar PDF
+          </button>
         </div>
-        <button type="button" className="mk-fs-boton" onClick={() => window.print()}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
-          </svg>
-          Descargar PDF
-        </button>
-      </div>
-
-      <article className="mk-fs-hoja mk-panel">
+        <div className="mk-fs-lienzo">
+      <article className="mk-fs-hoja">
         {/* Portada */}
         <header className="mk-fs-portada">
           <div>
@@ -105,7 +112,11 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
             <h1>English Without Borders</h1>
             <p>Formación docente en inglés · {r ? `${r.primer_anio}–${r.ultimo_anio}` : ""} · generado el {hoy}</p>
           </div>
-          <span className="mk-fs-logo" aria-hidden>EwB</span>
+          {/* Segunda columna: logos de los aliados, en blanco sobre la franja (sin etiqueta) */}
+          <div className="mk-fs-aliados">
+            <span>Un programa de</span>
+            <Image src="/logos/cobranding-azul-oscuro.png" alt="Alcaldía de Barranquilla y British Council" width={3114} height={396} />
+          </div>
         </header>
 
         {/* Guía técnica de lectura: qué se muestra y con qué reglas se calcula */}
@@ -312,6 +323,8 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
 
         <footer className="mk-fs-pie">English Without Borders · Fact sheet {r ? `${r.primer_anio}–${r.ultimo_anio}` : ""} · Desarrollado por TeseoDev · Medellín ©</footer>
       </article>
+        </div>
+      </section>
     </div>
   );
 }

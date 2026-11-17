@@ -10,6 +10,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Cambiado (tablero · detalles finales)
+- Avisos: se quita la línea de cantidad de registros.
+- Perfil (arriba a la derecha): la píldora abre un menú con el correo y **Cerrar sesión**; se quita el botón
+  de salir de la barra lateral.
+- Título del tablero en dos líneas con los logos de los aliados (Alcaldía de Barranquilla · British Council) en
+  blanco, separados por una línea; más espacio arriba y abajo.
+- Fact sheet: portada en dos columnas (título | logos en blanco) y vista tipo visor de PDF (barra con descarga y
+  hoja A4 sobre fondo oscuro).
+- Barra lateral: gris del hover un poco más oscuro.
+
 ### Cambiado (datos estandarizados)
 - Lectura del código DANE como texto (antes, leído como número, podía redondearse; ej. 108001000000).
 - Nueva lista oficial de IED (`data/referencia_ied/ied_name.csv`, fuera del repositorio) cargada a
