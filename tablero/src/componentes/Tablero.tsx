@@ -111,8 +111,6 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         <>
           {/* Arriba de la hoja Analítica: resumen del año y subcategorías Histórico / Por año */}
           <div className="mk-hoja-cab mk-bloque">
-            {/* El resumen es del año elegido: solo se muestra en "Por año" */}
-            {vista === "por_anio" && <AnaTextoResumen kpi={kpi} />}
             <div className="mk-subbarra">
               <nav className="mk-subtabs" role="tablist" aria-label="Vista de analítica">
                 {(["historico", "por_anio"] as VistaAnalitica[]).map((v) => (
@@ -123,6 +121,8 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               </nav>
               {vista === "por_anio" && <AnaFiltroAnio anios={anios} valor={anio} cambiar={setAnio} />}
             </div>
+            {/* El resumen es del año elegido: solo en "Por año", debajo de los botones y en letra pequeña */}
+            {vista === "por_anio" && <AnaTextoResumen kpi={kpi} />}
           </div>
           {vista === "historico" && (
             <section className="mk-panel" data-seccion="historico">
