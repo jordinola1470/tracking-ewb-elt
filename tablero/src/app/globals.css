@@ -736,3 +736,6 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-marca-ewb{flex:1;text-align:center;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--marca-negro);animation:mk-fundido .28s ease .08s both}
 .mk-app-contraida .mk-marca-ewb{display:none}
 @media (prefers-reduced-motion:reduce){.mk-marca-ewb{animation:none}}
+/* El bloque del botón de menú mide lo mismo que la barra de la derecha (Histórico / Por año): 68 px */
+.mk-lateral .mk-marca{box-sizing:border-box;height:68px;padding:0 15px}
+.mk-app-contraida .mk-lateral .mk-marca{height:68px;padding:0;justify-content:center}
