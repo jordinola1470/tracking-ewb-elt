@@ -37,9 +37,22 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   // Barra lateral contraída (solo íconos): la elige cada persona y se recuerda en su navegador
   const contraida = useSyncExternalStore(suscribirBarra, leerBarra, () => false);
   const alternarBarra = () => {
-    try { window.localStorage.setItem(CLAVE_BARRA, contraida ? "0" : "1"); } catch { /* sin almacenamiento */ }
+    try { window.localStorage.setItem(CLAVE_BARRA, leerBarra() ? "0" : "1"); } catch { /* sin almacenamiento */ }
     window.dispatchEvent(new Event(CLAVE_BARRA));
   };
+  // Atajo: Ctrl + B (⌘ + B en Mac) contrae o abre la barra
+  useEffect(() => {
+    const atajo = (e: KeyboardEvent) => {
+      const escribiendo = (e.target as HTMLElement)?.closest?.("input, textarea, select, [contenteditable=true]");
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b" && !escribiendo) {
+        e.preventDefault();
+        try { window.localStorage.setItem(CLAVE_BARRA, leerBarra() ? "0" : "1"); } catch { /* sin almacenamiento */ }
+        window.dispatchEvent(new Event(CLAVE_BARRA));
+      }
+    };
+    window.addEventListener("keydown", atajo);
+    return () => window.removeEventListener("keydown", atajo);
+  }, []);
   const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
 
   // ── Estado en el enlace (URL): pestaña, vista, año y filtros de Perfiles ──────────
@@ -120,11 +133,20 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       <div className={`mk-app${contraida ? " mk-app-contraida" : ""}`}>
       {/* Barra lateral vertical: marca · navegación · usuario abajo */}
       <aside className="mk-lateral">
-        <div className="mk-marca mk-bloque"><span className="mk-logo" aria-hidden>EwB</span></div>
+        {/* Arriba: botón de menú (☰ abre · ← contrae) junto a EwB, como el "navigation rail" de Material 3 */}
+        <div className="mk-marca mk-bloque">
+          <button type="button" className="mk-lateral-toggle" onClick={alternarBarra} aria-expanded={!contraida}
+            aria-label={contraida ? "Expandir la barra lateral (Ctrl + B)" : "Contraer la barra lateral (Ctrl + B)"}
+            title={contraida ? "Expandir · Ctrl + B" : "Contraer · Ctrl + B"}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              {contraida ? <path d="M4 7h16M4 12h16M4 17h16" /> : <path d="M19 12H5M11 6l-6 6 6 6" />}
+            </svg>
+          </button>
+          <span className="mk-logo" aria-hidden>EwB</span>
+        </div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
           {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (
-            <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}
-              title={contraida ? (p === "analitica" ? "Analítica" : p === "perfiles" ? "Perfiles" : "Reporte") : undefined}>
+            <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
               {p === "analitica" && (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
               )}
@@ -138,14 +160,6 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
             </button>
           ))}
         </nav>
-        {/* Contraer / expandir la barra (opcional, lo decide cada persona) */}
-        <button type="button" className="mk-lateral-toggle mk-bloque" onClick={alternarBarra}
-          aria-label={contraida ? "Expandir la barra lateral" : "Contraer la barra lateral"} title={contraida ? "Expandir" : "Contraer"}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            {contraida ? <path d="m9 6 6 6-6 6" /> : <path d="m15 6-6 6 6 6" />}
-          </svg>
-          <span className="mk-tab-txt">Contraer</span>
-        </button>
         {/* Sello al pie de la barra vertical */}
         <small className="mk-sello">Desarrollado por TeseoDev · Medellín ©</small>
       </aside>

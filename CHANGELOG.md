@@ -21,8 +21,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ### Cambiado (tablero)
 - Perfiles: la ficha del docente va debajo de la tabla de docentes (más espacio para ambas).
-- Barra lateral contraíble (opcional): botón para dejar solo los íconos, cada uno en su círculo; la elección
-  se recuerda en el navegador de cada persona y los gráficos se ajustan al nuevo ancho.
+- Barra lateral contraíble (opcional, patrón «navigation rail» de Material 3): botón ☰ / ← arriba junto a EwB
+  y atajo Ctrl + B (⌘ + B); contraída quedan los íconos en círculo con su nombre debajo. La elección se
+  recuerda en el navegador de cada persona y los gráficos se ajustan al nuevo ancho.
+- Perfiles: la tabla de docentes es más baja (se ven 6-7 docentes; el resto con desplazamiento).
 
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.
