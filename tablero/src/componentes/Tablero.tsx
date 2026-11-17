@@ -142,6 +142,8 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               {contraida ? <path d="M4 7h16M4 12h16M4 17h16" /> : <path d="M19 12H5M11 6l-6 6 6 6" />}
             </svg>
           </button>
+          {/* Logo EwB pequeño, sin burbuja (se oculta con la barra contraída) */}
+          <span className="mk-marca-ewb" aria-hidden>EwB</span>
         </div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
           {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (

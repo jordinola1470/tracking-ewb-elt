@@ -732,3 +732,7 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-lateral-toggle svg{transition:transform .3s cubic-bezier(.2,0,0,1)}
 .mk-lateral-toggle:active svg{transform:scale(.85)}
 @media (prefers-reduced-motion:reduce){.mk-app{transition:none}.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:none}}
+/* Logo EwB pequeño junto al botón de menú, sin burbuja, en gris pizarra */
+.mk-marca-ewb{flex:1;text-align:center;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--marca-negro);animation:mk-fundido .28s ease .08s both}
+.mk-app-contraida .mk-marca-ewb{display:none}
+@media (prefers-reduced-motion:reduce){.mk-marca-ewb{animation:none}}
