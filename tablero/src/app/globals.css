@@ -577,27 +577,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-cabecera::after{display:none}
 .mk-cabecera{background:radial-gradient(circle at calc(100% + 10px) -30px,rgba(64,152,76,.45),rgba(64,152,76,0) 170px),linear-gradient(120deg,var(--marca-principal) 0%,#145160 60%,var(--mezcla) 100%)}
 
-/* ── Perfiles: ordenar, páginas, sin resultados y ficha lateral ──────────────────── */
-.mk-th-orden{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;color:inherit;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
-.mk-th-flecha{font-size:9px;opacity:.75}
-.mk-tw-marco{max-height:none}
-.mk-table tbody tr:focus-visible{outline:2px solid var(--marca-verde);outline-offset:-2px}
-.mk-paginas{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
-.mk-paginas>div{display:flex;align-items:center;gap:8px}
-.mk-paginas-n{font-weight:700;color:var(--marca-negro)}
-.mk-btn:disabled{opacity:.45;cursor:default;transform:none}
-.mk-vacio{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:var(--cds-gap-md);padding:36px 16px;border:1px dashed var(--principal-medio);border-radius:16px;background:var(--color-panel);text-align:center;font-size:13px;color:var(--color-fg-muted)}
-.mk-vacio b{color:var(--marca-negro);font-size:14px}
-.mk-vacio .mk-btn{margin-top:8px}
-.mk-vacio-icono{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--principal-suave);color:var(--marca-principal)}
-.mk-panel-lateral-fondo{position:fixed;inset:0;z-index:60;background:rgba(17,24,28,.32);display:flex;justify-content:flex-end;animation:mk-fondo .18s ease}
-@keyframes mk-fondo{from{opacity:0}to{opacity:1}}
-.mk-panel-lateral{width:min(560px,100%);height:100%;overflow-y:auto;box-sizing:border-box;padding:20px 22px;background:var(--color-panel);box-shadow:-12px 0 32px rgba(12,52,61,.25);border-radius:24px 0 0 24px;animation:mk-entrar .22s ease}
-@keyframes mk-entrar{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
-.mk-panel-lateral-cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.mk-panel-lateral-cab h2{margin:0;font-size:18px;color:var(--marca-negro)}
-@media (max-width:600px){.mk-panel-lateral{border-radius:0}}
-@media (prefers-reduced-motion:reduce){.mk-panel-lateral,.mk-panel-lateral-fondo,.mk-popover{animation:none}}
+@media (prefers-reduced-motion:reduce){.mk-popover{animation:none}}
 
 /* Ícono ⓘ por gráfico: muestra qué mide al pasar el cursor o al enfocarlo con el teclado */
 .mk-titulo-info{display:flex;align-items:center;gap:6px}

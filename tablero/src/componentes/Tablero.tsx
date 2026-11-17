@@ -11,7 +11,7 @@ import {
 } from "./analitica/ana_graficos";
 import { RepFactSheet } from "./reporte/rep_fact_sheet";
 import { BarraAvisos } from "./comunes/barra_avisos";
-import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerPanelFicha, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
+import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
 type VistaAnalitica = "historico" | "por_anio";
@@ -23,7 +23,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<FiltrosPerfil>(FILTROS_VACIOS);
-  const [seleccionado, setSeleccionado] = useState<string | undefined>(undefined);
+  const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
 
   // ── Estado en el enlace (URL): pestaña, vista, año y filtros de Perfiles ──────────
   // Así se puede compartir lo que se ve y recargar sin perderlo; "atrás" vuelve a la vista anterior.
@@ -189,18 +189,19 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
 
       {pestana === "perfiles" && (
         <section className="mk-panel">
-          <div className="mk-card">
-            <h2>Docentes</h2>
-            <p className="mk-note">Busca por nombre, colegio o código, filtra y haz clic en una fila para abrir la ficha.</p>
-            <PerBuscador texto={busqueda} cambiar={setBusqueda} />
-            <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
-            <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado}
-              limpiar={() => { setFiltros(FILTROS_VACIOS); setBusqueda(""); }} />
+          <div className="mk-perf">
+            <div className="mk-card">
+              <h2>Docentes</h2>
+              <p className="mk-note">Busca por nombre, colegio o código y selecciona una fila para ver su ficha.</p>
+              <PerBuscador texto={busqueda} cambiar={setBusqueda} />
+              <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
+              <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado} />
+            </div>
+            <div className="mk-card">
+              <h2>Ficha del docente</h2>
+              <PerFichaDocente perfil={perfil} historial={historial} />
+            </div>
           </div>
-          {/* Ficha en panel lateral: se abre al elegir un docente */}
-          <PerPanelFicha abierto={!!perfil} cerrar={() => setSeleccionado(undefined)}>
-            <PerFichaDocente perfil={perfil} historial={historial} />
-          </PerPanelFicha>
         </section>
       )}
       </div>

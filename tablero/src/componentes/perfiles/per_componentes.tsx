@@ -1,7 +1,6 @@
 "use client";
-// Componentes de la vista Perfiles: per_buscador, per_filtros, per_tabla_docentes, per_panel_ficha, per_ficha_docente, per_tabla_historial
+// Componentes de la vista Perfiles: per_buscador, per_tabla_docentes, per_ficha_docente, per_tabla_historial
 // Fuentes: tab_perfiles (una fila por docente) y tab_historial (una fila por docente y año).
-import { useEffect, useMemo, useState } from "react";
 import type { Historial, Perfil } from "@/lib/datos";
 import { pct } from "../comunes/graficos";
 import { FiltroPildora } from "../comunes/filtro_pildora";
@@ -61,104 +60,24 @@ export function PerFiltros({ perfiles, filtros, cambiar, total }: {
   );
 }
 
-/** Columnas de la tabla de docentes y cómo se ordena cada una */
-type ColDocente = "docente_id" | "docente_nombre" | "cargo" | "colegio" | "niveles_por_anio" | "permanencia";
-const COLUMNAS: { clave: ColDocente; titulo: string }[] = [
-  { clave: "docente_id", titulo: "Código" }, { clave: "docente_nombre", titulo: "Nombre" }, { clave: "cargo", titulo: "Cargo" },
-  { clave: "colegio", titulo: "Colegio" }, { clave: "niveles_por_anio", titulo: "Nivel de formación por año" }, { clave: "permanencia", titulo: "Permanencia" },
-];
-const POR_PAGINA = 50;
-
-/** per_tabla_docentes · ordenar por columna, páginas de 50 y mensaje cuando no hay resultados */
-export function PerTablaDocentes({ filas, seleccionado, elegir, limpiar }: {
-  filas: Perfil[]; seleccionado?: string; elegir: (id: string) => void; limpiar: () => void;
-}) {
-  const [orden, setOrden] = useState<{ col: ColDocente; asc: boolean }>({ col: "docente_nombre", asc: true });
-  const [pagina, setPagina] = useState(0);
-  // Al cambiar la búsqueda o los filtros, volver a la primera página
-  const [filasPrevias, setFilasPrevias] = useState(filas);
-  if (filasPrevias !== filas) { setFilasPrevias(filas); setPagina(0); }
-
-  const ordenadas = useMemo(() => {
-    const f = (r: Perfil) => String(r[orden.col] ?? "");
-    return [...filas].sort((a, b) => f(a).localeCompare(f(b), "es", { numeric: true }) * (orden.asc ? 1 : -1));
-  }, [filas, orden]);
-  const paginas = Math.max(1, Math.ceil(ordenadas.length / POR_PAGINA));
-  const actual = Math.min(pagina, paginas - 1);
-  const visibles = ordenadas.slice(actual * POR_PAGINA, (actual + 1) * POR_PAGINA);
-  const ordenar = (col: ColDocente) => setOrden((o) => ({ col, asc: o.col === col ? !o.asc : true }));
-
-  if (!filas.length) {
-    return (
-      <div className="mk-vacio" data-componente="per_tabla_docentes">
-        <span className="mk-vacio-icono" aria-hidden>
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5M8.5 11h5" /></svg>
-        </span>
-        <b>No hay docentes con esa búsqueda o filtros</b>
-        <span>Prueba con otro nombre o quita alguno de los filtros.</span>
-        <button type="button" className="mk-btn" onClick={limpiar}>Quitar búsqueda y filtros</button>
-      </div>
-    );
-  }
-
+/** per_tabla_docentes */
+export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfil[]; seleccionado?: string; elegir: (id: string) => void }) {
   return (
-    <div data-componente="per_tabla_docentes">
-      <div className="mk-tw mk-tw-marco" style={{ marginTop: "var(--cds-gap-md)" }}>
-        <table className="mk-table">
-          <caption className="mk-sr">{filas.length} docentes</caption>
-          <thead>
-            <tr>{COLUMNAS.map((c) => (
-              <th key={c.clave} aria-sort={orden.col === c.clave ? (orden.asc ? "ascending" : "descending") : "none"}>
-                <button type="button" className="mk-th-orden" onClick={() => ordenar(c.clave)}>
-                  {c.titulo}
-                  <span className="mk-th-flecha" aria-hidden>{orden.col === c.clave ? (orden.asc ? "▲" : "▼") : "↕"}</span>
-                </button>
-              </th>
-            ))}</tr>
-          </thead>
-          <tbody>
-            {visibles.map((r) => (
-              <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}
-                tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); elegir(r.docente_id); } }}>
-                <td className="mk-td-codigo">{r.docente_id}</td><td className="mk-td-nombre">{r.docente_nombre}</td><td>{r.cargo}</td><td>{r.colegio}</td>
-                <td>{r.niveles_por_anio}</td><td><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mk-paginas">
-        <span>{(actual * POR_PAGINA + 1).toLocaleString("es-CO")}–{Math.min((actual + 1) * POR_PAGINA, filas.length).toLocaleString("es-CO")} de {filas.length.toLocaleString("es-CO")}</span>
-        <div>
-          <button type="button" className="mk-btn" disabled={actual === 0} onClick={() => setPagina(actual - 1)} aria-label="Página anterior">‹ Anterior</button>
-          <span className="mk-paginas-n">Página {actual + 1} de {paginas}</span>
-          <button type="button" className="mk-btn" disabled={actual >= paginas - 1} onClick={() => setPagina(actual + 1)} aria-label="Página siguiente">Siguiente ›</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** per_panel_ficha · la ficha del docente en un panel lateral (se cierra con ×, clic fuera o Esc) */
-export function PerPanelFicha({ abierto, cerrar, children }: { abierto: boolean; cerrar: () => void; children: React.ReactNode }) {
-  useEffect(() => {
-    if (!abierto) return;
-    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") cerrar(); };
-    document.addEventListener("keydown", esc);
-    return () => document.removeEventListener("keydown", esc);
-  }, [abierto, cerrar]);
-  if (!abierto) return null;
-  return (
-    <div className="mk-panel-lateral-fondo" onClick={cerrar} data-componente="per_panel_ficha">
-      <aside className="mk-panel-lateral" role="dialog" aria-modal="true" aria-label="Ficha del docente" onClick={(e) => e.stopPropagation()}>
-        <div className="mk-panel-lateral-cab">
-          <h2>Ficha del docente</h2>
-          <button type="button" className="mk-icono-btn" onClick={cerrar} aria-label="Cerrar ficha" title="Cerrar (Esc)">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
-          </button>
-        </div>
-        {children}
-      </aside>
+    <div className="mk-tw mk-tw-marco" style={{ marginTop: "var(--cds-gap-md)" }} data-componente="per_tabla_docentes">
+      <table className="mk-table">
+        <caption className="mk-sr">{filas.length} docentes</caption>
+        <thead>
+          <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>Permanencia</th></tr>
+        </thead>
+        <tbody>
+          {filas.map((r) => (
+            <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
+              <td className="mk-td-codigo">{r.docente_id}</td><td className="mk-td-nombre">{r.docente_nombre}</td><td>{r.cargo}</td><td>{r.colegio}</td>
+              <td>{r.niveles_por_anio}</td><td><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

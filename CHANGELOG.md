@@ -35,7 +35,6 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 ### Cambiado (experiencia de uso)
 - **Enlace con estado:** pestaña, vista, año y filtros de Perfiles quedan en la URL (compartir, recargar, atrás).
   No se guardan el docente elegido ni la búsqueda (pueden tener datos personales).
-- **Perfiles:** ordenar por columna, páginas de 50, mensaje cuando no hay resultados y ficha en panel lateral.
 - **Barra superior:** se quita el botón de buscar. **Avisos** muestra "Actualizado el …" de la base (dbt
   `tab_actualizacion`) y un resumen de lo que muestra el tablero; **Información**, datos básicos.
 - **ⓘ en cada gráfico** con lo que mide.
