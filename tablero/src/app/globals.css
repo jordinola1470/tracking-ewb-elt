@@ -434,3 +434,9 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-kpi-tono:hover .mk-kpi-v{transform:scale(1.04)}
 .mk-kpi-tono:hover .mk-kpi-icono{transform:none;background:rgba(255,255,255,.3)}
 @media (prefers-reduced-motion:reduce){.mk-kpi-tono::after{display:none}.mk-kpi-tono:hover .mk-kpi-v{transform:none}}
+/* Indicadores: versión sutil — sin brillo ni crecimiento; solo un borde interior tenue y un leve aclarado */
+.mk-kpi-tono::after{display:none}
+.mk-kpi-tono{transition:box-shadow .25s ease,filter .25s ease}
+.mk-kpi-tono:hover{box-shadow:var(--sombra),inset 0 0 0 1px rgba(255,255,255,.28);filter:brightness(1.04)}
+.mk-kpi-tono:hover .mk-kpi-v{transform:none}
+.mk-kpi-tono:hover .mk-kpi-icono{background:rgba(255,255,255,.24)}
