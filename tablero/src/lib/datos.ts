@@ -29,10 +29,28 @@ export type Historial = {
 };
 export type Totales = { ied_total: number; docentes_total: number; participaciones_total: number };
 export type CargoDocentes = { cargo: string; docentes: number };
+export type FsAnio = {
+  anio_lectivo: number; docentes: number; colegios: number; grupos: number; nuevos: number; recurrentes: number;
+  mujeres: number; hombres: number; genero_sin_dato: number; pct_mujeres: number | null;
+  mcer_comparables: number; mcer_mejoraron: number; mcer_mantuvieron: number; mcer_bajaron: number; pct_mcer_mejoraron: number | null;
+  score_comparables: number; score_entrada_promedio: number | null; score_salida_promedio: number | null; score_subieron: number;
+  con_constancia: number; sin_constancia: number; pct_constancia: number | null;
+  asistencia_promedio: number | null; asistencia_80_o_mas: number; asistencia_menos_80: number; asistencia_sin_dato: number;
+  base_retencion: number | null; continuan: number | null; pct_retencion: number | null;
+  nivel_comparables: number | null; nivel_subieron: number | null; nivel_mismo: number | null; nivel_bajaron: number | null;
+};
+export type FsDist = { seccion: string; anio: number | null; categoria: string; orden: number; docentes: number; extra: number | null; pct: number };
+export type FsResumen = {
+  participaciones: number; participantes_unicos: number; mujeres: number; hombres: number; un_anio: number; dos_anios: number;
+  tres_anios: number; cuatro_anios: number; colegios: number; colegios_todos_los_anios: number; anios_programa: number;
+  primer_anio: number; ultimo_anio: number;
+};
+export type FactSheet = { anios: FsAnio[]; dist: FsDist[]; resumen: FsResumen | null };
 export type NivelUltimo = { nivel: string; orden_nivel: number; docentes: number; pct_docentes: number };
 export type DatosTablero = {
   kpis: KpiAnio[]; niveles: NivelAnio[]; cargos: CargoAnio[]; permanencia: Permanencia[];
   perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[]; nivelUltimo: NivelUltimo[];
+  factSheet: FactSheet;
 };
 
 // Los datos cambian pocas veces al año: se guardan en memoria 10 minutos por servidor.
@@ -86,6 +104,25 @@ async function leerTablas(): Promise<DatosTablero> {
       select cargo, docentes::int from public.tab_cargo_docentes order by docentes desc, cargo`;
   const nivelUltimo = await sql<NivelUltimo[]>`
       select nivel, orden_nivel::int, docentes::int, pct_docentes::float8 from public.tab_nivel_ultimo order by orden_nivel, nivel`;
+  // Fact sheet (pestaña Reporte): solo agregados
+  const fsAnios = await sql<FsAnio[]>`
+      select anio_lectivo, docentes::int, colegios::int, grupos::int, nuevos::int, recurrentes::int,
+             mujeres::int, hombres::int, genero_sin_dato::int, pct_mujeres::float8,
+             mcer_comparables::int, mcer_mejoraron::int, mcer_mantuvieron::int, mcer_bajaron::int, pct_mcer_mejoraron::float8,
+             score_comparables::int, score_entrada_promedio::float8, score_salida_promedio::float8, score_subieron::int,
+             con_constancia::int, sin_constancia::int, pct_constancia::float8,
+             asistencia_promedio::float8, asistencia_80_o_mas::int, asistencia_menos_80::int, asistencia_sin_dato::int,
+             base_retencion::int, continuan::int, pct_retencion::float8,
+             nivel_comparables::int, nivel_subieron::int, nivel_mismo::int, nivel_bajaron::int
+      from public.tab_fs_anio order by anio_lectivo`;
+  const fsDist = await sql<FsDist[]>`
+      select seccion, anio::int, categoria, orden::int, docentes::int, extra::int, pct::float8
+      from public.tab_fs_distribucion order by seccion, anio nulls first, orden, docentes desc, categoria`;
+  const fsResumen = await sql<FsResumen[]>`
+      select participaciones::int, participantes_unicos::int, mujeres::int, hombres::int, un_anio::int, dos_anios::int,
+             tres_anios::int, cuatro_anios::int, colegios::int, colegios_todos_los_anios::int, anios_programa::int,
+             primer_anio::int, ultimo_anio::int
+      from public.tab_fs_resumen`;
   const perfiles = await sql<Perfil[]>`
       select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia::float8
@@ -99,6 +136,7 @@ async function leerTablas(): Promise<DatosTablero> {
     kpis: [...kpis], niveles: [...niveles], cargos: [...cargos],
     permanencia: [...permanencia], perfiles: [...perfiles], historial: [...historial],
     totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes], nivelUltimo: [...nivelUltimo],
+    factSheet: { anios: [...fsAnios], dist: [...fsDist], resumen: fsResumen[0] ?? null },
   };
   cache = { cuando: Date.now(), datos };
   return datos;

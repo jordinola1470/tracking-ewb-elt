@@ -26,7 +26,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Página de inicio de sesión con el estilo del tablero y los logos de Google y Microsoft.
 - Histórico: **Nivel actual de los docentes** (toda la población según su último nivel cursado, con % del
   total; `tab_nivel_ultimo`, cálculo propio: "-" no cuenta como nivel cursado). La ficha de Perfiles no cambia.
-- Nueva pestaña **Reporte** en la barra lateral (próximamente).
+- Nueva pestaña **Reporte** con el **fact sheet** del programa (las 8 secciones de `docs/FACT_SHEET_ANALITICA.md`,
+  2023–2026 y reglas actuales) y botón **Descargar PDF** (impresión del navegador con los estilos del tablero, A4).
+  dbt: `int_fs_docente_anio` (una fila por docente y año), `tab_fs_anio`, `tab_fs_distribucion`, `tab_fs_resumen`.
 - Indicadores por año: animación sutil al pasar el mouse.
 - Texto de permanencia más sencillo.
 

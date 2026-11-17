@@ -9,6 +9,7 @@ import {
   AnaGrafConstanciaAnio, AnaGrafConstanciaCargo, AnaGrafConstanciaNivel,
   AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafNivelUltimo, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
 } from "./analitica/ana_graficos";
+import { RepFactSheet } from "./reporte/rep_fact_sheet";
 import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
@@ -161,17 +162,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         </>
       )}
 
-      {pestana === "reporte" && (
-        <section className="mk-panel mk-reporte" data-seccion="reporte">
-          <div className="mk-reporte-vacio">
-            <span className="mk-reporte-icono" aria-hidden>
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
-            </span>
-            <h2>Reporte</h2>
-            <p className="mk-note">Próximamente.</p>
-          </div>
-        </section>
-      )}
+      {pestana === "reporte" && <RepFactSheet fs={datos.factSheet} />}
 
       {pestana === "perfiles" && (
         <section className="mk-panel">

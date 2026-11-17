@@ -38,6 +38,7 @@ tablero/
 | Barra vertical, título superior, botones de arriba a la derecha | `src/componentes/Tablero.tsx` (estilos en `globals.css`, clases `mk-lateral`, `mk-cabecera`, `mk-acciones`) |
 | Ancho de la barra vertical | `globals.css`, regla `.mk-app` (`grid-template-columns`) |
 | Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
+| El fact sheet (pestaña Reporte) y su PDF | `src/componentes/reporte/rep_fact_sheet.tsx` (estilos de impresión en `globals.css`, `@media print`) |
 | **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |
 
 ## Componentes y su fuente
@@ -52,6 +53,8 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 | `ana_graf_permanencia` | `tab_permanencia` |
 | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` | `tab_perfiles` |
 | `per_tabla_historial` | `tab_historial` |
+| `ana_graf_ied_atendidas` · `ana_graf_cargo_docentes` · `ana_graf_nivel_ultimo` | `tab_totales` + `tab_kpis_anio` · `tab_cargo_docentes` · `tab_nivel_ultimo` |
+| `rep_fact_sheet` | `tab_fs_resumen`, `tab_fs_anio`, `tab_fs_distribucion` |
 
 ## Paleta de colores
 

@@ -42,6 +42,27 @@ models:
       - name: nivel
         data_tests: [unique, not_null]
 
+  - name: int_fs_docente_anio
+    description: "Fact sheet: una fila por docente y año (prefiere la fila no retirada). Base interna del fact sheet."
+    columns:
+      - name: docente_id
+        data_tests: [not_null]
+
+  - name: tab_fs_anio
+    description: "Fact sheet: indicadores por año (rep_fact_sheet)."
+    columns:
+      - name: anio_lectivo
+        data_tests: [unique, not_null]
+
+  - name: tab_fs_distribucion
+    description: "Fact sheet: distribuciones (sección, año, categoría, docentes, %) (rep_fact_sheet)."
+    columns:
+      - name: seccion
+        data_tests: [not_null]
+
+  - name: tab_fs_resumen
+    description: "Fact sheet: resumen ejecutivo en una fila (rep_fact_sheet)."
+
   - name: tab_permanencia
     description: "Docentes por grupo de permanencia, todos los años (ana_graf_permanencia)."
     columns:
