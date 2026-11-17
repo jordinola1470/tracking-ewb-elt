@@ -440,3 +440,10 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-kpi-tono:hover{box-shadow:var(--sombra),inset 0 0 0 1px rgba(255,255,255,.28);filter:brightness(1.04)}
 .mk-kpi-tono:hover .mk-kpi-v{transform:none}
 .mk-kpi-tono:hover .mk-kpi-icono{background:rgba(255,255,255,.24)}
+/* Indicadores: punto medio — brillo suave y lento, borde interior visible pero tenue, número apenas mayor */
+.mk-kpi-tono::after{display:block;width:40%;
+  background:linear-gradient(105deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.12) 50%,rgba(255,255,255,0) 100%);
+  transition:transform 1s ease}
+.mk-kpi-tono:hover{box-shadow:var(--sombra),inset 0 0 0 1.5px rgba(255,255,255,.32);filter:brightness(1.05)}
+.mk-kpi-tono:hover .mk-kpi-v{transform:scale(1.02)}
+@media (prefers-reduced-motion:reduce){.mk-kpi-tono::after{display:none}.mk-kpi-tono:hover .mk-kpi-v{transform:none}}
