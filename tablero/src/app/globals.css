@@ -371,3 +371,36 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-filtro-anio-campo{position:relative;display:inline-flex;align-items:center}
 .mk-filtro-anio select{appearance:none;-webkit-appearance:none;border:0;outline:0;background:transparent;font:inherit;font-size:16px;font-weight:800;color:var(--marca-principal);padding:0 20px 0 0;margin:0;cursor:pointer}
 .mk-filtro-anio-flecha{position:absolute;right:0;pointer-events:none;color:var(--marca-verde)}
+
+/* ── Filtros en píldora (componentes/comunes/filtro_pildora.tsx) ─────────────────────
+   El <select> invisible cubre toda la píldora: cualquier clic abre la lista.
+   Grande = filtro principal (año). Pequeño = filtros de Perfiles (un poco menor, para dar jerarquía). */
+.mk-pildora-filtro{position:relative;display:inline-flex;align-items:center;min-width:0;border-radius:var(--radio-pildora);background:var(--color-panel);border:var(--borde) solid var(--color-border-line);box-shadow:var(--sombra);cursor:pointer;transition:border-color .15s ease,transform .12s ease}
+.mk-pildora-filtro:hover{border-color:var(--marca-principal);transform:translateY(-1px)}
+.mk-pildora-filtro:focus-within{border-color:var(--marca-verde);box-shadow:0 0 0 3px rgba(64,152,76,.2),var(--sombra)}
+.mk-pildora-filtro select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font:inherit;appearance:none;-webkit-appearance:none;border:0}
+.mk-pildora-icono{display:inline-grid;place-items:center;border-radius:50%;background:var(--marca-principal);color:#fff;flex:none}
+.mk-pildora-txt{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.15}
+.mk-pildora-txt small{font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-fg-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-pildora-valor{font-weight:800;color:var(--marca-principal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-pildora-flecha{flex:none;color:var(--marca-verde)}
+/* Grande (año) */
+.mk-pildora-grande{gap:10px;padding:5px 14px 5px 5px}
+.mk-pildora-grande .mk-pildora-icono{width:34px;height:34px}
+.mk-pildora-grande .mk-pildora-icono svg{width:16px;height:16px}
+.mk-pildora-grande small{font-size:10px}
+.mk-pildora-grande .mk-pildora-valor{font-size:16px}
+.mk-pildora-grande .mk-pildora-flecha{width:14px;height:14px}
+/* Pequeño (Perfiles) */
+.mk-pildora-pequeno{gap:8px;padding:4px 12px 4px 4px;width:100%}
+.mk-pildora-pequeno .mk-pildora-icono{width:28px;height:28px}
+.mk-pildora-pequeno .mk-pildora-icono svg{width:13px;height:13px}
+.mk-pildora-pequeno small{font-size:9px}
+.mk-pildora-pequeno .mk-pildora-valor{font-size:13px}
+.mk-pildora-pequeno .mk-pildora-flecha{width:12px;height:12px}
+/* Filtro con valor elegido: icono verde */
+.mk-pildora-pequeno.activo .mk-pildora-icono{background:var(--marca-verde)}
+.mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+/* Ajustes: tildes visibles en la etiqueta pequeña y filtros de Perfiles en 2 columnas con aire */
+.mk-pildora-txt small{line-height:1.4;padding-top:1px}
+.mk-filtros-perfil{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}

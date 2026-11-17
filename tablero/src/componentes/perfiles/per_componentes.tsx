@@ -3,6 +3,7 @@
 // Fuentes: tab_perfiles (una fila por docente) y tab_historial (una fila por docente y año).
 import type { Historial, Perfil } from "@/lib/datos";
 import { pct } from "../comunes/graficos";
+import { FiltroPildora } from "../comunes/filtro_pildora";
 
 /** per_buscador */
 export function PerBuscador({ texto, cambiar }: { texto: string; cambiar: (t: string) => void }) {
@@ -36,26 +37,23 @@ const opciones = (valores: (string | null)[], orden?: string[]) => {
 export function PerFiltros({ perfiles, filtros, cambiar, total }: {
   perfiles: Perfil[]; filtros: FiltrosPerfil; cambiar: (f: FiltrosPerfil) => void; total: number;
 }) {
-  const campos: { clave: keyof FiltrosPerfil; etiqueta: string; valores: string[] }[] = [
-    { clave: "nivel", etiqueta: "Nivel de formación", valores: opciones(perfiles.map((p) => p.ultimo_nivel_formacion), ORDEN_NIVEL) },
-    { clave: "cargo", etiqueta: "Cargo", valores: opciones(perfiles.map((p) => p.cargo)) },
-    { clave: "ied", etiqueta: "IED", valores: opciones(perfiles.map((p) => p.colegio)) },
-    { clave: "permanencia", etiqueta: "Permanencia", valores: opciones(perfiles.map((p) => p.permanencia)) },
+  const campos: { clave: keyof FiltrosPerfil; etiqueta: string; icono: string; valores: string[] }[] = [
+    { clave: "nivel", etiqueta: "Nivel de formación", icono: "nivel", valores: opciones(perfiles.map((p) => p.ultimo_nivel_formacion), ORDEN_NIVEL) },
+    { clave: "cargo", etiqueta: "Cargo", icono: "cargo", valores: opciones(perfiles.map((p) => p.cargo)) },
+    { clave: "ied", etiqueta: "IED", icono: "ied", valores: opciones(perfiles.map((p) => p.colegio)) },
+    { clave: "permanencia", etiqueta: "Permanencia", icono: "permanencia", valores: opciones(perfiles.map((p) => p.permanencia)) },
   ];
   const activos = Object.values(filtros).some(Boolean);
   return (
     <div className="mk-filtros-perfil" data-componente="per_filtros">
+      {/* Filtros secundarios (pequeños): misma forma que el filtro de año, un poco menores */}
       {campos.map((c) => (
-        <label key={c.clave} className="mk-filtro-perfil">
-          <span>{c.etiqueta}</span>
-          <select className="dash-select" value={filtros[c.clave]} onChange={(e) => cambiar({ ...filtros, [c.clave]: e.target.value })}>
-            <option value="">Todos</option>
-            {c.valores.map((v) => <option key={v} value={v}>{v}</option>)}
-          </select>
-        </label>
+        <FiltroPildora key={c.clave} tamano="pequeno" etiqueta={c.etiqueta} icono={c.icono} valor={filtros[c.clave]}
+          opciones={[{ valor: "", texto: "Todos" }, ...c.valores.map((v) => ({ valor: v, texto: v }))]}
+          cambiar={(v) => cambiar({ ...filtros, [c.clave]: v })} />
       ))}
       <div className="mk-filtros-pie">
-        <span>{total.toLocaleString("es-CO")} docentes</span>
+        <span>{total.toLocaleString("es-CO")} {total === 1 ? "docente" : "docentes"}</span>
         {activos && <button type="button" className="mk-btn" onClick={() => cambiar(FILTROS_VACIOS)}>Quitar filtros</button>}
       </div>
     </div>
