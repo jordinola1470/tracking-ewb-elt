@@ -19,6 +19,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   mayúsculas de título ("María del Carmen Pérez"), correos en minúscula, constancia "Si"/"No", nombres de IED
   en el formato de la lista oficial. En diamond, un solo nombre por docente (el del año más reciente).
 
+### Agregado (tablero)
+- Histórico: **IED atendidas** (total de todos los años + barras por año, `tab_totales`) y **Docentes por cargo**
+  (último cargo de cada docente, `tab_cargo_docentes`); cuadrícula de 2 x 2.
+- Perfiles: filtros de nivel de formación, cargo, IED y permanencia debajo del buscador.
+- Página de inicio de sesión con el estilo del tablero y los logos de Google y Microsoft.
+- Texto de permanencia más sencillo.
+
 ### Cambiado (tablero · indicadores)
 - "Con prueba de entrada y salida" se reemplaza por **IED únicas del año** (`tab_kpis_anio.ied_unicas`).
 - Cada indicador tiene color (degradados de la paleta institucional).
