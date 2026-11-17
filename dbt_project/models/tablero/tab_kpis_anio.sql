@@ -4,6 +4,17 @@
 --              ana_graf_pruebas_presentadas
 with base as (
     select * from {{ ref('consolidado_historico') }}
+),
+
+-- Asistencia y retirados con una fila por docente y año (igual que el fact sheet):
+-- si el Excel trae a un docente dos veces en el año, no se cuenta doble
+asistencia as (
+    select
+        anio_lectivo,
+        round((avg(asistencia) filter (where not es_retirado))::numeric, 4)        as asistencia_promedio,
+        count(*) filter (where es_retirado)                                        as retirados
+    from {{ ref('int_fs_docente_anio') }}
+    group by anio_lectivo
 )
 
 select
@@ -23,8 +34,9 @@ select
     count({{ tiene_constancia() }}) - coalesce(sum({{ tiene_constancia() }}), 0) as sin_constancia,
     -- % sobre quienes tienen el dato de constancia (vacío si el año aún no lo trae)
     round(avg({{ tiene_constancia() }})::numeric, 4)                            as pct_constancia,
-    -- Asistencia promedio sin contar retirados (escala 0-1)
-    round((avg(asistencia_porcentaje_fix) filter (where not {{ es_retirado() }}))::numeric, 4) as asistencia_promedio,
-    count(*) filter (where {{ es_retirado() }})                                 as retirados
+    -- Asistencia promedio sin contar retirados (escala 0-1) y retirados: una fila por docente y año
+    max(a.asistencia_promedio)                                                  as asistencia_promedio,
+    max(a.retirados)                                                            as retirados
 from base
+left join asistencia a using (anio_lectivo)
 group by anio_lectivo

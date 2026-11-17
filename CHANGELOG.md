@@ -10,6 +10,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Corregido (fact sheet)
+- Datos validados entre secciones y contra el tablero (0 diferencias con datos reales):
+  - IED por año con todas las filas del año, como el tablero (2026: 128, no 127).
+  - Asistencia: los rangos «≥ 80 %» y «< 80 %» ya no incluyen a los retirados (antes, en 2026, el promedio
+    era 85 % y 347 aparecían bajo 80 %); nueva columna «Retirados».
+  - Tablero y fact sheet calculan asistencia y retirados con una fila por docente y año (antes 84 % vs 85 %).
+  - Constancia de un año sin el dato se muestra «—» en vez de «0».
+- **Descargar PDF** propone el nombre «AAAA-MM-DD factsheet ewb» (fecha de la descarga).
+
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.
 - Perfil (arriba a la derecha): la píldora abre un menú con el correo y **Cerrar sesión**; se quita el botón
