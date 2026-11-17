@@ -1,7 +1,7 @@
 "use client";
 // Tablero completo: pestañas Analítica (subcategorías Histórico y Por año) y Perfiles.
 // Solo filtra filas ya calculadas por dbt y dibuja.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DatosTablero } from "@/lib/datos";
 import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
 import { AnaKpis } from "./analitica/ana_kpis";
@@ -10,7 +10,8 @@ import {
   AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafNivelUltimo, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
 } from "./analitica/ana_graficos";
 import { RepFactSheet } from "./reporte/rep_fact_sheet";
-import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
+import { BarraAvisos } from "./comunes/barra_avisos";
+import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerPanelFicha, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
 type VistaAnalitica = "historico" | "por_anio";
@@ -22,14 +23,47 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<FiltrosPerfil>(FILTROS_VACIOS);
-  const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
+  const [seleccionado, setSeleccionado] = useState<string | undefined>(undefined);
+
+  // ── Estado en el enlace (URL): pestaña, vista, año y filtros de Perfiles ──────────
+  // Así se puede compartir lo que se ve y recargar sin perderlo; "atrás" vuelve a la vista anterior.
+  // No se guardan el docente elegido ni la búsqueda (pueden contener datos personales).
+  const navegacion = useRef<string | null>(null);
+  const [enlaceLeido, setEnlaceLeido] = useState(false);
+  useEffect(() => {
+    const aplicar = () => {
+      const q = new URLSearchParams(window.location.search);
+      const pe = q.get("pestana"), vi = q.get("vista"), an = Number(q.get("anio"));
+      const p: Pestana = pe === "perfiles" || pe === "reporte" ? pe : "analitica";
+      const v: VistaAnalitica = vi === "por_anio" ? "por_anio" : "historico";
+      navegacion.current = `${p}|${v}`;
+      setPestana(p);
+      setVista(v);
+      if (anios.includes(an)) setAnio(an);
+      setFiltros({ nivel: q.get("nivel") ?? "", cargo: q.get("cargo") ?? "", ied: q.get("ied") ?? "", permanencia: q.get("permanencia") ?? "" });
+      setEnlaceLeido(true);
+    };
+    aplicar();
+    window.addEventListener("popstate", aplicar);
+    return () => window.removeEventListener("popstate", aplicar);
+  }, [anios]);
+  useEffect(() => {
+    if (!enlaceLeido) return; // primero se aplica lo que dice el enlace; recién entonces se escribe
+    const q = new URLSearchParams();
+    if (pestana !== "analitica") q.set("pestana", pestana);
+    if (pestana === "analitica" && vista === "por_anio") { q.set("vista", vista); q.set("anio", String(anio)); }
+    if (pestana === "perfiles") (Object.entries(filtros) as [string, string][]).forEach(([k, v]) => { if (v) q.set(k, v); });
+    const url = `${window.location.pathname}${q.toString() ? `?${q}` : ""}`;
+    const nav = `${pestana}|${vista}`;
+    if (nav !== navegacion.current) { window.history.pushState(null, "", url); navegacion.current = nav; }
+    else window.history.replaceState(null, "", url);
+  }, [enlaceLeido, pestana, vista, anio, filtros]);
 
   // Filtrar por año (sin cálculos)
   const kpi = datos.kpis.find((k) => k.anio_lectivo === anio);
   const nivelesAnio = useMemo(() => datos.niveles.filter((n) => n.anio_lectivo === anio), [datos.niveles, anio]);
   const cargosAnio = useMemo(() => datos.cargos.filter((c) => c.anio_lectivo === anio), [datos.cargos, anio]);
 
-  // Buscar docentes (sin cálculos)
   // Buscar y filtrar docentes (sin cálculos: solo se comparan los valores que ya trae tab_perfiles)
   const perfilesFiltrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
@@ -52,19 +86,8 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         <h1>English Without Borders</h1>
         {/* Menú secundario arriba a la derecha: perfil del usuario (sin cerrar sesión) */}
         <div className="mk-acciones">
-        {/* Botones de acción (modelo de la referencia): buscar · avisos · información */}
-        <div className="mk-iconos" data-componente="acciones_superiores">
-          <button type="button" className="mk-icono-sup" title="Buscar docente" aria-label="Buscar docente" onClick={() => setPestana("perfiles")}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-          </button>
-          <button type="button" className="mk-icono-sup" title="Avisos (próximamente)" aria-label="Avisos">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-            <span className="mk-punto" aria-hidden />
-          </button>
-          <button type="button" className="mk-icono-sup" title="Información (próximamente)" aria-label="Información">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
-          </button>
-        </div>
+        {/* Avisos (actualizado el + resumen) e información básica */}
+        <BarraAvisos act={datos.actualizacion} />
         <div className="mk-perfil-usuario" data-componente="perfil_usuario">
           <span className="mk-avatar" aria-hidden>{(usuario || "?").charAt(0).toUpperCase()}</span>
           <span className="mk-user-txt">
@@ -166,19 +189,18 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
 
       {pestana === "perfiles" && (
         <section className="mk-panel">
-          <div className="mk-perf">
-            <div className="mk-card">
-              <h2>Docentes</h2>
-              <p className="mk-note">Busca por nombre, colegio o código y selecciona una fila para ver su ficha.</p>
-              <PerBuscador texto={busqueda} cambiar={setBusqueda} />
-              <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
-              <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado} />
-            </div>
-            <div className="mk-card">
-              <h2>Ficha del docente</h2>
-              <PerFichaDocente perfil={perfil} historial={historial} />
-            </div>
+          <div className="mk-card">
+            <h2>Docentes</h2>
+            <p className="mk-note">Busca por nombre, colegio o código, filtra y haz clic en una fila para abrir la ficha.</p>
+            <PerBuscador texto={busqueda} cambiar={setBusqueda} />
+            <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
+            <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado}
+              limpiar={() => { setFiltros(FILTROS_VACIOS); setBusqueda(""); }} />
           </div>
+          {/* Ficha en panel lateral: se abre al elegir un docente */}
+          <PerPanelFicha abierto={!!perfil} cerrar={() => setSeleccionado(undefined)}>
+            <PerFichaDocente perfil={perfil} historial={historial} />
+          </PerPanelFicha>
         </section>
       )}
       </div>

@@ -38,6 +38,8 @@ tablero/
 | Barra vertical, título superior, botones de arriba a la derecha | `src/componentes/Tablero.tsx` (estilos en `globals.css`, clases `mk-lateral`, `mk-cabecera`, `mk-acciones`) |
 | Ancho de la barra vertical | `globals.css`, regla `.mk-app` (`grid-template-columns`) |
 | Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
+| Avisos (actualizado el) e Información de la barra superior | `src/componentes/comunes/barra_avisos.tsx` |
+| Textos del ícono ⓘ de cada gráfico | `src/componentes/analitica/ana_graficos.tsx` (constante `INFO`) |
 | El fact sheet (pestaña Reporte) y su PDF | `src/componentes/reporte/rep_fact_sheet.tsx` (estilos de impresión en `globals.css`, `@media print`) |
 | **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |
 
@@ -73,7 +75,7 @@ Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las va
 | `--principal-suave` | `#F3F5F5` | Tarjetas dentro de los paneles, filas alternas de las tablas |
 | `--verde-claro` | `#D9EBDB` | Fila elegida, estado "Sí" y píldoras de permanencia |
 | `--color-fondo` | `#D5DCDE` | Fondo gris de la página (más oscuro para dar contraste a los paneles blancos) |
-| `--marca-negro` | `#2B3036` | Gris grafito (negro suavizado): títulos y números principales, opción elegida de la barra lateral, píldora EwB, botón de descarga (ejes en `--negro-suave` `#4A5157`) |
+| `--marca-negro` | `#22333B` | Gris pizarra con matiz azul petróleo: títulos y números principales, opción elegida de la barra lateral, píldora EwB, botón de descarga (ejes e íconos ⓘ en `--negro-suave` `#56676D`) |
 
 Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.

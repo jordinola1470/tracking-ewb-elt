@@ -63,6 +63,12 @@ models:
   - name: tab_fs_resumen
     description: "Fact sheet: resumen ejecutivo en una fila (rep_fact_sheet)."
 
+  - name: tab_actualizacion
+    description: "Fechas de actualización: recálculo (dbt) y última carga de Excel (barra_avisos)."
+    columns:
+      - name: transformado_en
+        data_tests: [not_null]
+
   - name: tab_permanencia
     description: "Docentes por grupo de permanencia, todos los años (ana_graf_permanencia)."
     columns:

@@ -46,11 +46,12 @@ export type FsResumen = {
   primer_anio: number; ultimo_anio: number;
 };
 export type FactSheet = { anios: FsAnio[]; dist: FsDist[]; resumen: FsResumen | null };
+export type Actualizacion = { transformado_en: string; cargado_en: string | null; ultimo_anio: number; registros: number };
 export type NivelUltimo = { nivel: string; orden_nivel: number; docentes: number; pct_docentes: number };
 export type DatosTablero = {
   kpis: KpiAnio[]; niveles: NivelAnio[]; cargos: CargoAnio[]; permanencia: Permanencia[];
   perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[]; nivelUltimo: NivelUltimo[];
-  factSheet: FactSheet;
+  factSheet: FactSheet; actualizacion: Actualizacion | null;
 };
 
 // Los datos cambian pocas veces al año: se guardan en memoria 10 minutos por servidor.
@@ -104,6 +105,12 @@ async function leerTablas(): Promise<DatosTablero> {
       select cargo, docentes::int from public.tab_cargo_docentes order by docentes desc, cargo`;
   const nivelUltimo = await sql<NivelUltimo[]>`
       select nivel, orden_nivel::int, docentes::int, pct_docentes::float8 from public.tab_nivel_ultimo order by orden_nivel, nivel`;
+  // Fechas de actualización (hora de Colombia, como texto ISO sin zona)
+  const actualizacion = await sql<Actualizacion[]>`
+      select to_char(transformado_en at time zone 'America/Bogota', 'YYYY-MM-DD"T"HH24:MI') as transformado_en,
+             to_char(cargado_en at time zone 'America/Bogota', 'YYYY-MM-DD"T"HH24:MI') as cargado_en,
+             ultimo_anio::int, registros::int
+      from public.tab_actualizacion`;
   // Fact sheet (pestaña Reporte): solo agregados
   const fsAnios = await sql<FsAnio[]>`
       select anio_lectivo, docentes::int, colegios::int, grupos::int, nuevos::int, recurrentes::int,
@@ -137,6 +144,7 @@ async function leerTablas(): Promise<DatosTablero> {
     permanencia: [...permanencia], perfiles: [...perfiles], historial: [...historial],
     totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes], nivelUltimo: [...nivelUltimo],
     factSheet: { anios: [...fsAnios], dist: [...fsDist], resumen: fsResumen[0] ?? null },
+    actualizacion: actualizacion[0] ?? null,
   };
   cache = { cuando: Date.now(), datos };
   return datos;

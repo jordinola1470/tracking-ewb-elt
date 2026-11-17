@@ -32,9 +32,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Indicadores por año: animación sutil al pasar el mouse.
 - Texto de permanencia más sencillo.
 
+### Cambiado (experiencia de uso)
+- **Enlace con estado:** pestaña, vista, año y filtros de Perfiles quedan en la URL (compartir, recargar, atrás).
+  No se guardan el docente elegido ni la búsqueda (pueden tener datos personales).
+- **Perfiles:** ordenar por columna, páginas de 50, mensaje cuando no hay resultados y ficha en panel lateral.
+- **Barra superior:** se quita el botón de buscar. **Avisos** muestra "Actualizado el …" de la base (dbt
+  `tab_actualizacion`) y un resumen de lo que muestra el tablero; **Información**, datos básicos.
+- **ⓘ en cada gráfico** con lo que mide.
+
 ### Cambiado (tablero · indicadores)
-- Paleta: gris grafito `#2B3036` (`--marca-negro`, negro suavizado) en títulos y números principales, opción elegida de la barra
-  lateral, píldora EwB, iconos de filtros y botón de descarga; ejes de gráficos en `#4A5157`.
+- Paleta: gris pizarra `#22333B` (`--marca-negro`, con matiz azul petróleo) en títulos y números principales, opción elegida de la barra
+  lateral, píldora EwB, iconos de filtros y botón de descarga; ejes de gráficos en `#56676D`.
 - "Con prueba de entrada y salida" se reemplaza por **IED únicas del año** (`tab_kpis_anio.ied_unicas`).
 - Cada indicador tiene color (degradados de la paleta institucional).
 - En Histórico ya no se muestra el resumen del año (solo en Por año).

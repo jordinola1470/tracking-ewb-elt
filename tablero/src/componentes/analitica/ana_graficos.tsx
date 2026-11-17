@@ -3,10 +3,31 @@
 import type { CargoAnio, CargoDocentes, KpiAnio, NivelAnio, NivelUltimo, Permanencia, Totales } from "@/lib/datos";
 import { BarrasHorizontales, BarrasVerticales, BarrasVerticalesApiladas, COLORES, COLORES_SERIE, Dona, RAYADO_PRINCIPAL, RAYADO_VERDE, entero, pct } from "../comunes/graficos";
 
+/** Qué mide cada gráfico (ícono ⓘ junto al título). Un solo lugar para editar los textos. */
+const INFO: Record<string, string> = {
+  ana_graf_pruebas_presentadas: "Participaciones del año con prueba de entrada, con prueba de salida y sin cada una. Una participación es un docente en un año.",
+  ana_graf_constancia_anio: "Docentes con y sin constancia en cada año. El % se calcula sobre quienes tienen el dato; un año sin ese campo muestra «sin dato».",
+  ana_graf_permanencia: "Años distintos en que participó cada docente. «Seguidos» = sin interrumpir; «continua» = 2 años o más seguidos.",
+  ana_graf_constancia_nivel: "% de participaciones con constancia, por nivel de formación (nivel del grupo asignado), en el año elegido.",
+  ana_graf_constancia_cargo: "% de participaciones con constancia, por cargo, en el año elegido.",
+  ana_graf_nivel_formacion: "Participaciones del año según el nivel del grupo al que se asignó a cada docente.",
+  ana_graf_ied_atendidas: "Instituciones distintas (por código DANE) con al menos un docente: total de todos los años y por año.",
+  ana_graf_cargo_docentes: "Docentes de todos los años; cada uno cuenta una vez, con el último cargo registrado.",
+  ana_graf_nivel_ultimo: "Toda la población de docentes según el último nivel que cursó sin retirarse. «Sin nivel registrado» = sin un nivel cursado válido.",
+};
+
 function Tarjeta({ nombre, titulo, nota, ancho, children }: { nombre: string; titulo: string; nota: React.ReactNode; ancho?: boolean; children: React.ReactNode }) {
   return (
     <div className="mk-card" data-componente={nombre} style={ancho ? { gridColumn: "1/-1" } : undefined}>
-      <h2>{titulo}</h2>
+      <h2 className="mk-titulo-info">
+        {titulo}
+        {INFO[nombre] && (
+          <span className="mk-info" tabIndex={0} role="note" aria-label={`Qué mide: ${INFO[nombre]}`}>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+            <span className="mk-info-texto" aria-hidden>{INFO[nombre]}</span>
+          </span>
+        )}
+      </h2>
       <p className="mk-note">{nota}</p>
       {children}
     </div>
