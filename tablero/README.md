@@ -73,7 +73,7 @@ Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las va
 | `--principal-suave` | `#F3F5F5` | Tarjetas dentro de los paneles, filas alternas de las tablas |
 | `--verde-claro` | `#D9EBDB` | Fila elegida, estado "Sí" y píldoras de permanencia |
 | `--color-fondo` | `#D5DCDE` | Fondo gris de la página (más oscuro para dar contraste a los paneles blancos) |
-| `--marca-negro` | `#111418` | Negro sutil: títulos y números principales, opción elegida de la barra lateral, píldora EwB, botón de descarga (ejes en `--negro-suave` `#2A2F35`) |
+| `--marca-negro` | `#2B3036` | Gris grafito (negro suavizado): títulos y números principales, opción elegida de la barra lateral, píldora EwB, botón de descarga (ejes en `--negro-suave` `#4A5157`) |
 
 Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.

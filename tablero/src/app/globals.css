@@ -553,3 +553,5 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 /* Ejes de los gráficos en gris casi negro */
 .mk-chart .eje .domain,.mk-chart .eje .tick line{stroke:var(--negro-suave) !important}
 .mk-chart .eje .tick text{fill:var(--negro-suave)}
+/* Negro aclarado a gris grafito (más sutil) */
+.tablero{--marca-negro:#2B3036;--negro-suave:#4A5157}
