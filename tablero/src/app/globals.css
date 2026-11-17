@@ -666,3 +666,28 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
   .mk-fs-lienzo .mk-fs-hoja{box-shadow:none !important}
 }
 .mk-fs-lienzo .mk-fs-hoja{background:#fff}
+
+/* ── Perfiles: la ficha va debajo de la tabla (más espacio para ambas) ───────────── */
+.mk-perf{grid-template-columns:1fr}
+
+/* ── Barra lateral contraíble (opcional; la elección se recuerda en el navegador) ─── */
+.mk-app{transition:grid-template-columns .25s ease}
+.mk-lateral-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border:0;font:inherit;font-weight:600;font-size:13px;color:var(--marca-negro);cursor:pointer;border-radius:var(--radio-pildora)}
+.mk-lateral-toggle:hover{background:#E4E9EA}
+.mk-app-contraida{grid-template-columns:76px minmax(0,1fr)}
+.mk-app-contraida .mk-tab-txt,.mk-app-contraida .mk-sello{display:none}
+.mk-app-contraida .mk-marca{padding:6px}
+.mk-app-contraida .mk-logo{font-size:10px;height:40px}
+.mk-app-contraida .mk-tabs{align-items:center;padding:10px 0;gap:10px}
+/* Cada ícono dentro de su círculo */
+.mk-app-contraida .mk-lateral .mk-tab{justify-content:center;width:46px;height:46px;padding:0;border-radius:50%;background:var(--principal-suave)}
+.mk-app-contraida .mk-lateral .mk-tab:not([aria-selected=true]):hover{background:#E4E9EA}
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true]{background:var(--marca-negro);color:#fff}
+.mk-app-contraida .mk-lateral .mk-tab svg{width:18px;height:18px;opacity:1}
+.mk-app-contraida .mk-lateral-toggle{width:46px;height:46px;padding:0;margin:0 auto;border-radius:50%}
+/* En pantallas angostas la barra va arriba: no se contrae */
+@media (max-width:900px){.mk-lateral-toggle{display:none}.mk-app-contraida{grid-template-columns:1fr}.mk-app-contraida .mk-tab-txt{display:inline}}
+/* Círculos centrados en la barra contraída */
+.mk-app-contraida .mk-lateral .mk-tabs{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.mk-app-contraida .mk-lateral .mk-tab{align-self:center;margin:0;flex:none}
+.mk-app-contraida .mk-lateral .mk-tabs{flex-wrap:nowrap}

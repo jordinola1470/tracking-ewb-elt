@@ -19,6 +19,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   - Constancia de un año sin el dato se muestra «—» en vez de «0».
 - **Descargar PDF** propone el nombre «AAAA-MM-DD factsheet ewb» (fecha de la descarga).
 
+### Cambiado (tablero)
+- Perfiles: la ficha del docente va debajo de la tabla de docentes (más espacio para ambas).
+- Barra lateral contraíble (opcional): botón para dejar solo los íconos, cada uno en su círculo; la elección
+  se recuerda en el navegador de cada persona y los gráficos se ajustan al nuevo ancho.
+
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.
 - Perfil (arriba a la derecha): la píldora abre un menú con el correo y **Cerrar sesión**; se quita el botón
