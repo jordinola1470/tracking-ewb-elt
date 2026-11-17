@@ -739,3 +739,13 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 /* El bloque del botón de menú mide lo mismo que la barra de la derecha (Histórico / Por año): 68 px */
 .mk-lateral .mk-marca{box-sizing:border-box;height:68px;padding:0 15px}
 .mk-app-contraida .mk-lateral .mk-marca{height:68px;padding:0;justify-content:center}
+
+/* ── Perfiles: tabla de docentes por páginas de 8 (sin desplazamiento) y flechas abajo a la derecha ── */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada{max-height:none;overflow-y:visible}
+.mk-paginador{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
+.mk-paginador-txt{margin-right:6px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.mk-paginador-pag{min-width:64px;text-align:center;font-size:13px;font-weight:700;color:var(--marca-negro);font-variant-numeric:tabular-nums}
+.mk-paginador-btn{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;border:var(--borde) solid var(--color-border-line);border-radius:50%;background:var(--color-panel);color:var(--marca-negro);cursor:pointer;box-shadow:var(--sombra);transition:transform .12s ease,background .15s ease,color .15s ease}
+.mk-paginador-btn:hover:not(:disabled){background:var(--marca-negro);color:#fff;transform:translateY(-1px)}
+.mk-paginador-btn:focus-visible{outline:2px solid var(--marca-verde);outline-offset:2px}
+.mk-paginador-btn:disabled{opacity:.4;cursor:default;box-shadow:none}
