@@ -102,10 +102,39 @@ class Ingestor:
         return conn.execute(text("SELECT to_regclass(:t)"), {"t": f"raw.{key_name}"}).scalar() is not None
 
     # ------------------------------------------------------------------ carga
+    # Encabezados del Excel que traen el código DANE (se leen como texto para no perder dígitos)
+    COLUMNAS_DANE = ("DANE", "CODIGO_DANE")
+
+    @staticmethod
+    def normalizar_dane(valor) -> str | None:
+        """
+        Código DANE como texto de dígitos, sin redondeo ni notación científica.
+        108001000434 / 108001000434.0 / " 108001000434 " -> "108001000434"; vacío -> None.
+        """
+        if valor is None or (isinstance(valor, float) and pd.isna(valor)):
+            return None
+        if isinstance(valor, float) and valor.is_integer():
+            valor = int(valor)
+        texto = str(valor).strip()
+        if texto.endswith(".0"):
+            texto = texto[:-2]
+        texto = texto.replace(" ", "")
+        return texto or None
+
     def _leer_y_estandarizar(self, key_name: str, file_path: Path) -> pd.DataFrame:
-        df = pd.read_excel(file_path, sheet_name=data_config.get_sheet_name(key_name))
+        hoja = data_config.get_sheet_name(key_name)
+        # El DANE se lee como texto: leído como número, Excel/pandas puede redondearlo
+        # (ej. 1,08001E+11 -> 108001000000) y varios colegios terminan con el mismo código.
+        encabezados = pd.read_excel(file_path, sheet_name=hoja, nrows=0).columns
+        conversores = {c: self.normalizar_dane for c in encabezados if str(c).strip().upper() in self.COLUMNAS_DANE}
+        df = pd.read_excel(file_path, sheet_name=hoja, converters=conversores)
         year = self._extract_year_from_key(key_name)
-        return ColumnStandardizer.standardize(df, year)
+        df = ColumnStandardizer.standardize(df, year)
+        if "codigo_dane" in df.columns:
+            invalidos = df["codigo_dane"].dropna().map(lambda v: not (str(v).isdigit() and len(str(v)) == 12)).sum()
+            if invalidos:
+                print(f"   ⚠️  {year}: {invalidos} filas con código DANE que no tiene 12 dígitos (revisar el Excel).")
+        return df
 
     def cargar_fuente(self, key_name: str, forzar: bool = False) -> str:
         """
@@ -174,6 +203,40 @@ class Ingestor:
 
         motivo = "recarga forzada" if (forzar and sin_cambios) else "archivo nuevo o modificado"
         return f"🔄 {anio}: cargada ({filas_raw} filas, {motivo})"
+
+    # ------------------------------------------------------------------ referencia IED
+    # Lista oficial de IED (nombre y código DANE). Vive en data/ (nunca en el repositorio).
+    RUTA_REFERENCIA_IED = Path("data/referencia_ied/ied_name.csv")
+    TABLA_REFERENCIA_IED = "referencia_ied"
+
+    def leer_referencia_ied(self, ruta: Path | None = None) -> pd.DataFrame:
+        """Lee la lista oficial: columnas INSTITUCION y DANE -> colegio_oficial, codigo_dane (texto, sin filas vacías)."""
+        ruta = ruta or self.RUTA_REFERENCIA_IED
+        df = pd.read_csv(ruta, dtype=str, encoding="utf-8-sig")
+        df.columns = [str(c).strip().upper() for c in df.columns]
+        df = df[["INSTITUCION", "DANE"]].rename(columns={"INSTITUCION": "colegio_oficial", "DANE": "codigo_dane"})
+        df["colegio_oficial"] = df["colegio_oficial"].str.strip().str.replace(r"\s+", " ", regex=True)
+        df["codigo_dane"] = df["codigo_dane"].map(self.normalizar_dane)
+        return df.dropna().drop_duplicates(subset="codigo_dane").reset_index(drop=True)
+
+    def cargar_referencia_ied(self) -> str:
+        """
+        Carga (reemplaza) raw.referencia_ied. Si el archivo no existe, deja la tabla creada y vacía
+        para que dbt funcione igual (los nombres quedan con el formato estándar, sin el oficial).
+        """
+        tabla = f"raw.{self.TABLA_REFERENCIA_IED}"
+        try:
+            with get_connection() as conn:
+                with conn.begin():
+                    if self.RUTA_REFERENCIA_IED.exists():
+                        df = self.leer_referencia_ied()
+                        conn.execute(text(f"DROP TABLE IF EXISTS {tabla}"))
+                        df.to_sql(name=self.TABLA_REFERENCIA_IED, con=conn, schema="raw", if_exists="fail", index=False)
+                        return f"🏫 Referencia IED: {len(df)} instituciones oficiales cargadas"
+                    conn.execute(text(f"CREATE TABLE IF NOT EXISTS {tabla} (colegio_oficial text, codigo_dane text)"))
+                    return "🏫 Referencia IED: no se encontró el archivo; se usan los nombres con formato estándar"
+        except Exception as e:
+            raise DatabaseLoadError(f"Error al cargar la referencia de IED: {self._mensaje_seguro(e)}") from e
 
     def cargar(self, anio: int | None = None, forzar: bool = False) -> list[str]:
         """

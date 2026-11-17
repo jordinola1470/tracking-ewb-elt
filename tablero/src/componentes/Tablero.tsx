@@ -7,9 +7,9 @@ import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
 import { AnaKpis } from "./analitica/ana_kpis";
 import {
   AnaGrafConstanciaAnio, AnaGrafConstanciaCargo, AnaGrafConstanciaNivel,
-  AnaGrafNivelFormacion, AnaGrafPermanencia, AnaGrafPruebasNivel,
+  AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
 } from "./analitica/ana_graficos";
-import { PerBuscador, PerFichaDocente, PerTablaDocentes } from "./perfiles/per_componentes";
+import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles";
 type VistaAnalitica = "historico" | "por_anio";
@@ -20,6 +20,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   const [vista, setVista] = useState<VistaAnalitica>("historico");
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
+  const [filtros, setFiltros] = useState<FiltrosPerfil>(FILTROS_VACIOS);
   const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
 
   // Filtrar por año (sin cálculos)
@@ -28,11 +29,16 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   const cargosAnio = useMemo(() => datos.cargos.filter((c) => c.anio_lectivo === anio), [datos.cargos, anio]);
 
   // Buscar docentes (sin cálculos)
+  // Buscar y filtrar docentes (sin cálculos: solo se comparan los valores que ya trae tab_perfiles)
   const perfilesFiltrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    if (!q) return datos.perfiles;
-    return datos.perfiles.filter((p) => `${p.docente_nombre ?? ""} ${p.colegio ?? ""} ${p.docente_id}`.toLowerCase().includes(q));
-  }, [datos.perfiles, busqueda]);
+    return datos.perfiles.filter((p) =>
+      (!q || `${p.docente_nombre ?? ""} ${p.colegio ?? ""} ${p.docente_id}`.toLowerCase().includes(q)) &&
+      (!filtros.nivel || (p.ultimo_nivel_formacion ?? "Sin dato") === filtros.nivel) &&
+      (!filtros.cargo || (p.cargo ?? "Sin dato") === filtros.cargo) &&
+      (!filtros.ied || (p.colegio ?? "Sin dato") === filtros.ied) &&
+      (!filtros.permanencia || p.permanencia === filtros.permanencia));
+  }, [datos.perfiles, busqueda, filtros]);
   const perfil = datos.perfiles.find((p) => p.docente_id === seleccionado);
   const historial = useMemo(() => datos.historial.filter((h) => h.docente_id === seleccionado), [datos.historial, seleccionado]);
 
@@ -105,7 +111,8 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         <>
           {/* Arriba de la hoja Analítica: resumen del año y subcategorías Histórico / Por año */}
           <div className="mk-hoja-cab mk-bloque">
-            <AnaTextoResumen kpi={kpi} />
+            {/* El resumen es del año elegido: solo se muestra en "Por año" */}
+            {vista === "por_anio" && <AnaTextoResumen kpi={kpi} />}
             <div className="mk-subbarra">
               <nav className="mk-subtabs" role="tablist" aria-label="Vista de analítica">
                 {(["historico", "por_anio"] as VistaAnalitica[]).map((v) => (
@@ -119,9 +126,11 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
           </div>
           {vista === "historico" && (
             <section className="mk-panel" data-seccion="historico">
-              <div className="mk-grid">
+              <div className="mk-grid mk-grid-2">
                 <AnaGrafConstanciaAnio kpis={datos.kpis} />
                 <AnaGrafPermanencia permanencia={datos.permanencia} />
+                <AnaGrafIedAtendidas totales={datos.totales} kpis={datos.kpis} />
+                <AnaGrafCargoDocentes cargos={datos.cargoDocentes} />
               </div>
             </section>
           )}
@@ -131,14 +140,15 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               <section className="mk-panel" data-seccion="por_anio_kpis">
                 <AnaKpis kpi={kpi} />
               </section>
-              <section className="mk-panel" data-seccion="por_anio_pruebas">
-                <AnaGrafPruebasNivel niveles={nivelesAnio} />
+              {/* Intercambio: nivel de formación arriba (ancho) y pruebas presentadas abajo */}
+              <section className="mk-panel" data-seccion="por_anio_nivel">
+                <AnaGrafNivelFormacion niveles={nivelesAnio} />
               </section>
               <section className="mk-panel" data-seccion="por_anio_graficos">
                 <div className="mk-grid mk-grid-3">
                   <AnaGrafConstanciaNivel niveles={nivelesAnio} />
                   <AnaGrafConstanciaCargo cargos={cargosAnio} />
-                  <AnaGrafNivelFormacion niveles={nivelesAnio} />
+                  <AnaGrafPruebasPresentadas kpi={kpi} />
                 </div>
               </section>
             </>
@@ -153,6 +163,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               <h2>Docentes</h2>
               <p className="mk-note">Busca por nombre, colegio o código y selecciona una fila para ver su ficha.</p>
               <PerBuscador texto={busqueda} cambiar={setBusqueda} />
+              <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
               <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado} />
             </div>
             <div className="mk-card">

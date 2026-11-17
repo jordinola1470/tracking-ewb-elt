@@ -17,6 +17,51 @@ export function PerBuscador({ texto, cambiar }: { texto: string; cambiar: (t: st
   );
 }
 
+/** Filtros de la lista de docentes ("" = todos) */
+export type FiltrosPerfil = { nivel: string; cargo: string; ied: string; permanencia: string };
+export const FILTROS_VACIOS: FiltrosPerfil = { nivel: "", cargo: "", ied: "", permanencia: "" };
+
+// Orden de los niveles de formación (los demás valores van al final, en orden alfabético)
+const ORDEN_NIVEL = ["PRE_A1", "A1", "A2", "A2+", "B1", "B1+", "B2", "C1"];
+const opciones = (valores: (string | null)[], orden?: string[]) => {
+  const unicos = [...new Set(valores.map((v) => v ?? "Sin dato"))];
+  return unicos.sort((a, b) => {
+    const ia = orden?.indexOf(a) ?? -1, ib = orden?.indexOf(b) ?? -1;
+    if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    return a.localeCompare(b, "es");
+  });
+};
+
+/** per_filtros · nivel de formación (último), cargo (último), IED y permanencia — fuente: tab_perfiles */
+export function PerFiltros({ perfiles, filtros, cambiar, total }: {
+  perfiles: Perfil[]; filtros: FiltrosPerfil; cambiar: (f: FiltrosPerfil) => void; total: number;
+}) {
+  const campos: { clave: keyof FiltrosPerfil; etiqueta: string; valores: string[] }[] = [
+    { clave: "nivel", etiqueta: "Nivel de formación", valores: opciones(perfiles.map((p) => p.ultimo_nivel_formacion), ORDEN_NIVEL) },
+    { clave: "cargo", etiqueta: "Cargo", valores: opciones(perfiles.map((p) => p.cargo)) },
+    { clave: "ied", etiqueta: "IED", valores: opciones(perfiles.map((p) => p.colegio)) },
+    { clave: "permanencia", etiqueta: "Permanencia", valores: opciones(perfiles.map((p) => p.permanencia)) },
+  ];
+  const activos = Object.values(filtros).some(Boolean);
+  return (
+    <div className="mk-filtros-perfil" data-componente="per_filtros">
+      {campos.map((c) => (
+        <label key={c.clave} className="mk-filtro-perfil">
+          <span>{c.etiqueta}</span>
+          <select className="dash-select" value={filtros[c.clave]} onChange={(e) => cambiar({ ...filtros, [c.clave]: e.target.value })}>
+            <option value="">Todos</option>
+            {c.valores.map((v) => <option key={v} value={v}>{v}</option>)}
+          </select>
+        </label>
+      ))}
+      <div className="mk-filtros-pie">
+        <span>{total.toLocaleString("es-CO")} docentes</span>
+        {activos && <button type="button" className="mk-btn" onClick={() => cambiar(FILTROS_VACIOS)}>Quitar filtros</button>}
+      </div>
+    </div>
+  );
+}
+
 /** per_tabla_docentes */
 export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfil[]; seleccionado?: string; elegir: (id: string) => void }) {
   return (

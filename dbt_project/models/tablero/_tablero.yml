@@ -11,7 +11,7 @@ models:
         data_tests: [unique, not_null]
 
   - name: tab_pruebas_nivel_anio
-    description: "Pruebas y constancia por año y nivel de formación (ana_graf_pruebas_nivel, ana_graf_constancia_nivel, ana_graf_nivel_formacion)."
+    description: "Pruebas y constancia por año y nivel de formación (ana_graf_constancia_nivel, ana_graf_nivel_formacion)."
     columns:
       - name: anio_lectivo
         data_tests: [not_null]
@@ -23,6 +23,18 @@ models:
     columns:
       - name: anio_lectivo
         data_tests: [not_null]
+
+  - name: tab_totales
+    description: "Totales de todos los años: IED atendidas, docentes y participaciones (ana_graf_ied_atendidas)."
+    columns:
+      - name: ied_total
+        data_tests: [not_null]
+
+  - name: tab_cargo_docentes
+    description: "Docentes por cargo, con el último cargo registrado de cada docente (ana_graf_cargo_docentes)."
+    columns:
+      - name: cargo
+        data_tests: [unique, not_null]
 
   - name: tab_permanencia
     description: "Docentes por grupo de permanencia, todos los años (ana_graf_permanencia)."

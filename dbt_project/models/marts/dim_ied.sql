@@ -55,4 +55,17 @@ deduplicated as (
     group by codigo_dane
 )
 
-select * from deduplicated
+-- Nombre oficial según la lista oficial de IED (raw.referencia_ied), si está cargada
+{%- set ref_ied = adapter.get_relation(database=target.database, schema='raw', identifier='referencia_ied') %}
+select
+    d.codigo_dane,
+{%- if ref_ied %}
+    coalesce(r.colegio_oficial, d.colegio_nombre) as colegio_nombre,
+{%- else %}
+    d.colegio_nombre,
+{%- endif %}
+    d.ubicacion_geo
+from deduplicated d
+{%- if ref_ied %}
+left join {{ ref_ied }} r on r.codigo_dane::text = d.codigo_dane::text
+{%- endif %}

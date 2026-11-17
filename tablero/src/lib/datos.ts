@@ -4,7 +4,8 @@ import "server-only";
 import { db, reiniciarDb } from "./db";
 
 export type KpiAnio = {
-  anio_lectivo: number; participaciones: number; docentes_unicos: number; con_entrada_salida: number;
+  anio_lectivo: number; participaciones: number; docentes_unicos: number; ied_unicas: number; con_entrada_salida: number;
+  con_entrada: number; con_salida: number; sin_entrada: number; sin_salida: number;
   con_constancia: number | null; con_dato_constancia: number; sin_constancia: number; pct_constancia: number | null;
   asistencia_promedio: number | null; retirados: number;
 };
@@ -26,9 +27,11 @@ export type Historial = {
   docente_id: string; anio_lectivo: number; grupo: string | null; nivel_formacion: string; orden_nivel: number;
   prueba_entrada: string; prueba_salida: string; constancia: string; asistencia: number | null; es_retirado: boolean;
 };
+export type Totales = { ied_total: number; docentes_total: number; participaciones_total: number };
+export type CargoDocentes = { cargo: string; docentes: number };
 export type DatosTablero = {
   kpis: KpiAnio[]; niveles: NivelAnio[]; cargos: CargoAnio[]; permanencia: Permanencia[];
-  perfiles: Perfil[]; historial: Historial[];
+  perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[];
 };
 
 // Los datos cambian pocas veces al año: se guardan en memoria 10 minutos por servidor.
@@ -61,7 +64,8 @@ async function leerTablas(): Promise<DatosTablero> {
   // se cuelga si se envían varias a la vez por la misma conexión. Una por una soporta 100 usuarios simultáneos.
   // Conteos a int y porcentajes a float8 para que lleguen como números (no como texto).
   const kpis = await sql<KpiAnio[]>`
-      select anio_lectivo, participaciones::int, docentes_unicos::int, con_entrada_salida::int,
+      select anio_lectivo, participaciones::int, docentes_unicos::int, ied_unicas::int, con_entrada_salida::int,
+             con_entrada::int, con_salida::int, sin_entrada::int, sin_salida::int,
              con_constancia::int, con_dato_constancia::int, sin_constancia::int, pct_constancia::float8,
              asistencia_promedio::float8, retirados::int
       from public.tab_kpis_anio order by anio_lectivo`;
@@ -75,6 +79,10 @@ async function leerTablas(): Promise<DatosTablero> {
   const permanencia = await sql<Permanencia[]>`
       select permanencia, anios_participados::int, es_continuo, docentes::int
       from public.tab_permanencia order by anios_participados desc, es_continuo desc`;
+  const totales = await sql<Totales[]>`
+      select ied_total::int, docentes_total::int, participaciones_total::int from public.tab_totales`;
+  const cargoDocentes = await sql<CargoDocentes[]>`
+      select cargo, docentes::int from public.tab_cargo_docentes order by docentes desc, cargo`;
   const perfiles = await sql<Perfil[]>`
       select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia::float8
@@ -87,6 +95,7 @@ async function leerTablas(): Promise<DatosTablero> {
   const datos: DatosTablero = {
     kpis: [...kpis], niveles: [...niveles], cargos: [...cargos],
     permanencia: [...permanencia], perfiles: [...perfiles], historial: [...historial],
+    totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes],
   };
   cache = { cuando: Date.now(), datos };
   return datos;

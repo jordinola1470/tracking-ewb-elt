@@ -1,5 +1,5 @@
 -- Tablero · una fila por año lectivo y nivel de formación (nivel_estandar = nivel del grupo asignado).
--- Componentes: ana_graf_pruebas_nivel, ana_graf_constancia_nivel, ana_graf_nivel_formacion
+-- Componentes: ana_graf_constancia_nivel, ana_graf_nivel_formacion
 with base as (
     select
         *,

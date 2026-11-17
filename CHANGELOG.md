@@ -10,6 +10,27 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Cambiado (datos estandarizados)
+- Lectura del código DANE como texto (antes, leído como número, podía redondearse; ej. 108001000000).
+- Nueva lista oficial de IED (`data/referencia_ied/ied_name.csv`, fuera del repositorio) cargada a
+  `raw.referencia_ied`. En diamond cada fila toma el **nombre oficial** según su DANE; si el nombre de la fila
+  corresponde a otra IED oficial, se corrige también el DANE. `dim_ied` (gold) usa el nombre oficial.
+- Macros de estandarización (`macros/estandarizar.sql`) aplicadas en staging: nombres de docentes con
+  mayúsculas de título ("María del Carmen Pérez"), correos en minúscula, constancia "Si"/"No", nombres de IED
+  en el formato de la lista oficial. En diamond, un solo nombre por docente (el del año más reciente).
+
+### Cambiado (tablero · indicadores)
+- "Con prueba de entrada y salida" se reemplaza por **IED únicas del año** (`tab_kpis_anio.ied_unicas`).
+- Cada indicador tiene color (degradados de la paleta institucional).
+- En Histórico ya no se muestra el resumen del año (solo en Por año).
+
+### Cambiado (tablero · Por año)
+- "Nivel de formación de los docentes" pasa a la tarjeta ancha y "Pruebas presentadas" a la cuadrícula.
+- "Pruebas presentadas" ahora es un gráfico de barras con 4 categorías: Entrada, Salida,
+  Sin prueba de entrada y Sin prueba de salida (las "sin" van rayadas).
+- "Constancia, año por año": ejes X e Y visibles y etiqueta con el valor en cada tramo (el % se mantiene).
+- dbt `tab_kpis_anio`: nuevas columnas `con_entrada`, `con_salida`, `sin_entrada`, `sin_salida`.
+
 ### Cambiado (diseño del tablero)
 - Paleta institucional: principal azul petróleo `#0C343D` + verde `#40984C`, con mezclas; documentada en
   `tablero/README.md`. Fondo de página gris `#D5DCDE` y paneles blancos; sin modo oscuro.

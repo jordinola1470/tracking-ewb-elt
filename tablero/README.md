@@ -46,8 +46,8 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 
 | Componente | Tabla dbt |
 | :--- | :--- |
-| `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio` | `tab_kpis_anio` |
-| `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` | `tab_pruebas_nivel_anio` |
+| `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio`, `ana_graf_pruebas_presentadas` | `tab_kpis_anio` |
+| `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` | `tab_pruebas_nivel_anio` |
 | `ana_graf_constancia_cargo` | `tab_constancia_cargo_anio` |
 | `ana_graf_permanencia` | `tab_permanencia` |
 | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` | `tab_perfiles` |
@@ -87,7 +87,7 @@ Para cambiar un color en todo el tablero, se edita solo la variable en `globals.
 
 **Orden de la vista Analítica**
 1. **Histórico · todos los años** (no usa filtros): `ana_graf_constancia_anio` (barras verticales apiladas con %), `ana_graf_permanencia`.
-2. **Por año** (todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_nivel_formacion`.
+2. **Por año** (todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*` (participaciones, docentes únicos, IED únicas, constancia, asistencia), `ana_graf_nivel_formacion` (ancho), `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_pruebas_presentadas` (Entrada, Salida, Sin prueba de entrada, Sin prueba de salida).
 
 ## Desarrollo local
 
