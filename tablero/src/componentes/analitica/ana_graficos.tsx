@@ -69,12 +69,14 @@ export function AnaGrafPermanencia({ permanencia }: { permanencia: Permanencia[]
       <div className="mk-dona-fila">
         <Dona filas={permanencia} categoria={(d) => d.permanencia} valor={(d) => d.docentes}
           centro={entero(total)} subcentro="docentes" etiqueta="Docentes según los años en que participaron" />
-        <ul className="mk-lista">
+        <ul className="mk-lista mk-lista-tabla">
+          <li className="mk-lista-cab" aria-hidden><i /><span>Permanencia</span><span>Docentes</span><span>%</span></li>
           {permanencia.map((d, i) => (
             <li key={d.permanencia}>
               <i style={{ background: COLORES_SERIE[i % COLORES_SERIE.length] }} />
-              <span className="mk-lista-nombre">{d.permanencia}<small>{entero(d.docentes)} docentes</small></span>
-              <b>{total ? pct(d.docentes / total) : "—"}</b>
+              <span className="mk-lista-nombre">{d.permanencia}</span>
+              <span className="mk-lista-num">{entero(d.docentes)}</span>
+              <b className="mk-lista-num">{total ? pct(d.docentes / total) : "—"}</b>
             </li>
           ))}
         </ul>

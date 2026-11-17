@@ -179,6 +179,15 @@ export function Dona<T>(props: { filas: T[]; categoria: (d: T) => string; valor:
     const arco = d3.arc<d3.PieArcDatum<T>>().innerRadius(R * 0.64).outerRadius(R - 2).cornerRadius(5);
     svg.selectAll("path").data(arcos).join("path").attr("d", arco).style("fill", (_d, i) => COLORES_SERIE[i % COLORES_SERIE.length])
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d.data)}: ${entero(valor(d.data))} (${pct(valor(d.data) / tot)})`)).on("pointerleave", tip.ocultar);
+    // % sobre cada arco con espacio suficiente (píldora blanca, igual que las etiquetas de las barras)
+    arcos.filter((d) => d.endAngle - d.startAngle > 0.38).forEach((d) => {
+      const [cx, cy] = arco.centroid(d), txt = pct(valor(d.data) / tot), ancho = txt.length * 6.6 + 10;
+      const et = svg.append("g").style("pointer-events", "none");
+      et.append("rect").attr("x", cx - ancho / 2).attr("y", cy - 9).attr("width", ancho).attr("height", 18).attr("rx", 9)
+        .style("fill", "#fff").style("filter", "drop-shadow(0 1px 2px rgba(12,52,61,.25))");
+      et.append("text").attr("x", cx).attr("y", cy).attr("dy", ".35em").attr("text-anchor", "middle").attr("font-size", 10.5)
+        .attr("font-weight", 800).style("fill", "var(--marca-principal)").text(txt);
+    });
     svg.append("text").attr("text-anchor", "middle").attr("dy", "-.05em").attr("font-size", 30).attr("font-weight", 800).style("fill", "var(--marca-principal)").text(centro);
     svg.append("text").attr("text-anchor", "middle").attr("dy", "1.6em").attr("font-size", 12).style("fill", "var(--color-fg-muted)").text(subcentro);
   }, [filas, centro, subcentro]);
