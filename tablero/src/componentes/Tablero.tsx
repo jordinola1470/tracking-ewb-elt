@@ -1,6 +1,7 @@
 "use client";
 // Tablero completo: pestañas Analítica (subcategorías Histórico y Por año) y Perfiles.
 // Solo filtra filas ya calculadas por dbt y dibuja.
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DatosTablero } from "@/lib/datos";
 import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
@@ -11,6 +12,7 @@ import {
 } from "./analitica/ana_graficos";
 import { RepFactSheet } from "./reporte/rep_fact_sheet";
 import { BarraAvisos } from "./comunes/barra_avisos";
+import { MenuPerfil } from "./comunes/menu_perfil";
 import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
@@ -83,20 +85,19 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
           Debajo empiezan, a la misma altura, el botón EwB y la hoja elegida */}
       <header className="mk-cabecera mk-bloque">
       <div className="mk-head">
-        <h1>English Without Borders</h1>
+        {/* Título en dos líneas (como la portada del fact sheet) */}
+        <h1 className="mk-titulo-2l"><span>English Without</span><span>Borders</span></h1>
+        {/* Como en la portada del fact sheet: | y los logos de los aliados en blanco, sin etiqueta */}
+        <div className="mk-cab-aliados" data-componente="aliados">
+          <span>Un programa de</span>
+          <Image src="/logos/cobranding-azul-oscuro.png" alt="Alcaldía de Barranquilla y British Council" width={3114} height={396} priority />
+        </div>
         {/* Menú secundario arriba a la derecha: perfil del usuario (sin cerrar sesión) */}
         <div className="mk-acciones">
         {/* Avisos (actualizado el + resumen) e información básica */}
         <BarraAvisos act={datos.actualizacion} />
-        <div className="mk-perfil-usuario" data-componente="perfil_usuario">
-          <span className="mk-avatar" aria-hidden>{(usuario || "?").charAt(0).toUpperCase()}</span>
-          <span className="mk-user-txt">
-            <b title={usuario}>{(usuario || "").split("@")[0]}</b>
-            <small title={usuario}>{usuario}</small>
-          </span>
-          {/* Flecha: aquí se abrirá el menú secundario del perfil */}
-          <svg className="mk-flecha" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
-        </div>
+        {/* Perfil: abre un menú con el correo y "Cerrar sesión" */}
+        <MenuPerfil usuario={usuario} salir={salir} />
         </div>
       </div>
       </header>
@@ -121,15 +122,6 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
             </button>
           ))}
         </nav>
-        {/* Abajo: solo el círculo del usuario y el botón de salir */}
-        <form action={salir} className="mk-user mk-bloque mk-user-mini">
-          <span className="mk-avatar" aria-hidden title={usuario}>{(usuario || "?").charAt(0).toUpperCase()}</span>
-          <button className="mk-icono-btn" type="submit" title="Cerrar sesión" aria-label="Cerrar sesión">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" />
-            </svg>
-          </button>
-        </form>
         {/* Sello al pie de la barra vertical */}
         <small className="mk-sello">Desarrollado por TeseoDev · Medellín ©</small>
       </aside>
