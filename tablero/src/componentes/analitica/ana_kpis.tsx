@@ -1,5 +1,5 @@
 "use client";
-// Componentes: ana_kpi_participaciones, ana_kpi_docentes_unicos, ana_kpi_ied_unicas,
+// Componentes: ana_kpi_participaciones (docentes únicos), ana_kpi_ied_unicas,
 //              ana_kpi_constancia, ana_kpi_asistencia (fuente: tab_kpis_anio)
 import type { KpiAnio } from "@/lib/datos";
 import { entero, pct } from "../comunes/graficos";
@@ -38,9 +38,9 @@ function Kpi({ nombre, icono, titulo, texto, pie, tono }: {
 export function AnaKpis({ kpi }: { kpi?: KpiAnio }) {
   return (
     <div className="mk-kpis">
-      <Kpi tono="principal" nombre="ana_kpi_participaciones" icono="participaciones" titulo="Participaciones del año" texto={valor(kpi?.participaciones, entero)} />
-      <Kpi tono="verde" nombre="ana_kpi_docentes_unicos" icono="docentes" titulo="Docentes únicos del año" texto={valor(kpi?.docentes_unicos, entero)} />
-      <Kpi tono="mezcla" nombre="ana_kpi_ied_unicas" icono="ied" titulo="IED únicas del año" texto={valor(kpi?.ied_unicas, entero)} />
+      {/* Participaciones del año = docentes sin repetir (un docente cuenta una vez aunque el Excel lo traiga dos veces) */}
+      <Kpi tono="principal" nombre="ana_kpi_participaciones" icono="docentes" titulo="Participaciones del año" texto={valor(kpi?.docentes_unicos, entero)} />
+      <Kpi tono="verde" nombre="ana_kpi_ied_unicas" icono="ied" titulo="IED únicas del año" texto={valor(kpi?.ied_unicas, entero)} />
       <Kpi tono="medio" nombre="ana_kpi_constancia" icono="constancia" titulo="Con constancia en el año" texto={valor(kpi?.pct_constancia, pct)} />
       <Kpi tono="verde-oscuro" nombre="ana_kpi_asistencia" icono="asistencia" titulo="Asistencia promedio del año" texto={valor(kpi?.asistencia_promedio, pct)}
         pie={<span className="mk-chip">Sin contar {valor(kpi?.retirados, entero)} retirados</span>} />
