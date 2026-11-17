@@ -522,3 +522,12 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-fs-tabla .mk-table th,.mk-fs-tabla .mk-table td{padding:6px 7px}
 .mk-fs-tabla .mk-table th{white-space:nowrap}
 @media print{.mk-fs-hoja{width:auto !important;max-width:none !important;padding:0 !important;margin:0 !important}}
+/* Guía de lectura del fact sheet */
+.mk-fs-convenciones{padding:14px 18px}
+.mk-fs-convenciones h3{margin:0 0 6px;font-size:13px;font-weight:800;color:var(--marca-principal);text-transform:uppercase;letter-spacing:.05em}
+.mk-fs-convenciones p{margin:0 0 10px;font-size:11.5px;line-height:1.5;color:var(--color-fg)}
+.mk-fs-convenciones dl{display:grid;grid-template-columns:150px 1fr;gap:5px 14px;margin:0;font-size:11px;line-height:1.45}
+.mk-fs-convenciones dt{font-weight:700;color:var(--marca-principal)}
+.mk-fs-convenciones dd{margin:0;color:var(--color-fg-muted)}
+@media (max-width:600px){.mk-fs-convenciones dl{grid-template-columns:1fr}}
+@media print{.mk-fs-convenciones{break-inside:avoid}}

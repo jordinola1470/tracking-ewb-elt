@@ -108,12 +108,37 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
           <span className="mk-fs-logo" aria-hidden>EwB</span>
         </header>
 
-        <p className="mk-fs-convenciones">
-          <b>Cómo leer este documento.</b> Participante = docente distinto. Se cuenta una fila por docente y año (si el registro
-          trae a un docente dos veces, se usa la fila en la que no está retirado). Nombres de IED según la lista oficial por
-          código DANE. Nivel cursado = nivel del grupo asignado. MCER no evaluable (sin prueba, invalidado, abandonado) no se
-          compara. Asistencia promedio sin contar retirados; % de constancia sobre quienes tienen el dato.
-        </p>
+        {/* Guía técnica de lectura: qué se muestra y con qué reglas se calcula */}
+        <section className="mk-fs-convenciones">
+          <h3>Cómo leer este documento</h3>
+          <p>
+            Este fact sheet resume la participación de docentes en English Without Borders entre {r ? `${r.primer_anio} y ${r.ultimo_anio}` : "los años registrados"}.
+            Todas las cifras son agregados calculados sobre la tabla consolidada del programa (capa diamond) y no incluyen datos
+            personales. El orden es: resumen ejecutivo, panorama por año, permanencia, perfil, instituciones, nivel cursado,
+            mejora de inglés y cumplimiento.
+          </p>
+          <dl>
+            <dt>Unidad de conteo</dt>
+            <dd>Docente = persona distinta. Participación = un docente en un año lectivo. Si el registro de un año trae al mismo
+              docente dos veces, se conserva una sola fila: la que no está marcada como retirada.</dd>
+            <dt>Instituciones (IED)</dt>
+            <dd>Nombre oficial según su código DANE. «IED atendidas» cuenta códigos DANE distintos.</dd>
+            <dt>Nivel cursado</dt>
+            <dd>Nivel del grupo al que se asignó al docente en el año (de PRE A1 a B2, con A2+ y B1+). «Sin nivel asignado» agrupa
+              los registros sin grupo de nivel.</dd>
+            <dt>MCER</dt>
+            <dd>Nivel obtenido en la prueba de entrada y en la de salida. Solo se comparan registros con ambos resultados válidos;
+              no se cuentan pruebas no presentadas, invalidadas ni abandonadas.</dd>
+            <dt>Permanencia y retención</dt>
+            <dd>Permanencia = años distintos en que participó cada docente. Retención = parte de los docentes de un año que vuelve
+              al año siguiente.</dd>
+            <dt>Perfil</dt>
+            <dd>Género y formación académica se toman del último registro con dato de cada docente.</dd>
+            <dt>Cumplimiento</dt>
+            <dd>La asistencia promedio no incluye a los retirados. El % de constancia se calcula sobre quienes tienen el dato
+              (un año sin ese campo aparece como «—»).</dd>
+          </dl>
+        </section>
 
         {/* 8. Resumen ejecutivo (primero, como portada de cifras) */}
         <Seccion numero={1} titulo="Resumen ejecutivo">
