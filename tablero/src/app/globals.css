@@ -360,3 +360,14 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 @media (max-width:760px){.login-marco{grid-template-columns:1fr}.login-marca{padding:32px 26px}.login-marca h1{font-size:26px}}
 /* Resumen del año: debajo de Histórico / Por año, en letra pequeña */
 .mk-hoja-cab .mk-sub{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--principal-claro);font-size:12.5px}
+
+/* Filtro de año: una píldora con icono, etiqueta pequeña y el año; la flecha va junto al año */
+.mk-filtro-anio{position:relative;display:inline-flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border-radius:var(--radio-pildora);background:var(--color-panel);border:var(--borde) solid var(--color-border-line);box-shadow:var(--sombra);cursor:pointer;transition:border-color .15s ease,transform .12s ease}
+.mk-filtro-anio:hover{border-color:var(--marca-principal);transform:translateY(-1px)}
+.mk-filtro-anio:focus-within{border-color:var(--marca-verde);box-shadow:0 0 0 3px rgba(64,152,76,.2),var(--sombra)}
+.mk-filtro-anio-icono{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--marca-principal);color:#fff;flex:none}
+.mk-filtro-anio-txt{display:flex;flex-direction:column;line-height:1.1}
+.mk-filtro-anio-txt small{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-fg-muted)}
+.mk-filtro-anio-campo{position:relative;display:inline-flex;align-items:center}
+.mk-filtro-anio select{appearance:none;-webkit-appearance:none;border:0;outline:0;background:transparent;font:inherit;font-size:16px;font-weight:800;color:var(--marca-principal);padding:0 20px 0 0;margin:0;cursor:pointer}
+.mk-filtro-anio-flecha{position:absolute;right:0;pointer-events:none;color:var(--marca-verde)}
