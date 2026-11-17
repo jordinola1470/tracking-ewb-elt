@@ -447,3 +447,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-kpi-tono:hover{box-shadow:var(--sombra),inset 0 0 0 1.5px rgba(255,255,255,.32);filter:brightness(1.05)}
 .mk-kpi-tono:hover .mk-kpi-v{transform:scale(1.02)}
 @media (prefers-reduced-motion:reduce){.mk-kpi-tono::after{display:none}.mk-kpi-tono:hover .mk-kpi-v{transform:none}}
+/* Indicadores: se elevan al pasar el mouse (con el brillo suave y el borde tenue) */
+.mk-kpi-tono{transition:transform .2s ease,box-shadow .25s ease,filter .25s ease}
+.mk-kpi-tono:hover{transform:translateY(-3px);box-shadow:0 4px 0 rgba(0,0,0,.06),0 12px 22px rgba(12,52,61,.24),inset 0 0 0 1.5px rgba(255,255,255,.32)}
+@media (prefers-reduced-motion:reduce){.mk-kpi-tono:hover{transform:none}}
