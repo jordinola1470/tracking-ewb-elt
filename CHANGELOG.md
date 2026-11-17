@@ -25,7 +25,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Perfiles: filtros de nivel de formación, cargo, IED y permanencia debajo del buscador.
 - Página de inicio de sesión con el estilo del tablero y los logos de Google y Microsoft.
 - Histórico: **Nivel actual de los docentes** (toda la población según su último nivel cursado, con % del
-  total; `tab_nivel_ultimo`). El último nivel ya no cuenta "-" (sin nivel asignado) como nivel cursado.
+  total; `tab_nivel_ultimo`, cálculo propio: "-" no cuenta como nivel cursado). La ficha de Perfiles no cambia.
 - Nueva pestaña **Reporte** en la barra lateral (próximamente).
 - Indicadores por año: animación sutil al pasar el mouse.
 - Texto de permanencia más sencillo.
