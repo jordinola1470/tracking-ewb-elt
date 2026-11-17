@@ -539,3 +539,17 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-lista-tabla .mk-lista-cab i{box-shadow:none;background:none}
 .mk-lista-tabla .mk-lista-cab span:nth-child(n+3){text-align:right}
 .mk-lista-num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── Toque final: negro sutil en la paleta (modernidad y contraste) ─────────────────
+   Se usa en textos principales y pocos detalles; fondos, degradados y gráficos no cambian. */
+.tablero{--marca-negro:#111418;--negro-suave:#2A2F35}
+/* Textos principales */
+.mk-card h2,.mk-fs-bloque h3,.mk-fs-acciones h2,.mk-fs-convenciones h3,.mk-fs-h2{color:var(--marca-negro)}
+.mk-total-grande b,.mk-fs-cifras-claras b,.mk-pildora-valor,.mk-fname,.mk-td-codigo{color:var(--marca-negro)}
+.mk-table td,.mk-lista-nombre,.mk-lista-num{color:var(--marca-negro)}
+/* Detalles: opción elegida de la barra lateral, píldora EwB y botón de descarga */
+.mk-lateral .mk-tab[aria-selected=true],.mk-logo,.mk-fs-boton{background:var(--marca-negro)}
+.mk-pildora-icono{background:var(--marca-negro)}
+/* Ejes de los gráficos en gris casi negro */
+.mk-chart .eje .domain,.mk-chart .eje .tick line{stroke:var(--negro-suave) !important}
+.mk-chart .eje .tick text{fill:var(--negro-suave)}

@@ -33,6 +33,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Texto de permanencia más sencillo.
 
 ### Cambiado (tablero · indicadores)
+- Paleta: negro sutil `#111418` (`--marca-negro`) en títulos y números principales, opción elegida de la barra
+  lateral, píldora EwB, iconos de filtros y botón de descarga; ejes de gráficos en `#2A2F35`.
 - "Con prueba de entrada y salida" se reemplaza por **IED únicas del año** (`tab_kpis_anio.ied_unicas`).
 - Cada indicador tiene color (degradados de la paleta institucional).
 - En Histórico ya no se muestra el resumen del año (solo en Por año).
