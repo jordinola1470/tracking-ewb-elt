@@ -26,6 +26,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   elección se recuerda en el navegador de cada persona. Animación fluida: curva de Material 3, textos con
   fundido y gráficos que se redibujan una sola vez al terminar (mientras tanto el SVG solo se escala).
 - Perfiles: la tabla de docentes es más baja (se ven 6-7 docentes; el resto con desplazamiento).
+- Permanencia: «años seguidos» pasa a «años consecutivos» (y «no seguidos» a «no consecutivos»).
 
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.

@@ -16,9 +16,9 @@ select
     anios_participados,
     case
         when anios_participados = 1           then '1 año'
-        when anios_participados = rango_anios then anios_participados || ' años seguidos'
-        else                                       anios_participados || ' años no seguidos'
+        when anios_participados = rango_anios then anios_participados || ' años consecutivos'
+        else                                       anios_participados || ' años no consecutivos'
     end                                                    as permanencia,
-    -- Continua = 2 o más años seguidos
+    -- Continua = 2 o más años consecutivos
     (anios_participados >= 2 and anios_participados = rango_anios) as es_continuo
 from por_docente

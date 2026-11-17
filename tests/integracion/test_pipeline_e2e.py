@@ -64,10 +64,10 @@ def test_tablero_kpis_y_niveles(db_conn):
 
 
 def test_tablero_perfiles_y_permanencia(db_conn):
-    # Los 5 docentes ficticios participan los 4 años seguidos
+    # Los 5 docentes ficticios participan los 4 años consecutivos
     assert _contar(db_conn, "select count(*) from public.tab_perfiles") == FILAS_POR_ANIO
     assert _contar(
-        db_conn, "select docentes from public.tab_permanencia where permanencia = '4 años seguidos'"
+        db_conn, "select docentes from public.tab_permanencia where permanencia = '4 años consecutivos'"
     ) == FILAS_POR_ANIO
     assert _contar(db_conn, "select count(*) from public.tab_historial") == TOTAL_FILAS
 
