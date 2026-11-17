@@ -717,3 +717,18 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 /* Opción elegida (contraída): nombre en gris pizarra; solo el ícono va en blanco sobre el círculo oscuro */
 .mk-app-contraida .mk-lateral .mk-tab[aria-selected=true]{color:var(--marca-negro)}
 .mk-app-contraida .mk-lateral .mk-tab[aria-selected=true] svg{color:#fff}
+
+/* ── Barra lateral (versión 3): solo el botón de menú arriba y animación más fluida ── */
+.mk-lateral .mk-marca{justify-content:flex-start;padding:8px}
+.mk-app-contraida .mk-lateral .mk-marca{align-items:center;padding:8px 6px}
+/* Curva "emphasized" de Material 3: arranca rápido y frena suave */
+.mk-app{transition:grid-template-columns .34s cubic-bezier(.2,0,0,1)}
+/* Los textos entran con un fundido corto en lugar de aparecer de golpe */
+@keyframes mk-fundido{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+@keyframes mk-fundido-abajo{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:mk-fundido .28s ease .08s both;white-space:nowrap}
+.mk-app-contraida .mk-lateral .mk-tab-txt{animation-name:mk-fundido-abajo}
+.mk-lateral .mk-tab svg{transition:background .2s ease,padding .2s ease}
+.mk-lateral-toggle svg{transition:transform .3s cubic-bezier(.2,0,0,1)}
+.mk-lateral-toggle:active svg{transform:scale(.85)}
+@media (prefers-reduced-motion:reduce){.mk-app{transition:none}.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:none}}

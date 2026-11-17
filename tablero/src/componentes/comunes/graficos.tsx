@@ -22,9 +22,16 @@ function useDibujo(dibujar: (el: HTMLDivElement) => void, deps: unknown[]) {
     if (!el) return;
     const pintar = () => { el.replaceChildren(); dibujar(el); };
     pintar();
-    const obs = new ResizeObserver(() => pintar());
+    // Al cambiar el ancho (por ejemplo, al contraer la barra lateral) se redibuja una sola vez,
+    // cuando el ancho deja de cambiar; mientras tanto el SVG se escala solo y la animación va fluida.
+    let ancho = el.clientWidth, espera: ReturnType<typeof setTimeout> | undefined;
+    const obs = new ResizeObserver(() => {
+      if (el.clientWidth === ancho) return;
+      clearTimeout(espera);
+      espera = setTimeout(() => { ancho = el.clientWidth; pintar(); }, 180);
+    });
     obs.observe(el);
-    return () => obs.disconnect();
+    return () => { clearTimeout(espera); obs.disconnect(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return ref;

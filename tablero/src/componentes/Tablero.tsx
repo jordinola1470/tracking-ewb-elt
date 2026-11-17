@@ -133,7 +133,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       <div className={`mk-app${contraida ? " mk-app-contraida" : ""}`}>
       {/* Barra lateral vertical: marca · navegación · usuario abajo */}
       <aside className="mk-lateral">
-        {/* Arriba: botón de menú (☰ abre · ← contrae) junto a EwB, como el "navigation rail" de Material 3 */}
+        {/* Arriba: botón de menú (☰ abre · ← contrae), como el "navigation rail" de Material 3 */}
         <div className="mk-marca mk-bloque">
           <button type="button" className="mk-lateral-toggle" onClick={alternarBarra} aria-expanded={!contraida}
             aria-label={contraida ? "Expandir la barra lateral (Ctrl + B)" : "Contraer la barra lateral (Ctrl + B)"}
@@ -142,7 +142,6 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               {contraida ? <path d="M4 7h16M4 12h16M4 17h16" /> : <path d="M19 12H5M11 6l-6 6 6 6" />}
             </svg>
           </button>
-          <span className="mk-logo" aria-hidden>EwB</span>
         </div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
           {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (
