@@ -23,7 +23,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Histórico: **IED atendidas** (total de todos los años + barras por año, `tab_totales`) y **Docentes por cargo**
   (último cargo de cada docente, `tab_cargo_docentes`); cuadrícula de 2 x 2.
 - Perfiles: filtros de nivel de formación, cargo, IED y permanencia debajo del buscador.
-- Página de inicio de sesión con el estilo del tablero y los logos de Google y Microsoft.
+- Página de inicio de sesión con el estilo del tablero, los logos de Google y Microsoft y el cobranding
+  Alcaldía de Barranquilla · British Council (`tablero/public/logos/`).
 - Histórico: **Nivel actual de los docentes** (toda la población según su último nivel cursado, con % del
   total; `tab_nivel_ultimo`, cálculo propio: "-" no cuenta como nivel cursado). La ficha de Perfiles no cambia.
 - Nueva pestaña **Reporte** con el **fact sheet** del programa (las 8 secciones de `docs/FACT_SHEET_ANALITICA.md`,

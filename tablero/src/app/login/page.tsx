@@ -1,5 +1,6 @@
 // Página de inicio de sesión: Google (Gmail) o Microsoft (Outlook).
 // Mismo estilo del tablero: franja oscura en degradado + tarjeta blanca con sombras.
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { obtenerSesion, signIn } from "@/auth";
 
@@ -53,6 +54,11 @@ export default async function Login() {
           <form action={async () => { "use server"; await signIn("microsoft-entra-id", { redirectTo: "/" }); }}>
             <button className="login-btn" type="submit"><LogoMicrosoft /><span>Continuar con Microsoft</span></button>
           </form>
+          {/* Aliados del programa (cobranding) */}
+          <div className="login-aliados">
+            <span>Un programa de</span>
+            <Image src="/logos/cobranding-azul-oscuro.png" alt="Alcaldía de Barranquilla y British Council" width={3114} height={396} priority />
+          </div>
           <small className="mk-sello login-sello">Desarrollado por TeseoDev · Medellín ©</small>
         </section>
       </div>

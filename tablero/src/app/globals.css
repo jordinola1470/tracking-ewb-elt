@@ -591,3 +591,9 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-popover-avisos::before{right:61px}
 .mk-popover-info::before{right:19px}
 .mk-info-texto{bottom:auto;top:calc(100% + 8px);transform:translate(-50%,-4px)}
+
+/* Inicio de sesión: logos de los aliados (cobranding) */
+.login-aliados{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--principal-claro)}
+.login-aliados span{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-fg-muted)}
+.login-aliados img{width:100%;max-width:300px;height:auto}
+.login-sello{margin-top:14px}
