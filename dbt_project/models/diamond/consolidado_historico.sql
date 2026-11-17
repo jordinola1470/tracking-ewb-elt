@@ -99,10 +99,90 @@ select
     recibe_constancia
 from {{ ref('stg_docentes_2026') }}
 
+),
+
+-- ── Estandarización entre años ────────────────────────────────────────────────
+-- Un solo nombre por docente: el del año más reciente (ya con formato "María del Carmen Pérez")
+nombre_docente as (
+    select docente_id,
+        (array_agg(docente_nombre order by anio_lectivo desc) filter (where docente_nombre is not null))[1] as nombre_unico
+    from unioned
+    where docente_id is not null
+    group by docente_id
+),
+
+-- Nombre oficial de la IED según la lista oficial (raw.referencia_ied, cargada desde data/referencia_ied/).
+-- 1) Si el nombre de la fila coincide con una IED oficial (igual, o contenido en un solo nombre oficial),
+--    se usa esa IED: corrige filas con el DANE equivocado.
+-- 2) Si no, se usa el nombre oficial de su DANE.  3) Si el DANE no está en la lista: el nombre tal cual en 2023
+--    (si no aparece en 2023, el nombre estandarizado).
+{%- set ref_ied = adapter.get_relation(database=target.database, schema='raw', identifier='referencia_ied') %}
+referencia as (
+{%- if ref_ied %}
+    select codigo_dane::text as codigo_dane, colegio_oficial, {{ clave_ied('colegio_oficial') }} as clave
+    from {{ ref_ied }}
+{%- else %}
+    select null::text as codigo_dane, null::text as colegio_oficial, null::text as clave where false
+{%- endif %}
+),
+
+pares as (
+    select distinct codigo_dane::text as dane_original, colegio_nombre, {{ clave_ied('colegio_nombre') }} as clave
+    from unioned
+),
+
+coincide_exacta as (
+    select p.dane_original, p.colegio_nombre, r.codigo_dane, r.colegio_oficial
+    from pares p join referencia r on r.clave = p.clave
+),
+
+coincide_parcial as (
+    select p.dane_original, p.colegio_nombre, min(r.codigo_dane) as codigo_dane, min(r.colegio_oficial) as colegio_oficial
+    from pares p
+    join referencia r on length(p.clave) >= 6 and position(' ' || p.clave || ' ' in ' ' || r.clave || ' ') > 0
+    group by p.dane_original, p.colegio_nombre
+    having count(*) = 1
+),
+
+-- Fuera de la lista oficial: el nombre tal cual aparece en 2023 (texto original del Excel)
+nombre_2023 as (
+    select trim(cast(codigo_dane as varchar)) as codigo_dane,
+        min({{ limpiar_espacios('colegio_nombre') }}) as colegio_2023
+    from {{ source('raw_tracking_ewb', 'base_docentes_2023') }}
+    where codigo_dane is not null
+    group by 1
+),
+
+ied_resuelta as (
+    select p.dane_original, p.colegio_nombre,
+        coalesce(e.codigo_dane, pa.codigo_dane, rd.codigo_dane, p.dane_original)          as codigo_dane_final,
+        coalesce(e.colegio_oficial, pa.colegio_oficial, rd.colegio_oficial, n23.colegio_2023, p.colegio_nombre) as colegio_final
+    from pares p
+    left join coincide_exacta e
+        on e.dane_original is not distinct from p.dane_original and e.colegio_nombre is not distinct from p.colegio_nombre
+    left join coincide_parcial pa
+        on pa.dane_original is not distinct from p.dane_original and pa.colegio_nombre is not distinct from p.colegio_nombre
+    left join referencia rd on rd.codigo_dane = p.dane_original
+    left join nombre_2023 n23 on n23.codigo_dane = p.dane_original
+),
+
+base as (
+    select
+        u.docente_id, u.tipo_documento,
+        coalesce(nd.nombre_unico, u.docente_nombre) as docente_nombre,
+        u.genero, u.fecha_nacimiento, u.correo_electronico, u.anio_lectivo, u.nivel_formacion,
+        ir.codigo_dane_final as codigo_dane,
+        ir.colegio_final as colegio_nombre,
+        u.cargo_rol, u.grupo_id, u.nivel_asignado, u.asistencia_porcentaje_fix,
+        u.score_entrada, u.mcer_entrada, u.score_salida, u.mcer_salida, u.recibe_constancia
+    from unioned u
+    left join nombre_docente nd on nd.docente_id = u.docente_id
+    left join ied_resuelta ir
+        on ir.dane_original is not distinct from u.codigo_dane::text and ir.colegio_nombre is not distinct from u.colegio_nombre
 )
 
 select
-    unioned.*,
+    base.*,
 
     -- Regla Excel sobre nivel_asignado (comparaciones sin distinguir mayúsculas, como en Excel; los NULL se conservan; el trim se aplica en staging)
     case
@@ -135,4 +215,4 @@ select
         else cargo_rol
     end as cargo_estandar
 
-from unioned
+from base

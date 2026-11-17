@@ -6,15 +6,15 @@ with source as (
 select
     -- DOCENTE
     trim(cast(docente_id as varchar)) as docente_id,
-    trim(cast(docente_nombre as varchar)) as docente_nombre,
+    {{ nombre_propio('docente_nombre') }} as docente_nombre,
     trim(cast(tipo_documento as varchar)) as tipo_documento,
     trim(cast(genero as varchar)) as genero,
     trim(cast(fecha_nacimiento as varchar)) as fecha_nacimiento,
-    trim(cast(correo_electronico as varchar)) as correo_electronico,
+    {{ correo('correo_electronico') }} as correo_electronico,
     trim(cast(telefono_celular as varchar)) as telefono_celular,
 
     -- IED
-    trim(cast(colegio_nombre as varchar)) as colegio_nombre,
+    {{ nombre_ied('colegio_nombre') }} as colegio_nombre,
     trim(cast(codigo_dane as varchar)) as codigo_dane,
     trim(cast(ubicacion_geo as varchar)) as ubicacion_geo,
 
@@ -47,6 +47,6 @@ select
         when cast("de_participacion_ewb_2024" as varchar) ~ '^[0-9]+(\.[0-9]+)?%$' then round(cast(replace(cast("de_participacion_ewb_2024" as varchar), '%', '') as numeric) / 100, 4)
         else null 
     end as asistencia_porcentaje,
-    trim(cast(recibe_constancia as varchar)) as recibe_constancia
+    {{ si_no('recibe_constancia') }} as recibe_constancia
 
 from source

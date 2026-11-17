@@ -21,6 +21,7 @@ def _cargar(anio: int | None, forzar: bool) -> None:
     print(f"1. Carga a capa Bronze (raw): {objetivo}...")
     for resultado in ingestor_pipeline.cargar(anio=anio, forzar=forzar):
         print(f"   {resultado}")
+    print(f"   {ingestor_pipeline.cargar_referencia_ied()}")
     print("✅ Carga terminada. Ejecuta `transformar` para actualizar las tablas finales.")
 
 

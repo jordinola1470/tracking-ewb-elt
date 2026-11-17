@@ -38,6 +38,9 @@ tablero/
 | Barra vertical, título superior, botones de arriba a la derecha | `src/componentes/Tablero.tsx` (estilos en `globals.css`, clases `mk-lateral`, `mk-cabecera`, `mk-acciones`) |
 | Ancho de la barra vertical | `globals.css`, regla `.mk-app` (`grid-template-columns`) |
 | Qué columnas se leen de cada tabla | `src/lib/datos.ts` |
+| Avisos (actualizado el) e Información de la barra superior | `src/componentes/comunes/barra_avisos.tsx` |
+| Textos del ícono ⓘ de cada gráfico | `src/componentes/analitica/ana_graficos.tsx` (constante `INFO`) |
+| El fact sheet (pestaña Reporte) y su PDF | `src/componentes/reporte/rep_fact_sheet.tsx` (estilos de impresión en `globals.css`, `@media print`) |
 | **Los datos o cálculos** | dbt: `dbt_project/models/tablero/` (no en el tablero) |
 
 ## Componentes y su fuente
@@ -46,12 +49,14 @@ Cada componente tiene el atributo `data-componente="<nombre>"` para ubicarlo en 
 
 | Componente | Tabla dbt |
 | :--- | :--- |
-| `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio` | `tab_kpis_anio` |
-| `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` | `tab_pruebas_nivel_anio` |
+| `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_constancia_anio`, `ana_graf_pruebas_presentadas` | `tab_kpis_anio` |
+| `ana_graf_constancia_nivel`, `ana_graf_nivel_formacion` | `tab_pruebas_nivel_anio` |
 | `ana_graf_constancia_cargo` | `tab_constancia_cargo_anio` |
 | `ana_graf_permanencia` | `tab_permanencia` |
 | `per_buscador`, `per_tabla_docentes`, `per_ficha_docente` | `tab_perfiles` |
 | `per_tabla_historial` | `tab_historial` |
+| `ana_graf_ied_atendidas` · `ana_graf_cargo_docentes` · `ana_graf_nivel_ultimo` | `tab_totales` + `tab_kpis_anio` · `tab_cargo_docentes` · `tab_nivel_ultimo` |
+| `rep_fact_sheet` | `tab_fs_resumen`, `tab_fs_anio`, `tab_fs_distribucion` |
 
 ## Paleta de colores
 
@@ -70,6 +75,7 @@ Color principal azul petróleo `#0C343D` y verde institucional `#40984C`. Las va
 | `--principal-suave` | `#F3F5F5` | Tarjetas dentro de los paneles, filas alternas de las tablas |
 | `--verde-claro` | `#D9EBDB` | Fila elegida, estado "Sí" y píldoras de permanencia |
 | `--color-fondo` | `#D5DCDE` | Fondo gris de la página (más oscuro para dar contraste a los paneles blancos) |
+| `--marca-negro` | `#22333B` | Gris pizarra con matiz azul petróleo: títulos y números principales, opción elegida de la barra lateral, píldora EwB, botón de descarga (ejes e íconos ⓘ en `--negro-suave` `#56676D`) |
 
 Orden de uso en gráficos: `--chart-1` (principal) → `--chart-2` (verde) → `--chart-3` → `--chart-4` → `--chart-5`.
 Para cambiar un color en todo el tablero, se edita solo la variable en `globals.css`.
@@ -87,7 +93,7 @@ Para cambiar un color en todo el tablero, se edita solo la variable en `globals.
 
 **Orden de la vista Analítica**
 1. **Histórico · todos los años** (no usa filtros): `ana_graf_constancia_anio` (barras verticales apiladas con %), `ana_graf_permanencia`.
-2. **Por año** (todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*`, `ana_graf_pruebas_nivel`, `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_nivel_formacion`.
+2. **Por año** (todo responde al filtro): `ana_filtro_anio`, `ana_texto_resumen`, `ana_kpi_*` (participaciones, docentes únicos, IED únicas, constancia, asistencia), `ana_graf_nivel_formacion` (ancho), `ana_graf_constancia_nivel`, `ana_graf_constancia_cargo`, `ana_graf_pruebas_presentadas` (Entrada, Salida, Sin prueba de entrada, Sin prueba de salida).
 
 ## Desarrollo local
 

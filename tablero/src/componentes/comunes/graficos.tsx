@@ -63,17 +63,24 @@ const limpiarId = (id: string) => "r" + id.replace(/[^a-zA-Z0-9]/g, "");
 export function BarrasHorizontales<T>(props: {
   filas: T[]; categoria: (d: T) => string; valor: (d: T) => number | null;
   formato: (v: number) => string; max?: number; alto?: number; etiqueta: string; color?: string;
+  /** Opcional: color o rayado propio para cada barra */
+  estilo?: (d: T) => { color?: string; rayado?: Rayado };
+  /** Opcional: texto a la derecha de la barra (por defecto, el valor con `formato`) */
+  etiquetaValor?: (d: T) => string;
 }) {
-  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0] } = props;
+  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0], estilo, etiquetaValor } = props;
+  const id = limpiarId(useId());
   const ref = useDibujo((el) => {
     const datos = filas.filter((d) => valor(d) != null);
     if (!datos.length) return sinDatos(el);
     const bh = 22, gap = 12, W = el.clientWidth || 320, H = alto ?? datos.length * (bh + gap) + 8;
     const svg = d3.select(el).append("svg").attr("width", "100%").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", etiqueta);
+    datos.forEach((d, i) => { const r = estilo?.(d).rayado; if (r) definirRayado(svg, `${id}b${i}`, r); });
+    const relleno = (d: T, i: number) => { const e = estilo?.(d); return e?.rayado ? rayado(`${id}b${i}`) : (e?.color ?? color); };
     const tip = crearTooltip(el);
     const med = svg.append("g"); datos.forEach((d) => med.append("text").attr("font-size", 12).text(categoria(d)));
     const lw = d3.max(med.selectAll<SVGTextElement, unknown>("text").nodes(), (n) => n.getComputedTextLength()) || 60; med.remove();
-    const L = lw + 14, R = 52;
+    const L = lw + 14, R = etiquetaValor ? 92 : 52;
     const y = d3.scaleBand(datos.map(categoria), [4, H - 4]).paddingInner(0.35);
     const x = d3.scaleLinear([0, max ?? (d3.max(datos, (d) => valor(d) as number) || 1)], [L, W - R]);
     svg.append("g").selectAll("text").data(datos).join("text").attr("x", L - 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
@@ -81,11 +88,11 @@ export function BarrasHorizontales<T>(props: {
     if (max != null) svg.selectAll("rect.pista").data(datos).join("rect").attr("x", L).attr("y", (d) => y(categoria(d)) ?? 0)
       .attr("width", W - R - L).attr("height", y.bandwidth()).attr("rx", RADIO).style("fill", "var(--principal-suave)");
     svg.selectAll("rect.b").data(datos).join("rect").attr("x", L).attr("y", (d) => y(categoria(d)) ?? 0).attr("height", y.bandwidth())
-      .attr("width", (d) => Math.max(RADIO, x(valor(d) as number) - L)).attr("rx", RADIO).style("fill", color)
+      .attr("width", (d) => Math.max(RADIO, x(valor(d) as number) - L)).attr("rx", RADIO).style("fill", (d, i) => relleno(d, i))
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d)}: ${formato(valor(d) as number)}`)).on("pointerleave", tip.ocultar);
     svg.selectAll("text.v").data(datos).join("text").attr("x", W - R + 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
-      .attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700).style("fill", "var(--color-fg)").text((d) => formato(valor(d) as number));
-  }, [filas, max, alto, color]);
+      .attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700).style("fill", "var(--color-fg)").text((d) => (etiquetaValor ? etiquetaValor(d) : formato(valor(d) as number)));
+  }, [filas, max, alto, color, estilo, etiquetaValor]);
   return <div className="mk-chart" ref={ref} />;
 }
 
@@ -172,6 +179,15 @@ export function Dona<T>(props: { filas: T[]; categoria: (d: T) => string; valor:
     const arco = d3.arc<d3.PieArcDatum<T>>().innerRadius(R * 0.64).outerRadius(R - 2).cornerRadius(5);
     svg.selectAll("path").data(arcos).join("path").attr("d", arco).style("fill", (_d, i) => COLORES_SERIE[i % COLORES_SERIE.length])
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d.data)}: ${entero(valor(d.data))} (${pct(valor(d.data) / tot)})`)).on("pointerleave", tip.ocultar);
+    // % sobre cada arco con espacio suficiente (píldora blanca, igual que las etiquetas de las barras)
+    arcos.filter((d) => d.endAngle - d.startAngle > 0.38).forEach((d) => {
+      const [cx, cy] = arco.centroid(d), txt = pct(valor(d.data) / tot), ancho = txt.length * 6.6 + 10;
+      const et = svg.append("g").style("pointer-events", "none");
+      et.append("rect").attr("x", cx - ancho / 2).attr("y", cy - 9).attr("width", ancho).attr("height", 18).attr("rx", 9)
+        .style("fill", "#fff").style("filter", "drop-shadow(0 1px 2px rgba(12,52,61,.25))");
+      et.append("text").attr("x", cx).attr("y", cy).attr("dy", ".35em").attr("text-anchor", "middle").attr("font-size", 10.5)
+        .attr("font-weight", 800).style("fill", "var(--marca-principal)").text(txt);
+    });
     svg.append("text").attr("text-anchor", "middle").attr("dy", "-.05em").attr("font-size", 30).attr("font-weight", 800).style("fill", "var(--marca-principal)").text(centro);
     svg.append("text").attr("text-anchor", "middle").attr("dy", "1.6em").attr("font-size", 12).style("fill", "var(--color-fg-muted)").text(subcentro);
   }, [filas, centro, subcentro]);
@@ -195,9 +211,12 @@ export function BarrasVerticalesApiladas<T>(props: {
     const total = (d: T) => tramos.reduce((s, t) => s + t.valor(d), 0);
     const x = d3.scaleBand(datos.map(categoria), [m.l, W - m.r]).padding(0.38);
     const y = d3.scaleLinear().domain([0, d3.max(datos, total) || 1]).nice().range([H - m.b, m.t]);
-    svg.append("g").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickSize(0).tickPadding(8)).call((a) => a.select(".domain").remove());
+    // Cuadrícula punteada y ejes X e Y visibles (línea sólida)
     svg.append("g").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W - m.l - m.r)))
       .call((a) => { a.select(".domain").remove(); a.selectAll(".tick line").style("stroke", "var(--cds-chart-grid)").style("stroke-dasharray", "3 4"); });
+    svg.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(4).tickFormat(() => ""));
+    svg.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickSize(4).tickPadding(8));
+    svg.selectAll(".eje .domain, .eje .tick line").style("stroke", "var(--principal-medio)").style("stroke-width", 1.5);
     datos.forEach((d) => {
       let acc = 0; const x0 = x(categoria(d)) ?? 0;
       tramos.forEach((t, k) => {
@@ -206,6 +225,15 @@ export function BarrasVerticalesApiladas<T>(props: {
         svg.append("rect").attr("x", x0).attr("width", x.bandwidth()).attr("y", yTop).attr("height", Math.max(2, h - SEP)).attr("rx", RADIO)
           .style("fill", t.rayado ? rayado(`${id}t${k}`) : (t.color ?? COLORES[0]))
           .on("pointermove", (ev) => tip.mostrar(ev, `${categoria(d)} · ${t.nombre}: ${entero(v)} de ${entero(total(d))}`)).on("pointerleave", tip.ocultar);
+        // Etiqueta con el valor encima del tramo (píldora blanca con sombra)
+        if (h > 22) {
+          const cx = x0 + x.bandwidth() / 2, cy = yTop + (h - SEP) / 2, txt = entero(v), ancho = txt.length * 7.5 + 16;
+          const et = svg.append("g").style("pointer-events", "none");
+          et.append("rect").attr("x", cx - ancho / 2).attr("y", cy - 10).attr("width", ancho).attr("height", 20).attr("rx", 10)
+            .style("fill", "#fff").style("filter", "drop-shadow(0 1px 2px rgba(12,52,61,.25))");
+          et.append("text").attr("x", cx).attr("y", cy).attr("dy", ".35em").attr("text-anchor", "middle").attr("font-size", 12)
+            .attr("font-weight", 700).style("fill", "var(--marca-principal)").text(txt);
+        }
       });
       svg.append("text").attr("x", x0 + x.bandwidth() / 2).attr("y", y(total(d)) - 8).attr("text-anchor", "middle")
         .attr("font-size", 13).attr("font-weight", 800).style("fill", "var(--color-fg)").text(etiquetaArriba(d));

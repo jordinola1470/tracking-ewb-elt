@@ -6,16 +6,16 @@ select
     -- DOCENTE
     trim(cast(docente_id as varchar)) as docente_id,
     -- 2026 trae nombres y apellidos por separado
-    nullif(trim(concat_ws(' ', trim(cast(nombres as varchar)), trim(cast(apellidos as varchar)))), '') as docente_nombre,
+    {{ nombre_propio("concat_ws(' ', trim(cast(nombres as varchar)), trim(cast(apellidos as varchar)))") }} as docente_nombre,
     -- 2026 viene como 'CC - CEDULA DE CIUDADANIA'; se deja solo el código (CC, CE...) como en 2023/2024
     trim(split_part(cast(tipo_documento as varchar), ' - ', 1)) as tipo_documento,
     cast(null as varchar) as genero,
     cast(null as varchar) as fecha_nacimiento,
-    trim(cast(correo_electronico as varchar)) as correo_electronico,
+    {{ correo('correo_electronico') }} as correo_electronico,
     trim(cast(telefono_celular as varchar)) as telefono_celular,
 
     -- IED
-    trim(cast(colegio_nombre as varchar)) as colegio_nombre,
+    {{ nombre_ied('colegio_nombre') }} as colegio_nombre,
     trim(cast(codigo_dane as varchar)) as codigo_dane,
     cast(null as varchar) as ubicacion_geo,
 

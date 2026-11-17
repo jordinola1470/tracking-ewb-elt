@@ -11,7 +11,7 @@ models:
         data_tests: [unique, not_null]
 
   - name: tab_pruebas_nivel_anio
-    description: "Pruebas y constancia por año y nivel de formación (ana_graf_pruebas_nivel, ana_graf_constancia_nivel, ana_graf_nivel_formacion)."
+    description: "Pruebas y constancia por año y nivel de formación (ana_graf_constancia_nivel, ana_graf_nivel_formacion)."
     columns:
       - name: anio_lectivo
         data_tests: [not_null]
@@ -22,6 +22,51 @@ models:
     description: "% con constancia por año y cargo (ana_graf_constancia_cargo)."
     columns:
       - name: anio_lectivo
+        data_tests: [not_null]
+
+  - name: tab_totales
+    description: "Totales de todos los años: IED atendidas, docentes y participaciones (ana_graf_ied_atendidas)."
+    columns:
+      - name: ied_total
+        data_tests: [not_null]
+
+  - name: tab_cargo_docentes
+    description: "Docentes por cargo, con el último cargo registrado de cada docente (ana_graf_cargo_docentes)."
+    columns:
+      - name: cargo
+        data_tests: [unique, not_null]
+
+  - name: tab_nivel_ultimo
+    description: "Docentes de toda la población según su último nivel cursado, con % sobre el total (ana_graf_nivel_ultimo)."
+    columns:
+      - name: nivel
+        data_tests: [unique, not_null]
+
+  - name: int_fs_docente_anio
+    description: "Fact sheet: una fila por docente y año (prefiere la fila no retirada). Base interna del fact sheet."
+    columns:
+      - name: docente_id
+        data_tests: [not_null]
+
+  - name: tab_fs_anio
+    description: "Fact sheet: indicadores por año (rep_fact_sheet)."
+    columns:
+      - name: anio_lectivo
+        data_tests: [unique, not_null]
+
+  - name: tab_fs_distribucion
+    description: "Fact sheet: distribuciones (sección, año, categoría, docentes, %) (rep_fact_sheet)."
+    columns:
+      - name: seccion
+        data_tests: [not_null]
+
+  - name: tab_fs_resumen
+    description: "Fact sheet: resumen ejecutivo en una fila (rep_fact_sheet)."
+
+  - name: tab_actualizacion
+    description: "Fechas de actualización: recálculo (dbt) y última carga de Excel (barra_avisos)."
+    columns:
+      - name: transformado_en
         data_tests: [not_null]
 
   - name: tab_permanencia

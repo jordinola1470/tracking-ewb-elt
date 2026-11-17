@@ -2,15 +2,13 @@
 // Componentes: ana_filtro_anio, ana_texto_resumen (fuente: tab_kpis_anio)
 import type { KpiAnio } from "@/lib/datos";
 import { entero, pct } from "../comunes/graficos";
+import { FiltroPildora } from "../comunes/filtro_pildora";
 
 export function AnaFiltroAnio({ anios, valor, cambiar }: { anios: number[]; valor: number; cambiar: (a: number) => void }) {
+  // Filtro principal (grande): toda la píldora abre la lista de años
   return (
-    <label className="mk-filtro" data-componente="ana_filtro_anio">
-      <span>Año lectivo</span>
-      <select className="dash-select" aria-label="Año lectivo" value={valor} onChange={(e) => cambiar(Number(e.target.value))}>
-        {anios.map((a) => <option key={a} value={a}>{a}</option>)}
-      </select>
-    </label>
+    <FiltroPildora nombre="ana_filtro_anio" tamano="grande" etiqueta="Año lectivo" icono="calendario" valor={String(valor)}
+      opciones={anios.map((a) => ({ valor: String(a), texto: String(a) }))} cambiar={(v) => cambiar(Number(v))} />
   );
 }
 

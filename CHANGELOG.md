@@ -10,6 +10,50 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Cambiado (datos estandarizados)
+- Lectura del código DANE como texto (antes, leído como número, podía redondearse; ej. 108001000000).
+- Nueva lista oficial de IED (`data/referencia_ied/ied_name.csv`, fuera del repositorio) cargada a
+  `raw.referencia_ied`. En diamond cada fila toma el **nombre oficial** según su DANE; si el nombre de la fila
+  corresponde a otra IED oficial, se corrige también el DANE. `dim_ied` (gold) usa el nombre oficial.
+- Macros de estandarización (`macros/estandarizar.sql`) aplicadas en staging: nombres de docentes con
+  mayúsculas de título ("María del Carmen Pérez"), correos en minúscula, constancia "Si"/"No", nombres de IED
+  en el formato de la lista oficial. En diamond, un solo nombre por docente (el del año más reciente).
+
+### Agregado (tablero)
+- Histórico: **IED atendidas** (total de todos los años + barras por año, `tab_totales`) y **Docentes por cargo**
+  (último cargo de cada docente, `tab_cargo_docentes`); cuadrícula de 2 x 2.
+- Perfiles: filtros de nivel de formación, cargo, IED y permanencia debajo del buscador.
+- Página de inicio de sesión con el estilo del tablero, los logos de Google y Microsoft y el cobranding
+  Alcaldía de Barranquilla · British Council (`tablero/public/logos/`).
+- Histórico: **Nivel actual de los docentes** (toda la población según su último nivel cursado, con % del
+  total; `tab_nivel_ultimo`, cálculo propio: "-" no cuenta como nivel cursado). La ficha de Perfiles no cambia.
+- Nueva pestaña **Reporte** con el **fact sheet** del programa (las 8 secciones de `docs/FACT_SHEET_ANALITICA.md`,
+  2023–2026 y reglas actuales) y botón **Descargar PDF** (impresión del navegador con los estilos del tablero, A4).
+  dbt: `int_fs_docente_anio` (una fila por docente y año), `tab_fs_anio`, `tab_fs_distribucion`, `tab_fs_resumen`.
+- Indicadores por año: animación sutil al pasar el mouse.
+- Texto de permanencia más sencillo.
+
+### Cambiado (experiencia de uso)
+- **Enlace con estado:** pestaña, vista, año y filtros de Perfiles quedan en la URL (compartir, recargar, atrás).
+  No se guardan el docente elegido ni la búsqueda (pueden tener datos personales).
+- **Barra superior:** se quita el botón de buscar. **Avisos** muestra "Actualizado el …" de la base (dbt
+  `tab_actualizacion`) y un resumen de lo que muestra el tablero; **Información**, datos básicos.
+- **ⓘ en cada gráfico** con lo que mide.
+
+### Cambiado (tablero · indicadores)
+- Paleta: gris pizarra `#22333B` (`--marca-negro`, con matiz azul petróleo) en títulos y números principales, opción elegida de la barra
+  lateral, píldora EwB, iconos de filtros y botón de descarga; ejes de gráficos en `#56676D`.
+- "Con prueba de entrada y salida" se reemplaza por **IED únicas del año** (`tab_kpis_anio.ied_unicas`).
+- Cada indicador tiene color (degradados de la paleta institucional).
+- En Histórico ya no se muestra el resumen del año (solo en Por año).
+
+### Cambiado (tablero · Por año)
+- "Nivel de formación de los docentes" pasa a la tarjeta ancha y "Pruebas presentadas" a la cuadrícula.
+- "Pruebas presentadas" ahora es un gráfico de barras con 4 categorías: Entrada, Salida,
+  Sin prueba de entrada y Sin prueba de salida (las "sin" van rayadas).
+- "Constancia, año por año": ejes X e Y visibles y etiqueta con el valor en cada tramo (el % se mantiene).
+- dbt `tab_kpis_anio`: nuevas columnas `con_entrada`, `con_salida`, `sin_entrada`, `sin_salida`.
+
 ### Cambiado (diseño del tablero)
 - Paleta institucional: principal azul petróleo `#0C343D` + verde `#40984C`, con mezclas; documentada en
   `tablero/README.md`. Fondo de página gris `#D5DCDE` y paneles blancos; sin modo oscuro.

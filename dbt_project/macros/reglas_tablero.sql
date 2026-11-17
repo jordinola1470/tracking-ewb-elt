@@ -29,3 +29,10 @@
         when 'B1' then 5 when 'B1+' then 6 when 'B2' then 7 when 'C1' then 8
         when '-' then 98 else 99 end
 {%- endmacro %}
+
+{# MCER a orden numérico (fact sheet): PRE A1=0, A1=1, A2=2, B1=3, B2=4, C1=5; otro valor = sin evaluar (NULL) #}
+{% macro orden_mcer(col) -%}
+    case upper(replace(replace({{ col }}, ' ', ''), '-', ''))
+        when 'PREA1' then 0 when 'A1' then 1 when 'A2' then 2
+        when 'B1' then 3 when 'B2' then 4 when 'C1' then 5 end
+{%- endmacro %}
