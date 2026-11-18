@@ -17,6 +17,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   (gold, una fila por docente y año con el nivel del curso del último retiro), con pruebas de unicidad y niveles válidos.
 - `consolidado_historico`: los retirados sin nivel (`-`) reciben el nivel del curso del que se retiraron; siguen
   contando como retirados. Con los datos actuales: 2025 → 408 de 412 filas, 2026 → 237 de 251.
+- Último nivel de formación (gráfico de Histórico y Perfiles): los retirados ya cuentan con el nivel del curso del
+  que se retiraron (antes se excluían y quedaban «Sin nivel registrado»: 506 → 279, casi todos activos de 2024 sin nivel en el Excel).
 
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.
