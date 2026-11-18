@@ -92,9 +92,9 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
           <tbody>
             {visibles.map((r) => (
               <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
-                <td className="mk-td-codigo" title={r.docente_id}>{r.docente_id}</td><td className="mk-td-nombre" title={r.docente_nombre}>{r.docente_nombre}</td>
-                <td title={r.cargo}>{r.cargo}</td><td title={r.colegio}>{r.colegio}</td>
-                <td title={r.niveles_por_anio}>{r.niveles_por_anio}</td><td title={r.permanencia}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
+                <td className="mk-td-codigo" title={r.docente_id}>{r.docente_id}</td><td className="mk-td-nombre" title={r.docente_nombre ?? undefined}>{r.docente_nombre}</td>
+                <td title={r.cargo ?? undefined}>{r.cargo}</td><td title={r.colegio ?? undefined}>{r.colegio}</td>
+                <td title={r.niveles_por_anio ?? undefined}>{r.niveles_por_anio}</td><td title={r.permanencia ?? undefined}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
               </tr>
             ))}
             {/* Filas vacías para que la última página mida lo mismo que las demás */}
