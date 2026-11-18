@@ -162,7 +162,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
           ))}
         </nav>
         {/* Sello al pie de la barra vertical */}
-        <small className="mk-sello">Desarrollado por TeseoDev · Medellín ©</small>
+        <small className="mk-sello">Desarrollado por TeseoDev · Medellín&nbsp;©</small>
       </aside>
 
       <div className="mk-contenido">

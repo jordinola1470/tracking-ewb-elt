@@ -675,7 +675,8 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-lateral-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border:0;font:inherit;font-weight:600;font-size:13px;color:var(--marca-negro);cursor:pointer;border-radius:var(--radio-pildora)}
 .mk-lateral-toggle:hover{background:#E4E9EA}
 .mk-app-contraida{grid-template-columns:76px minmax(0,1fr)}
-.mk-app-contraida .mk-tab-txt,.mk-app-contraida .mk-sello{display:none}
+.mk-app-contraida .mk-tab-txt{display:none}
+.mk-app-contraida .mk-sello{font-size:9px;padding:2px 0 0}
 .mk-app-contraida .mk-marca{padding:6px}
 .mk-app-contraida .mk-logo{font-size:10px;height:40px}
 .mk-app-contraida .mk-tabs{align-items:center;padding:10px 0;gap:10px}

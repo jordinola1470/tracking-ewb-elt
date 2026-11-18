@@ -29,7 +29,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   el rango «1–6 de N» y la página actual; al buscar o filtrar vuelve a la página 1. Filas de altura fija,
   columnas de ancho fijo (texto largo con «…» y completo al pasar el mouse) y filas vacías de relleno en la
   última página: la tabla mide lo mismo en todas las páginas.
-- Barra lateral: el sello «Desarrollado por TeseoDev · Medellín ©» vuelve a verse completo al pie (se cortaba).
+- Barra lateral: el sello «Desarrollado por TeseoDev · Medellín ©» vuelve a verse completo al pie (se cortaba)
+  y también se ve con la barra contraída (antes se ocultaba).
 - Permanencia: «años seguidos» pasa a «años consecutivos» (y «no seguidos» a «no consecutivos»).
 
 ### Cambiado (tablero · detalles finales)
