@@ -39,6 +39,7 @@ Este repositorio fomenta la **Medallion Architecture**, garantizando niveles gra
     - **`consolidado_historico`** (una sola tabla con el *append* `UNION ALL` de las bases 2023, 2024, 2025 y 2026, construida desde `staging`, sin deduplicar). Aquí se unifica entre años:
       - **Un solo nombre por docente:** el del año más reciente.
       - **Nombre oficial de la IED** según su código DANE (lista oficial `raw.referencia_ied`). Si el nombre de una fila corresponde a otra IED oficial, se corrige también su DANE. Las IED que no están en la lista conservan el nombre tal cual aparece en 2023.
+      - **Nivel de los retirados:** los docentes retirados que no tienen nivel (`-`) reciben el nivel del curso del que se retiraron, según las alertas del helpdesk (`marts.fct_helpdesk_retiros`). Siguen contando como retirados porque `grupo_id` no cambia.
   - **Tablas del tablero** (`models/tablero/`, prefijo `tab_`), construidas sobre `consolidado_historico`. El tablero solo filtra y dibuja; todos los cálculos están aquí:
 
     | Tabla | Grano | Componentes del tablero |
@@ -100,6 +101,8 @@ Este repositorio fomenta la **Medallion Architecture**, garantizando niveles gra
 
 > **Código DANE y lista oficial de IED:** el DANE se lee del Excel **como texto**, para que no se redondee (por ejemplo, a `108001000000`). La lista oficial (`data/referencia_ied/ied_name.csv`, columnas `INSTITUCION` y `DANE`) **no se sube al repositorio**. `cargar` la lleva a `raw.referencia_ied`; si el archivo no existe, crea la tabla vacía y dbt usa los nombres estandarizados.
 
+> **Alertas del helpdesk (nivel de los retirados):** los CSV exportados de la plataforma van en `data/helpdesk_data/` con el nombre `helpdesk_<año>_<grupo>.csv` (por ejemplo, `helpdesk_2026_docentes.csv`) y **no se suben al repositorio**. `cargar` lee todos los CSV de la carpeta y reemplaza `raw.helpdesk_alertas` guardando solo el documento, el grupo antes, el grupo después y la fecha (descarta nombres, correos y títulos). `stg_helpdesk_alertas` quita duplicados y saca el nivel del código de grupo; `fct_helpdesk_retiros` (gold) deja, por docente y año, el nivel del curso del último retiro. Para actualizar con versiones nuevas: reemplaza los CSV y corre `cargar` y `transformar`. Sin archivos, la tabla queda vacía y los retirados conservan `-`.
+
 > **Base 2026:** se lee la hoja `base` (concatenación de las hojas del Excel). No trae `genero`, `fecha_nacimiento`, `ubicacion_geo`, `jornada_laboral`, `grado_dicta`, `recibe_constancia` ni score/MCER de salida: esas columnas existen en el consolidado con valor NULL para 2026. `docente_nombre` se arma con `nombres` + `apellidos`, `tipo_documento` se reduce al código (`CC`, `CE`) y las columnas de entrada, que vienen con contenido mezclado, se separan por contenido (valor numérico → `score_entrada`, valor con forma de nivel → `mcer_entrada`). `dim_docentes` y `dim_ied` toman el último valor no nulo de cada campo para que el 2026 no borre datos de años anteriores.
 
 > **Nota sobre asistencia 2024:** el Excel de 2024 trae el porcentaje como texto con "%" (ej. `100.00%`). `stg_docentes_2024` lo convierte a decimal (`1.0000`) para quedar en la misma escala 0-1 que 2023 y 2025.
@@ -138,7 +141,7 @@ El diseño de directorios respeta altamente el concepto Separation of Concerns (
 
 ```text
 tracking-ewb-elt/
-├── data/                       # [Landing Zone] Excel locales y referencia_ied/ied_name.csv. NO se versiona.
+├── data/                       # [Landing Zone] Excel locales, referencia_ied/ied_name.csv y helpdesk_data/*.csv. NO se versiona.
 ├── config/                     # [Contexto de Ejecución]
 │   ├── sources.yaml            # Archivos a procesar y hoja a leer por fuente (sección opcional `sheets`).
 │   ├── column_mapping.yaml     # Mapeos agnósticos leídos por Python para EL.
@@ -196,7 +199,7 @@ La instalación de un repositorio limpio y moderno, empaquetado y resuelto bajo 
    ```
 
    - **`cargar`** calcula la huella SHA-256 de cada Excel y la compara con la última carga registrada en `raw._registro_cargas`. Si cambió, reemplaza la tabla `raw.base_docentes_AAAA` en una sola transacción y verifica que las filas del Excel coincidan con las de raw; si no cuadran, deshace la carga. Correrlo varias veces seguidas da el mismo resultado.
-   - **`cargar`** también recarga la lista oficial de IED (`raw.referencia_ied`) en cada ejecución.
+   - **`cargar`** también recarga la lista oficial de IED (`raw.referencia_ied`) y las alertas del helpdesk (`raw.helpdesk_alertas`) en cada ejecución.
    - **`transformar`** no necesita los Excel: reconstruye todo desde `raw`.
    - **Errores:** los del proyecto se muestran como un mensaje corto (sin datos personales) y el programa termina con código 1.
 
