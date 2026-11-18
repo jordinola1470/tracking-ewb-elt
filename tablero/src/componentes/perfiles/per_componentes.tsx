@@ -62,7 +62,7 @@ export function PerFiltros({ perfiles, filtros, cambiar, total }: {
 }
 
 /** Filas por página de la tabla de docentes */
-const POR_PAGINA = 8;
+const POR_PAGINA = 6;
 
 /** per_tabla_docentes · 8 docentes por página, con flechas abajo a la derecha */
 export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfil[]; seleccionado?: string; elegir: (id: string) => void }) {
@@ -80,17 +80,26 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
   return (
     <div data-componente="per_tabla_docentes">
       <div className="mk-tw mk-tw-marco mk-tw-paginada" style={{ marginTop: "var(--cds-gap-md)" }}>
-        <table className="mk-table">
+        <table className="mk-table mk-table-fija">
           <caption className="mk-sr">{filas.length} docentes</caption>
+          <colgroup>
+            <col style={{ width: "11%" }} /><col style={{ width: "22%" }} /><col style={{ width: "13%" }} />
+            <col style={{ width: "24%" }} /><col style={{ width: "16%" }} /><col style={{ width: "14%" }} />
+          </colgroup>
           <thead>
             <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>Permanencia</th></tr>
           </thead>
           <tbody>
             {visibles.map((r) => (
               <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
-                <td className="mk-td-codigo">{r.docente_id}</td><td className="mk-td-nombre">{r.docente_nombre}</td><td>{r.cargo}</td><td>{r.colegio}</td>
-                <td>{r.niveles_por_anio}</td><td><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
+                <td className="mk-td-codigo" title={r.docente_id}>{r.docente_id}</td><td className="mk-td-nombre" title={r.docente_nombre}>{r.docente_nombre}</td>
+                <td title={r.cargo}>{r.cargo}</td><td title={r.colegio}>{r.colegio}</td>
+                <td title={r.niveles_por_anio}>{r.niveles_por_anio}</td><td title={r.permanencia}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
               </tr>
+            ))}
+            {/* Filas vacías para que la última página mida lo mismo que las demás */}
+            {Array.from({ length: filas.length > 0 ? POR_PAGINA - visibles.length : 0 }, (_, i) => (
+              <tr key={`vacia-${i}`} className="mk-fila-vacia" aria-hidden><td colSpan={6} /></tr>
             ))}
           </tbody>
         </table>

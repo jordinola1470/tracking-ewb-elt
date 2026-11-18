@@ -726,7 +726,8 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 /* Los textos entran con un fundido corto en lugar de aparecer de golpe */
 @keyframes mk-fundido{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
 @keyframes mk-fundido-abajo{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
-.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:mk-fundido .28s ease .08s both;white-space:nowrap}
+.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:mk-fundido .28s ease .08s both}
+.mk-lateral .mk-tab-txt{white-space:nowrap}
 .mk-app-contraida .mk-lateral .mk-tab-txt{animation-name:mk-fundido-abajo}
 .mk-lateral .mk-tab svg{transition:background .2s ease,padding .2s ease}
 .mk-lateral-toggle svg{transition:transform .3s cubic-bezier(.2,0,0,1)}
@@ -749,3 +750,11 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-paginador-btn:hover:not(:disabled){background:var(--marca-negro);color:#fff;transform:translateY(-1px)}
 .mk-paginador-btn:focus-visible{outline:2px solid var(--marca-verde);outline-offset:2px}
 .mk-paginador-btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+
+/* Tabla de docentes: filas de altura fija y columnas fijas para que no salte al cambiar de página */
+[data-componente="per_tabla_docentes"] .mk-table-fija{table-layout:fixed;width:100%}
+[data-componente="per_tabla_docentes"] .mk-table-fija tbody tr{height:52px}
+[data-componente="per_tabla_docentes"] .mk-table-fija td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+[data-componente="per_tabla_docentes"] .mk-table-fija th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-componente="per_tabla_docentes"] .mk-table-fija .mk-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+[data-componente="per_tabla_docentes"] .mk-fila-vacia,[data-componente="per_tabla_docentes"] .mk-fila-vacia:hover{cursor:default;background:transparent}

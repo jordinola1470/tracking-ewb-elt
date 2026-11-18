@@ -25,8 +25,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   EwB pequeño al lado (sin burbuja) y atajo Ctrl + B (⌘ + B); contraída quedan los íconos en círculo con su nombre debajo. La
   elección se recuerda en el navegador de cada persona. Animación fluida: curva de Material 3, textos con
   fundido y gráficos que se redibujan una sola vez al terminar (mientras tanto el SVG solo se escala).
-- Perfiles: la tabla de docentes muestra 8 por página (sin desplazamiento) con flechas ‹ › abajo a la derecha,
-  el rango «1–8 de N» y la página actual; al buscar o filtrar vuelve a la página 1.
+- Perfiles: la tabla de docentes muestra 6 por página (sin desplazamiento) con flechas ‹ › abajo a la derecha,
+  el rango «1–6 de N» y la página actual; al buscar o filtrar vuelve a la página 1. Filas de altura fija,
+  columnas de ancho fijo (texto largo con «…» y completo al pasar el mouse) y filas vacías de relleno en la
+  última página: la tabla mide lo mismo en todas las páginas.
+- Barra lateral: el sello «Desarrollado por TeseoDev · Medellín ©» vuelve a verse completo al pie (se cortaba).
 - Permanencia: «años seguidos» pasa a «años consecutivos» (y «no seguidos» a «no consecutivos»).
 
 ### Cambiado (tablero · detalles finales)
