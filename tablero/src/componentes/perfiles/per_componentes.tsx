@@ -1,6 +1,7 @@
 "use client";
 // Componentes de la vista Perfiles: per_buscador, per_tabla_docentes, per_ficha_docente, per_tabla_historial
 // Fuentes: tab_perfiles (una fila por docente) y tab_historial (una fila por docente y año).
+import { useState } from "react";
 import type { Historial, Perfil } from "@/lib/datos";
 import { pct } from "../comunes/graficos";
 import { FiltroPildora } from "../comunes/filtro_pildora";
@@ -60,24 +61,62 @@ export function PerFiltros({ perfiles, filtros, cambiar, total }: {
   );
 }
 
-/** per_tabla_docentes */
+/** Filas por página de la tabla de docentes */
+const POR_PAGINA = 6;
+
+/** per_tabla_docentes · 8 docentes por página, con flechas abajo a la derecha */
 export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfil[]; seleccionado?: string; elegir: (id: string) => void }) {
+  const [pagina, setPagina] = useState(0);
+  // Si cambian la búsqueda o los filtros, se vuelve a la primera página
+  const [filasPrevias, setFilasPrevias] = useState(filas);
+  if (filasPrevias !== filas) { setFilasPrevias(filas); setPagina(0); }
+
+  const paginas = Math.max(1, Math.ceil(filas.length / POR_PAGINA));
+  const actual = Math.min(pagina, paginas - 1);
+  const desde = actual * POR_PAGINA;
+  const visibles = filas.slice(desde, desde + POR_PAGINA);
+  const n = (x: number) => x.toLocaleString("es-CO");
+
   return (
-    <div className="mk-tw mk-tw-marco" style={{ marginTop: "var(--cds-gap-md)" }} data-componente="per_tabla_docentes">
-      <table className="mk-table">
-        <caption className="mk-sr">{filas.length} docentes</caption>
-        <thead>
-          <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>Permanencia</th></tr>
-        </thead>
-        <tbody>
-          {filas.map((r) => (
-            <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
-              <td className="mk-td-codigo">{r.docente_id}</td><td className="mk-td-nombre">{r.docente_nombre}</td><td>{r.cargo}</td><td>{r.colegio}</td>
-              <td>{r.niveles_por_anio}</td><td><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div data-componente="per_tabla_docentes">
+      <div className="mk-tw mk-tw-marco mk-tw-paginada" style={{ marginTop: "var(--cds-gap-md)" }}>
+        <table className="mk-table mk-table-fija">
+          <caption className="mk-sr">{filas.length} docentes</caption>
+          <colgroup>
+            <col style={{ width: "11%" }} /><col style={{ width: "22%" }} /><col style={{ width: "13%" }} />
+            <col style={{ width: "24%" }} /><col style={{ width: "16%" }} /><col style={{ width: "14%" }} />
+          </colgroup>
+          <thead>
+            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>Permanencia</th></tr>
+          </thead>
+          <tbody>
+            {visibles.map((r) => (
+              <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
+                <td className="mk-td-codigo" title={r.docente_id}>{r.docente_id}</td><td className="mk-td-nombre" title={r.docente_nombre ?? undefined}>{r.docente_nombre}</td>
+                <td title={r.cargo ?? undefined}>{r.cargo}</td><td title={r.colegio ?? undefined}>{r.colegio}</td>
+                <td title={r.niveles_por_anio ?? undefined}>{r.niveles_por_anio}</td><td title={r.permanencia ?? undefined}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
+              </tr>
+            ))}
+            {/* Filas vacías para que la última página mida lo mismo que las demás */}
+            {Array.from({ length: filas.length > 0 ? POR_PAGINA - visibles.length : 0 }, (_, i) => (
+              <tr key={`vacia-${i}`} className="mk-fila-vacia" aria-hidden><td colSpan={6} /></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Paginación abajo a la derecha */}
+      {filas.length > 0 && (
+        <nav className="mk-paginador" aria-label="Páginas de la tabla de docentes">
+          <span className="mk-paginador-txt">{n(desde + 1)}–{n(desde + visibles.length)} de {n(filas.length)}</span>
+          <button type="button" className="mk-paginador-btn" onClick={() => setPagina(actual - 1)} disabled={actual === 0} aria-label="Página anterior" title="Anterior">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 6-6 6 6 6" /></svg>
+          </button>
+          <span className="mk-paginador-pag" aria-live="polite">{actual + 1} / {paginas}</span>
+          <button type="button" className="mk-paginador-btn" onClick={() => setPagina(actual + 1)} disabled={actual >= paginas - 1} aria-label="Página siguiente" title="Siguiente">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 6 6 6-6 6" /></svg>
+          </button>
+        </nav>
+      )}
     </div>
   );
 }

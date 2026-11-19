@@ -73,6 +73,18 @@ function Cifra({ valor, etiqueta, tono = "principal" }: { valor: string; etiquet
   return <div className={`mk-fs-cifra mk-kpi-tono-${tono}`}><b>{valor}</b><span>{etiqueta}</span></div>;
 }
 
+/** Nombre del PDF: "AAAA-MM-DD factsheet ewb" (fecha de la descarga).
+    El navegador propone como nombre del archivo el título de la página, así que se cambia mientras se imprime. */
+function descargarPdf() {
+  const hoy = new Date();
+  const fecha = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+  const tituloOriginal = document.title;
+  const restaurar = () => { document.title = tituloOriginal; window.removeEventListener("afterprint", restaurar); };
+  window.addEventListener("afterprint", restaurar);
+  document.title = `${fecha} factsheet ewb`;
+  window.print();
+}
+
 export function RepFactSheet({ fs }: { fs: FactSheet }) {
   const { anios, dist, resumen: r } = fs;
   const listaAnios = anios.map((a) => a.anio_lectivo);
@@ -96,7 +108,7 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
               <p className="mk-note">Vista previa de la hoja A4 · «Descargar PDF» → destino «Guardar como PDF».</p>
             </div>
           </div>
-          <button type="button" className="mk-fs-boton" onClick={() => window.print()}>
+          <button type="button" className="mk-fs-boton" onClick={descargarPdf}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
             </svg>
@@ -305,17 +317,18 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
           <div className="mk-fs-dos">
             <Bloque titulo="Constancias por año">
               <TablaAnios filas={anios} columnas={[
-                { titulo: "Con", valor: (d) => entero(d.con_constancia) },
-                { titulo: "Sin", valor: (d) => entero(d.sin_constancia) },
+                // Un año sin el campo de constancia muestra «—» (no «0»)
+                { titulo: "Con", valor: (d) => (d.con_constancia + d.sin_constancia ? entero(d.con_constancia) : "—") },
+                { titulo: "Sin", valor: (d) => (d.con_constancia + d.sin_constancia ? entero(d.sin_constancia) : "—") },
                 { titulo: "% con", valor: (d) => v(d.pct_constancia, pct) },
               ]} />
             </Bloque>
-            <Bloque titulo="Asistencia por año">
+            <Bloque titulo="Asistencia por año" nota="Promedio y rangos sin contar a los retirados, que van en su propia columna.">
               <TablaAnios filas={anios} columnas={[
                 { titulo: "Promedio", valor: (d) => v(d.asistencia_promedio, pct) },
                 { titulo: "≥ 80 %", valor: (d) => entero(d.asistencia_80_o_mas) },
                 { titulo: "< 80 %", valor: (d) => entero(d.asistencia_menos_80) },
-                { titulo: "Sin dato", valor: (d) => entero(d.asistencia_sin_dato) },
+                { titulo: "Retirados", valor: (d) => entero(d.retirados) },
               ]} />
             </Bloque>
           </div>

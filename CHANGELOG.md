@@ -10,6 +10,29 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Corregido (fact sheet)
+- Datos validados entre secciones y contra el tablero (0 diferencias con datos reales):
+  - IED por año con todas las filas del año, como el tablero (2026: 128, no 127).
+  - Asistencia: los rangos «≥ 80 %» y «< 80 %» ya no incluyen a los retirados (antes, en 2026, el promedio
+    era 85 % y 347 aparecían bajo 80 %); nueva columna «Retirados».
+  - Tablero y fact sheet calculan asistencia y retirados con una fila por docente y año (antes 84 % vs 85 %).
+  - Constancia de un año sin el dato se muestra «—» en vez de «0».
+- **Descargar PDF** propone el nombre «AAAA-MM-DD factsheet ewb» (fecha de la descarga).
+
+### Cambiado (tablero)
+- Perfiles: la ficha del docente va debajo de la tabla de docentes (más espacio para ambas).
+- Barra lateral contraíble (opcional, patrón «navigation rail» de Material 3): botón ☰ / ← arriba con el logo
+  EwB pequeño al lado (sin burbuja) y atajo Ctrl + B (⌘ + B); contraída quedan los íconos en círculo con su nombre debajo. La
+  elección se recuerda en el navegador de cada persona. Animación fluida: curva de Material 3, textos con
+  fundido y gráficos que se redibujan una sola vez al terminar (mientras tanto el SVG solo se escala).
+- Perfiles: la tabla de docentes muestra 6 por página (sin desplazamiento) con flechas ‹ › abajo a la derecha,
+  el rango «1–6 de N» y la página actual; al buscar o filtrar vuelve a la página 1. Filas de altura fija,
+  columnas de ancho fijo (texto largo con «…» y completo al pasar el mouse) y filas vacías de relleno en la
+  última página: la tabla mide lo mismo en todas las páginas.
+- Barra lateral: el sello «Desarrollado por TeseoDev · Medellín ©» vuelve a verse completo al pie (se cortaba)
+  y también se ve con la barra contraída (antes se ocultaba).
+- Permanencia: «años seguidos» pasa a «años consecutivos» (y «no seguidos» a «no consecutivos»).
+
 ### Agregado (nivel de los retirados desde el helpdesk)
 - `cargar` lee los CSV de `data/helpdesk_data/` (`helpdesk_<año>_<grupo>.csv`) y reemplaza `raw.helpdesk_alertas`
   solo con documento, grupo antes, grupo después y fecha (sin nombres, correos ni títulos). Sin archivos, la tabla queda vacía.

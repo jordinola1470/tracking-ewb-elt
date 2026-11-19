@@ -2,7 +2,7 @@
 // Tablero completo: pestañas Analítica (subcategorías Histórico y Por año) y Perfiles.
 // Solo filtra filas ya calculadas por dbt y dibuja.
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DatosTablero } from "@/lib/datos";
 import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
 import { AnaKpis } from "./analitica/ana_kpis";
@@ -18,6 +18,15 @@ import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocen
 type Pestana = "analitica" | "perfiles" | "reporte";
 type VistaAnalitica = "historico" | "por_anio";
 
+/** Preferencia de la barra lateral guardada en el navegador (si no hay almacenamiento, queda abierta) */
+const CLAVE_BARRA = "ewb.barraContraida";
+function leerBarra() { try { return window.localStorage.getItem(CLAVE_BARRA) === "1"; } catch { return false; } }
+function suscribirBarra(aviso: () => void) {
+  window.addEventListener("storage", aviso);
+  window.addEventListener(CLAVE_BARRA, aviso);
+  return () => { window.removeEventListener("storage", aviso); window.removeEventListener(CLAVE_BARRA, aviso); };
+}
+
 export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero; usuario: string; salir: () => Promise<void> }) {
   const anios = useMemo(() => datos.kpis.map((k) => k.anio_lectivo), [datos.kpis]);
   const [pestana, setPestana] = useState<Pestana>("analitica");
@@ -25,6 +34,25 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
   const [filtros, setFiltros] = useState<FiltrosPerfil>(FILTROS_VACIOS);
+  // Barra lateral contraída (solo íconos): la elige cada persona y se recuerda en su navegador
+  const contraida = useSyncExternalStore(suscribirBarra, leerBarra, () => false);
+  const alternarBarra = () => {
+    try { window.localStorage.setItem(CLAVE_BARRA, leerBarra() ? "0" : "1"); } catch { /* sin almacenamiento */ }
+    window.dispatchEvent(new Event(CLAVE_BARRA));
+  };
+  // Atajo: Ctrl + B (⌘ + B en Mac) contrae o abre la barra
+  useEffect(() => {
+    const atajo = (e: KeyboardEvent) => {
+      const escribiendo = (e.target as HTMLElement)?.closest?.("input, textarea, select, [contenteditable=true]");
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b" && !escribiendo) {
+        e.preventDefault();
+        try { window.localStorage.setItem(CLAVE_BARRA, leerBarra() ? "0" : "1"); } catch { /* sin almacenamiento */ }
+        window.dispatchEvent(new Event(CLAVE_BARRA));
+      }
+    };
+    window.addEventListener("keydown", atajo);
+    return () => window.removeEventListener("keydown", atajo);
+  }, []);
   const [seleccionado, setSeleccionado] = useState<string | undefined>(datos.perfiles[0]?.docente_id);
 
   // ── Estado en el enlace (URL): pestaña, vista, año y filtros de Perfiles ──────────
@@ -102,10 +130,21 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
       </div>
       </header>
 
-      <div className="mk-app">
+      <div className={`mk-app${contraida ? " mk-app-contraida" : ""}`}>
       {/* Barra lateral vertical: marca · navegación · usuario abajo */}
       <aside className="mk-lateral">
-        <div className="mk-marca mk-bloque"><span className="mk-logo" aria-hidden>EwB</span></div>
+        {/* Arriba: botón de menú (☰ abre · ← contrae), como el "navigation rail" de Material 3 */}
+        <div className="mk-marca mk-bloque">
+          <button type="button" className="mk-lateral-toggle" onClick={alternarBarra} aria-expanded={!contraida}
+            aria-label={contraida ? "Expandir la barra lateral (Ctrl + B)" : "Contraer la barra lateral (Ctrl + B)"}
+            title={contraida ? "Expandir · Ctrl + B" : "Contraer · Ctrl + B"}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              {contraida ? <path d="M4 7h16M4 12h16M4 17h16" /> : <path d="M19 12H5M11 6l-6 6 6 6" />}
+            </svg>
+          </button>
+          {/* Logo EwB pequeño, sin burbuja (se oculta con la barra contraída) */}
+          <span className="mk-marca-ewb" aria-hidden>EwB</span>
+        </div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
           {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (
             <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
@@ -118,12 +157,12 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
               {p === "reporte" && (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6M8 13h8M8 17h5" /></svg>
               )}
-              <span>{p === "analitica" ? "Analítica" : p === "perfiles" ? "Perfiles" : "Reporte"}</span>
+              <span className="mk-tab-txt">{p === "analitica" ? "Analítica" : p === "perfiles" ? "Perfiles" : "Reporte"}</span>
             </button>
           ))}
         </nav>
         {/* Sello al pie de la barra vertical */}
-        <small className="mk-sello">Desarrollado por TeseoDev · Medellín ©</small>
+        <small className="mk-sello">Desarrollado por TeseoDev · Medellín&nbsp;©</small>
       </aside>
 
       <div className="mk-contenido">

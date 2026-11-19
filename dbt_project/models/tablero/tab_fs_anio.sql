@@ -17,11 +17,18 @@ siguiente as (
 
 ultimo_anio as (select max(anio_lectivo) as anio from d),
 
+ied_anio as (
+    -- IED por año con TODAS las filas del año (igual que el tablero): si un docente aparece en dos IED
+    -- el mismo año, cuentan las dos
+    select anio_lectivo, count(distinct codigo_dane) as colegios
+    from {{ ref('consolidado_historico') }}
+    group by anio_lectivo
+),
+
 por_anio as (
     select
         d.anio_lectivo,
         count(*)                                                                          as docentes,
-        count(distinct d.codigo_dane)                                                     as colegios,
         count(distinct d.grupo_id)                                                        as grupos,
         count(*) filter (where p.primer_anio = d.anio_lectivo)                            as nuevos,
         count(*) filter (where p.primer_anio < d.anio_lectivo)                            as recurrentes,
@@ -44,9 +51,11 @@ por_anio as (
         round(avg(d.constancia)::numeric, 4)                                              as pct_constancia,
         -- Asistencia (sin contar retirados)
         round((avg(d.asistencia) filter (where not d.es_retirado))::numeric, 4)           as asistencia_promedio,
-        count(*) filter (where d.asistencia >= 0.80)                                      as asistencia_80_o_mas,
-        count(*) filter (where d.asistencia < 0.80)                                       as asistencia_menos_80,
-        count(*) filter (where d.asistencia is null)                                      as asistencia_sin_dato
+        -- Rangos de asistencia SIN contar retirados (igual que el promedio); los retirados van aparte
+        count(*) filter (where not d.es_retirado and d.asistencia >= 0.80)                as asistencia_80_o_mas,
+        count(*) filter (where not d.es_retirado and d.asistencia < 0.80)                 as asistencia_menos_80,
+        count(*) filter (where not d.es_retirado and d.asistencia is null)                as asistencia_sin_dato,
+        count(*) filter (where d.es_retirado)                                             as retirados
     from d
     join primer p using (docente_id)
     group by d.anio_lectivo
@@ -68,6 +77,7 @@ paso as (
 
 select
     a.*,
+    i.colegios,
     round(a.mujeres::numeric / nullif(a.mujeres + a.hombres, 0), 4)                       as pct_mujeres,
     round(a.mcer_mejoraron::numeric / nullif(a.mcer_comparables, 0), 4)                   as pct_mcer_mejoraron,
     p.base_retencion, p.continuan,
@@ -75,3 +85,4 @@ select
     p.nivel_comparables, p.nivel_subieron, p.nivel_mismo, p.nivel_bajaron
 from por_anio a
 left join paso p using (anio_lectivo)
+left join ied_anio i using (anio_lectivo)

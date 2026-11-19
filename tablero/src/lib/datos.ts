@@ -35,7 +35,7 @@ export type FsAnio = {
   mcer_comparables: number; mcer_mejoraron: number; mcer_mantuvieron: number; mcer_bajaron: number; pct_mcer_mejoraron: number | null;
   score_comparables: number; score_entrada_promedio: number | null; score_salida_promedio: number | null; score_subieron: number;
   con_constancia: number; sin_constancia: number; pct_constancia: number | null;
-  asistencia_promedio: number | null; asistencia_80_o_mas: number; asistencia_menos_80: number; asistencia_sin_dato: number;
+  asistencia_promedio: number | null; asistencia_80_o_mas: number; asistencia_menos_80: number; asistencia_sin_dato: number; retirados: number;
   base_retencion: number | null; continuan: number | null; pct_retencion: number | null;
   nivel_comparables: number | null; nivel_subieron: number | null; nivel_mismo: number | null; nivel_bajaron: number | null;
 };
@@ -118,7 +118,7 @@ async function leerTablas(): Promise<DatosTablero> {
              mcer_comparables::int, mcer_mejoraron::int, mcer_mantuvieron::int, mcer_bajaron::int, pct_mcer_mejoraron::float8,
              score_comparables::int, score_entrada_promedio::float8, score_salida_promedio::float8, score_subieron::int,
              con_constancia::int, sin_constancia::int, pct_constancia::float8,
-             asistencia_promedio::float8, asistencia_80_o_mas::int, asistencia_menos_80::int, asistencia_sin_dato::int,
+             asistencia_promedio::float8, asistencia_80_o_mas::int, asistencia_menos_80::int, asistencia_sin_dato::int, retirados::int,
              base_retencion::int, continuan::int, pct_retencion::float8,
              nivel_comparables::int, nivel_subieron::int, nivel_mismo::int, nivel_bajaron::int
       from public.tab_fs_anio order by anio_lectivo`;

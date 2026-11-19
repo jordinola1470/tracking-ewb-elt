@@ -7,7 +7,7 @@ import { BarrasHorizontales, BarrasVerticales, BarrasVerticalesApiladas, COLORES
 const INFO: Record<string, string> = {
   ana_graf_pruebas_presentadas: "Participaciones del año con prueba de entrada, con prueba de salida y sin cada una. Una participación es un docente en un año.",
   ana_graf_constancia_anio: "Docentes con y sin constancia en cada año. El % se calcula sobre quienes tienen el dato; un año sin ese campo muestra «sin dato».",
-  ana_graf_permanencia: "Años distintos en que participó cada docente. «Seguidos» = sin interrumpir; «continua» = 2 años o más seguidos.",
+  ana_graf_permanencia: "Años distintos en que participó cada docente. «Consecutivos» = sin interrumpir; «continua» = 2 años o más consecutivos.",
   ana_graf_constancia_nivel: "% de participaciones con constancia, por nivel de formación (nivel del grupo asignado), en el año elegido.",
   ana_graf_constancia_cargo: "% de participaciones con constancia, por cargo, en el año elegido.",
   ana_graf_nivel_formacion: "Participaciones del año según el nivel del grupo al que se asignó a cada docente.",

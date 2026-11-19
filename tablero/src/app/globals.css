@@ -666,3 +666,96 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
   .mk-fs-lienzo .mk-fs-hoja{box-shadow:none !important}
 }
 .mk-fs-lienzo .mk-fs-hoja{background:#fff}
+
+/* ── Perfiles: la ficha va debajo de la tabla (más espacio para ambas) ───────────── */
+.mk-perf{grid-template-columns:1fr}
+
+/* ── Barra lateral contraíble (opcional; la elección se recuerda en el navegador) ─── */
+.mk-app{transition:grid-template-columns .25s ease}
+.mk-lateral-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border:0;font:inherit;font-weight:600;font-size:13px;color:var(--marca-negro);cursor:pointer;border-radius:var(--radio-pildora)}
+.mk-lateral-toggle:hover{background:#E4E9EA}
+.mk-app-contraida{grid-template-columns:76px minmax(0,1fr)}
+.mk-app-contraida .mk-tab-txt{display:none}
+.mk-app-contraida .mk-sello{font-size:9px;padding:2px 0 0}
+.mk-app-contraida .mk-marca{padding:6px}
+.mk-app-contraida .mk-logo{font-size:10px;height:40px}
+.mk-app-contraida .mk-tabs{align-items:center;padding:10px 0;gap:10px}
+/* Cada ícono dentro de su círculo */
+.mk-app-contraida .mk-lateral .mk-tab{justify-content:center;width:46px;height:46px;padding:0;border-radius:50%;background:var(--principal-suave)}
+.mk-app-contraida .mk-lateral .mk-tab:not([aria-selected=true]):hover{background:#E4E9EA}
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true]{background:var(--marca-negro);color:#fff}
+.mk-app-contraida .mk-lateral .mk-tab svg{width:18px;height:18px;opacity:1}
+.mk-app-contraida .mk-lateral-toggle{width:46px;height:46px;padding:0;margin:0 auto;border-radius:50%}
+/* En pantallas angostas la barra va arriba: no se contrae */
+@media (max-width:900px){.mk-lateral-toggle{display:none}.mk-app-contraida{grid-template-columns:1fr}.mk-app-contraida .mk-tab-txt{display:inline}}
+/* Círculos centrados en la barra contraída */
+.mk-app-contraida .mk-lateral .mk-tabs{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.mk-app-contraida .mk-lateral .mk-tab{align-self:center;margin:0;flex:none}
+.mk-app-contraida .mk-lateral .mk-tabs{flex-wrap:nowrap}
+
+/* ── Barra lateral (versión 2): botón ☰/← arriba junto a EwB; contraída = íconos en círculo con su nombre debajo ── */
+.mk-lateral .mk-marca{display:flex;align-items:center;gap:6px;padding:8px}
+.mk-lateral .mk-marca .mk-logo{flex:1;min-width:0}
+.mk-lateral-toggle{display:inline-grid;place-items:center;width:38px;height:38px;flex:none;padding:0;border:0;border-radius:50%;background:var(--principal-suave);color:var(--marca-negro);cursor:pointer;box-shadow:none;transition:background .15s ease}
+.mk-lateral-toggle:hover{background:#E4E9EA}
+.mk-lateral-toggle:focus-visible{outline:2px solid var(--marca-verde);outline-offset:2px}
+/* Contraída: 88 px, botón encima de EwB, cada opción con su círculo y el nombre en letra pequeña */
+.mk-app-contraida{grid-template-columns:88px minmax(0,1fr)}
+.mk-app-contraida .mk-lateral .mk-marca{flex-direction:column;padding:8px 6px;gap:8px}
+.mk-app-contraida .mk-lateral .mk-marca .mk-logo{width:100%;flex:none;font-size:10px;height:30px}
+.mk-app-contraida .mk-lateral .mk-tabs{gap:6px;padding:12px 0}
+.mk-app-contraida .mk-lateral .mk-tab{display:flex;flex-direction:column;align-items:center;gap:5px;width:auto;height:auto;padding:0;background:none !important;box-shadow:none !important;border-radius:0;color:var(--marca-negro)}
+.mk-app-contraida .mk-lateral .mk-tab svg{box-sizing:content-box;width:18px;height:18px;padding:12px;border-radius:50%;background:var(--principal-suave);transition:background .15s ease}
+.mk-app-contraida .mk-lateral .mk-tab:not([aria-selected=true]):hover svg{background:#E4E9EA}
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true] svg{background:var(--marca-negro);color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.18),0 6px 14px rgba(12,52,61,.22)}
+.mk-app-contraida .mk-tab-txt{display:block !important;font-size:10.5px;font-weight:600;line-height:1.1;text-align:center}
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true] .mk-tab-txt{font-weight:800}
+.mk-app-contraida .mk-lateral-toggle{width:38px;height:38px;margin:0}
+@media (max-width:900px){.mk-lateral-toggle{display:none}}
+
+/* ── Perfiles: tabla de docentes más baja (se ven 6-7 docentes; el resto con desplazamiento) ── */
+[data-componente="per_tabla_docentes"].mk-tw{max-height:380px}
+/* Opción elegida (contraída): nombre en gris pizarra; solo el ícono va en blanco sobre el círculo oscuro */
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true]{color:var(--marca-negro)}
+.mk-app-contraida .mk-lateral .mk-tab[aria-selected=true] svg{color:#fff}
+
+/* ── Barra lateral (versión 3): solo el botón de menú arriba y animación más fluida ── */
+.mk-lateral .mk-marca{justify-content:flex-start;padding:8px}
+.mk-app-contraida .mk-lateral .mk-marca{align-items:center;padding:8px 6px}
+/* Curva "emphasized" de Material 3: arranca rápido y frena suave */
+.mk-app{transition:grid-template-columns .34s cubic-bezier(.2,0,0,1)}
+/* Los textos entran con un fundido corto en lugar de aparecer de golpe */
+@keyframes mk-fundido{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+@keyframes mk-fundido-abajo{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:mk-fundido .28s ease .08s both}
+.mk-lateral .mk-tab-txt{white-space:nowrap}
+.mk-app-contraida .mk-lateral .mk-tab-txt{animation-name:mk-fundido-abajo}
+.mk-lateral .mk-tab svg{transition:background .2s ease,padding .2s ease}
+.mk-lateral-toggle svg{transition:transform .3s cubic-bezier(.2,0,0,1)}
+.mk-lateral-toggle:active svg{transform:scale(.85)}
+@media (prefers-reduced-motion:reduce){.mk-app{transition:none}.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:none}}
+/* Logo EwB pequeño junto al botón de menú, sin burbuja, en gris pizarra */
+.mk-marca-ewb{flex:1;text-align:center;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--marca-negro);animation:mk-fundido .28s ease .08s both}
+.mk-app-contraida .mk-marca-ewb{display:none}
+@media (prefers-reduced-motion:reduce){.mk-marca-ewb{animation:none}}
+/* El bloque del botón de menú mide lo mismo que la barra de la derecha (Histórico / Por año): 68 px */
+.mk-lateral .mk-marca{box-sizing:border-box;height:68px;padding:0 15px}
+.mk-app-contraida .mk-lateral .mk-marca{height:68px;padding:0;justify-content:center}
+
+/* ── Perfiles: tabla de docentes por páginas de 8 (sin desplazamiento) y flechas abajo a la derecha ── */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada{max-height:none;overflow-y:visible}
+.mk-paginador{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
+.mk-paginador-txt{margin-right:6px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.mk-paginador-pag{min-width:64px;text-align:center;font-size:13px;font-weight:700;color:var(--marca-negro);font-variant-numeric:tabular-nums}
+.mk-paginador-btn{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;border:var(--borde) solid var(--color-border-line);border-radius:50%;background:var(--color-panel);color:var(--marca-negro);cursor:pointer;box-shadow:var(--sombra);transition:transform .12s ease,background .15s ease,color .15s ease}
+.mk-paginador-btn:hover:not(:disabled){background:var(--marca-negro);color:#fff;transform:translateY(-1px)}
+.mk-paginador-btn:focus-visible{outline:2px solid var(--marca-verde);outline-offset:2px}
+.mk-paginador-btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+
+/* Tabla de docentes: filas de altura fija y columnas fijas para que no salte al cambiar de página */
+[data-componente="per_tabla_docentes"] .mk-table-fija{table-layout:fixed;width:100%}
+[data-componente="per_tabla_docentes"] .mk-table-fija tbody tr{height:52px}
+[data-componente="per_tabla_docentes"] .mk-table-fija td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+[data-componente="per_tabla_docentes"] .mk-table-fija th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-componente="per_tabla_docentes"] .mk-table-fija .mk-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+[data-componente="per_tabla_docentes"] .mk-fila-vacia,[data-componente="per_tabla_docentes"] .mk-fila-vacia:hover{cursor:default;background:transparent}
