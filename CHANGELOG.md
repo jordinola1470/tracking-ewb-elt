@@ -10,6 +10,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Corregido (eximidos)
+- `consolidado_historico`: los docentes en grupos de eximidos que indican el nivel (2025: «Eximido C1», 14 filas)
+  ya no quedan con «-»: toman el nivel del nombre del grupo (C1). El grupo «Eximidos» de 2024 (sin nivel en el
+  nombre) no cambia. Fact sheet: la guía de lectura menciona C1 para los eximidos.
+
 ### Corregido (fact sheet)
 - Datos validados entre secciones y contra el tablero (0 diferencias con datos reales):
   - IED por año con todas las filas del año, como el tablero (2026: 128, no 127).

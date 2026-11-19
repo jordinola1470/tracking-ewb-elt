@@ -190,6 +190,10 @@ select
     case
         when {{ es_retirado('base.grupo_id') }} and hr.nivel_retiro is not null
             and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', '')) then hr.nivel_retiro
+        -- Eximidos que ya acreditan el nivel (grupo "Eximido C1"): toman el nivel del nombre del grupo
+        when substring(upper(base.grupo_id) from '^EXIMID[OA]S?\s+([ABC][12]\+?)\s*$') is not null
+            and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', ''))
+            then substring(upper(base.grupo_id) from '^EXIMID[OA]S?\s+([ABC][12]\+?)\s*$')
         when lower(nivel_asignado) in ('entry - pre a1', 'entry - pre-a1') then 'PRE_A1'
         when lower(nivel_asignado) in ('fundamentals - a1', 'fundamentals 2 - a1.2') then 'A1'
         when lower(nivel_asignado) in (

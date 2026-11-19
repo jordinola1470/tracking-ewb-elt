@@ -147,7 +147,7 @@ export function RepFactSheet({ fs }: { fs: FactSheet }) {
             <dt>Instituciones (IED)</dt>
             <dd>Nombre oficial según su código DANE. «IED atendidas» cuenta códigos DANE distintos.</dd>
             <dt>Nivel cursado</dt>
-            <dd>Nivel del grupo al que se asignó al docente en el año (de PRE A1 a B2, con A2+ y B1+). «Sin nivel asignado» agrupa
+            <dd>Nivel del grupo al que se asignó al docente en el año (de PRE A1 a B2, con A2+ y B1+; C1 para los eximidos que ya lo acreditan). «Sin nivel asignado» agrupa
               los registros sin grupo de nivel.</dd>
             <dt>MCER</dt>
             <dd>Nivel obtenido en la prueba de entrada y en la de salida. Solo se comparan registros con ambos resultados válidos;
