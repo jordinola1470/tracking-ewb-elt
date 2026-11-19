@@ -33,6 +33,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   y también se ve con la barra contraída (antes se ocultaba).
 - Permanencia: «años seguidos» pasa a «años consecutivos» (y «no seguidos» a «no consecutivos»).
 
+### Agregado (nivel de los retirados desde el helpdesk)
+- `cargar` lee los CSV de `data/helpdesk_data/` (`helpdesk_<año>_<grupo>.csv`) y reemplaza `raw.helpdesk_alertas`
+  solo con documento, grupo antes, grupo después y fecha (sin nombres, correos ni títulos). Sin archivos, la tabla queda vacía.
+- dbt: `stg_helpdesk_alertas` (staging, sin duplicados, nivel tomado del código de grupo) y `fct_helpdesk_retiros`
+  (gold, una fila por docente y año con el nivel del curso del último retiro), con pruebas de unicidad y niveles válidos.
+- `consolidado_historico`: los retirados sin nivel (`-`) reciben el nivel del curso del que se retiraron; siguen
+  contando como retirados. Con los datos actuales: 2025 → 408 de 412 filas, 2026 → 237 de 251.
+- Último nivel de formación (gráfico de Histórico y Perfiles): los retirados ya cuentan con el nivel del curso del
+  que se retiraron (antes se excluían y quedaban «Sin nivel registrado»: 506 → 279, casi todos activos de 2024 sin nivel en el Excel).
+
 ### Cambiado (tablero · detalles finales)
 - Avisos: se quita la línea de cantidad de registros.
 - Perfil (arriba a la derecha): la píldora abre un menú con el correo y **Cerrar sesión**; se quita el botón

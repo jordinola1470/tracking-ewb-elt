@@ -22,6 +22,7 @@ def _cargar(anio: int | None, forzar: bool) -> None:
     for resultado in ingestor_pipeline.cargar(anio=anio, forzar=forzar):
         print(f"   {resultado}")
     print(f"   {ingestor_pipeline.cargar_referencia_ied()}")
+    print(f"   {ingestor_pipeline.cargar_helpdesk()}")
     print("✅ Carga terminada. Ejecuta `transformar` para actualizar las tablas finales.")
 
 

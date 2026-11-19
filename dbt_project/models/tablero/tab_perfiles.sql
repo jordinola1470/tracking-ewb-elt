@@ -31,11 +31,11 @@ ultimo as (
         (array_agg(genero         order by anio_lectivo desc) filter (where genero is not null))[1]         as genero,
         (array_agg(cargo_estandar order by anio_lectivo desc) filter (where cargo_estandar is not null))[1] as cargo,
         (array_agg(colegio_nombre order by anio_lectivo desc) filter (where colegio_nombre is not null))[1] as colegio,
-        -- Último nivel de formación: el del año más reciente en que participó SIN retirarse
-        -- (si se retiró en 2026 y participó en 2025, queda el nivel de 2025)
-        (array_agg(nivel_estandar order by anio_lectivo desc)
-            filter (where nivel_estandar is not null and not {{ es_retirado() }}))[1]                      as ultimo_nivel_formacion,
-        -- Asistencia de esa misma participación (no es un promedio)
+        -- Último nivel de formación: el del año más reciente. Los retirados cuentan con el nivel del curso
+        -- del que se retiraron (helpdesk); si ese año también tiene una fila activa, se usa la activa.
+        (array_agg(nivel_estandar order by anio_lectivo desc, {{ es_retirado() }} asc)
+            filter (where nivel_estandar is not null and (not {{ es_retirado() }} or nivel_estandar <> '-')))[1] as ultimo_nivel_formacion,
+        -- Asistencia de la última participación sin retirarse (no es un promedio)
         (array_agg(asistencia_porcentaje_fix order by anio_lectivo desc)
             filter (where nivel_estandar is not null and not {{ es_retirado() }}))[1]                      as asistencia
     from base

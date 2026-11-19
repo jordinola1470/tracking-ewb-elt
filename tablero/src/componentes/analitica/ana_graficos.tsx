@@ -13,7 +13,7 @@ const INFO: Record<string, string> = {
   ana_graf_nivel_formacion: "Participaciones del año según el nivel del grupo al que se asignó a cada docente.",
   ana_graf_ied_atendidas: "Instituciones distintas (por código DANE) con al menos un docente: total de todos los años y por año.",
   ana_graf_cargo_docentes: "Docentes de todos los años; cada uno cuenta una vez, con el último cargo registrado.",
-  ana_graf_nivel_ultimo: "Toda la población de docentes según el último nivel que cursó sin retirarse. «Sin nivel registrado» = sin un nivel cursado válido.",
+  ana_graf_nivel_ultimo: "Toda la población de docentes según el último nivel que cursó; los retirados cuentan con el nivel del curso del que se retiraron. «Sin nivel registrado» = sin un nivel cursado válido.",
 };
 
 function Tarjeta({ nombre, titulo, nota, ancho, children }: { nombre: string; titulo: string; nota: React.ReactNode; ancho?: boolean; children: React.ReactNode }) {

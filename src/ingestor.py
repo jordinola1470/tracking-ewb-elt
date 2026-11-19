@@ -238,6 +238,63 @@ class Ingestor:
         except Exception as e:
             raise DatabaseLoadError(f"Error al cargar la referencia de IED: {self._mensaje_seguro(e)}") from e
 
+    # ------------------------------------------------------------------ helpdesk (alertas de movimientos)
+    # CSV exportados de la plataforma (helpdesk_<año>_<grupo>.csv). Viven en data/ (nunca en el repositorio).
+    # Solo se guardan el documento, el grupo antes/después y la fecha: nombres, correos y títulos se descartan.
+    CARPETA_HELPDESK = Path("data/helpdesk_data")
+    TABLA_HELPDESK = "helpdesk_alertas"
+    COLUMNAS_HELPDESK = {
+        "student.documentId": "docente_id",
+        "before": "grupo_antes",
+        "after": "grupo_despues",
+        "creationDate.dateString": "fecha_alerta",
+    }
+
+    def leer_helpdesk(self, carpeta: Path | None = None) -> pd.DataFrame:
+        """
+        Lee todos los CSV de la carpeta: archivo, fila (posición en el archivo; 1 = la más reciente),
+        docente_id, grupo_antes, grupo_despues, fecha_alerta (texto AAAA-MM-DD).
+        """
+        carpeta = carpeta or self.CARPETA_HELPDESK
+        partes = []
+        for ruta in sorted(carpeta.glob("*.csv")):
+            df = pd.read_csv(ruta, dtype=str, keep_default_na=False, encoding="utf-8-sig")
+            df.columns = [str(c).replace("\\.", ".").strip() for c in df.columns]
+            faltan = [c for c in self.COLUMNAS_HELPDESK if c not in df.columns]
+            if faltan:
+                raise DatabaseLoadError(f"Helpdesk: al archivo {ruta.name} le faltan columnas {faltan}")
+            df = df[list(self.COLUMNAS_HELPDESK)].rename(columns=self.COLUMNAS_HELPDESK)
+            df = df.apply(lambda s: s.str.strip())
+            df.insert(0, "fila", range(1, len(df) + 1))
+            df.insert(0, "archivo", ruta.name)
+            partes.append(df)
+        columnas = ["archivo", "fila", *self.COLUMNAS_HELPDESK.values()]
+        return pd.concat(partes, ignore_index=True) if partes else pd.DataFrame(columns=columnas)
+
+    def cargar_helpdesk(self) -> str:
+        """
+        Carga (reemplaza) raw.helpdesk_alertas con todos los CSV de data/helpdesk_data.
+        Si no hay archivos, deja la tabla creada (vacía si no existía) para que dbt funcione igual.
+        """
+        tabla = f"raw.{self.TABLA_HELPDESK}"
+        try:
+            df = self.leer_helpdesk() if self.CARPETA_HELPDESK.exists() else None
+            with get_connection() as conn:
+                with conn.begin():
+                    if df is not None and len(df):
+                        conn.execute(text(f"DROP TABLE IF EXISTS {tabla}"))
+                        df.to_sql(name=self.TABLA_HELPDESK, con=conn, schema="raw", if_exists="fail", index=False)
+                        return f"🛟 Helpdesk: {len(df)} alertas de {df['archivo'].nunique()} archivos cargadas"
+                    conn.execute(text(
+                        f"CREATE TABLE IF NOT EXISTS {tabla} (archivo text, fila bigint, docente_id text, "
+                        "grupo_antes text, grupo_despues text, fecha_alerta text)"
+                    ))
+                    return "🛟 Helpdesk: no se encontraron archivos; los retirados quedan sin nivel del curso"
+        except BaseProjectException:
+            raise
+        except Exception as e:
+            raise DatabaseLoadError(f"Error al cargar las alertas del helpdesk: {self._mensaje_seguro(e)}") from e
+
     def cargar(self, anio: int | None = None, forzar: bool = False) -> list[str]:
         """
         Carga un año (anio) o todos los años de sources.yaml.

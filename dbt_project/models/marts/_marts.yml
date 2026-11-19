@@ -42,3 +42,18 @@ models:
               arguments:
                 values: [2023, 2024, 2025, 2026]
                 quote: false
+
+  # Nivel del curso del que se retiró cada docente (helpdesk): una fila por docente y año
+  - name: fct_helpdesk_retiros
+    data_tests:
+      - unique:
+          column_name: "docente_id || '-' || anio_lectivo"
+    columns:
+      - name: docente_id
+        data_tests: [not_null]
+      - name: nivel_retiro
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['PRE_A1', 'A1', 'A1+', 'A2', 'A2+', 'B1', 'B1+', 'B2', 'B2+', 'C1', 'C1+']
