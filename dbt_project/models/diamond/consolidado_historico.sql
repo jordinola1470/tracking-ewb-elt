@@ -185,7 +185,11 @@ select
     base.*,
 
     -- Regla Excel sobre nivel_asignado (comparaciones sin distinguir mayúsculas, como en Excel; los NULL se conservan; el trim se aplica en staging)
+    -- Retirados sin nivel ('-', 'NULL', '0' o vacío): se completa con el nivel del curso del que se retiró
+    -- según el helpdesk (fct_helpdesk_retiros). Sigue contando como retirado porque grupo_id no cambia.
     case
+        when {{ es_retirado('base.grupo_id') }} and hr.nivel_retiro is not null
+            and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', '')) then hr.nivel_retiro
         when lower(nivel_asignado) in ('entry - pre a1', 'entry - pre-a1') then 'PRE_A1'
         when lower(nivel_asignado) in ('fundamentals - a1', 'fundamentals 2 - a1.2') then 'A1'
         when lower(nivel_asignado) in (
@@ -216,3 +220,5 @@ select
     end as cargo_estandar
 
 from base
+left join {{ ref('fct_helpdesk_retiros') }} hr
+    on hr.docente_id = base.docente_id and hr.anio_lectivo = base.anio_lectivo
