@@ -10,6 +10,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Corregido (latido de Supabase)
+- «Mantener Supabase activo» pasa de una vez por semana (viernes) a **dos veces al día** (6:17 a. m. y 6:17 p. m.,
+  Colombia), con hasta 3 reintentos y límite de 10 minutos. Supabase avisó de inactividad: una consulta semanal
+  no cuenta como actividad suficiente («unas pocas peticiones diarias»).
+
 ### Corregido (eximidos)
 - `consolidado_historico`: los docentes en grupos de eximidos que indican el nivel (2025: «Eximido C1», 14 filas)
   ya no quedan con «-»: toman el nivel del nombre del grupo (C1). El grupo «Eximidos» de 2024 (sin nivel en el
