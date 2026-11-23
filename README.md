@@ -167,7 +167,7 @@ tracking-ewb-elt/
 ├── tablero/                    # [Tablero] App Next.js publicada en Vercel (ver tablero/README.md).
 ├── scripts/cargar_prod.sh      # Carga de Excel a producción desde el Mac (con confirmación).
 ├── sql/roles_supabase.sql      # Roles de mínimo privilegio en Supabase.
-├── .github/workflows/          # CI, CD y latido semanal de Supabase.
+├── .github/workflows/          # CI, CD y latido diario de Supabase.
 ├── tests/                      # Pruebas (pytest), generador de Excel ficticios y notebook de normalización.
 ├── docs/                       # Manual de consultas, fact sheet y documentación del modelo.
 ├── .env.example                # Plantilla de variables de entorno con marcadores.
@@ -302,13 +302,14 @@ Monta la carpeta `data/` completa, así que también actualiza la lista oficial 
 Si cambia la forma de leer los Excel (por ejemplo, el DANE como texto), usa `--forzar` para releerlos todos.
 
 **Mantener Supabase activo:** el flujo [Mantener Supabase activo](.github/workflows/mantener_activo.yml)
-corre cada **viernes a las 6:00 a. m. (Colombia)** y hace una consulta mínima de solo lectura con
-`ewb_tablero` en staging y prod (el plan gratuito pausa los proyectos tras 1 semana sin actividad).
+corre **dos veces al día, todos los días (6:17 a. m. y 6:17 p. m., Colombia)** y hace una consulta mínima de solo
+lectura con `ewb_tablero` en staging y prod; reintenta hasta 3 veces si falla la red. El plan gratuito pausa los
+proyectos con poca actividad en 7 días y, según Supabase, bastan «unas pocas peticiones diarias» (una semanal no alcanzaba).
 Usa los secretos de repositorio `TABLERO_STAGING_USER/PASS` y `TABLERO_PROD_USER/PASS`.
 En repositorios públicos GitHub desactiva los flujos programados tras 60 días sin actividad en el
 repositorio: si llega el aviso, se reactiva en *Actions → Mantener Supabase activo → Enable workflow*.
 
-**Alertas:** GitHub envía un correo cuando falla cualquier flujo (CI, CD o el latido semanal).
+**Alertas:** GitHub envía un correo cuando falla cualquier flujo (CI, CD o el latido diario).
 
 ## 🧪 Pruebas y CI
 
