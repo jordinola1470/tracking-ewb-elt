@@ -16,6 +16,11 @@ import { MenuPerfil } from "./comunes/menu_perfil";
 import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
+
+// Pestaña Reporte (fact sheet) oculta por ahora: sus datos deben validarse antes de volver a publicarla.
+// El código se conserva (componentes/reporte/ y modelos tab_fs_* de dbt); para mostrarla, cambiar a true.
+const MOSTRAR_REPORTE = false;
+const PESTANAS: Pestana[] = MOSTRAR_REPORTE ? ["analitica", "perfiles", "reporte"] : ["analitica", "perfiles"];
 type VistaAnalitica = "historico" | "por_anio";
 
 /** Preferencia de la barra lateral guardada en el navegador (si no hay almacenamiento, queda abierta) */
@@ -64,7 +69,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
     const aplicar = () => {
       const q = new URLSearchParams(window.location.search);
       const pe = q.get("pestana"), vi = q.get("vista"), an = Number(q.get("anio"));
-      const p: Pestana = pe === "perfiles" || pe === "reporte" ? pe : "analitica";
+      const p: Pestana = pe === "perfiles" || (MOSTRAR_REPORTE && pe === "reporte") ? pe : "analitica";
       const v: VistaAnalitica = vi === "por_anio" ? "por_anio" : "historico";
       navegacion.current = `${p}|${v}`;
       setPestana(p);
@@ -146,7 +151,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
           <span className="mk-marca-ewb" aria-hidden>EwB</span>
         </div>
         <nav className="mk-tabs mk-bloque" role="tablist" aria-orientation="vertical">
-          {(["analitica", "perfiles", "reporte"] as Pestana[]).map((p) => (
+          {PESTANAS.map((p) => (
             <button key={p} className="mk-tab" role="tab" aria-selected={pestana === p} onClick={() => setPestana(p)}>
               {p === "analitica" && (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
@@ -216,7 +221,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         </>
       )}
 
-      {pestana === "reporte" && <RepFactSheet fs={datos.factSheet} />}
+      {MOSTRAR_REPORTE && pestana === "reporte" && <RepFactSheet fs={datos.factSheet} />}
 
       {pestana === "perfiles" && (
         <section className="mk-panel">

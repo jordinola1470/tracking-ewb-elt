@@ -11,6 +11,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 ## [Sin publicar]
 
 ### Versión 2 · bases validadas con la SED (en curso)
+- Tablero: la pestaña **Reporte** (fact sheet) se oculta hasta validar sus datos (`MOSTRAR_REPORTE = false` en
+  `Tablero.tsx`). Su código y los modelos `tab_fs_*` se conservan.
 - **Entregable SED** (capa Diamante, ver `docs/entregable_sed.md`): `sed_entregable_ancho` (una fila por persona,
   último dato disponible, columnas por año 2023-2026; en 2026 se descarta la fila de ewb_plus de los docentes que
   están en dos programas) y `sed_entregable_largo` (una fila por persona y año). Con pruebas de unicidad y valores.
