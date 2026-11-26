@@ -32,6 +32,13 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 - Corregido: recargar el helpdesk fallaba porque la vista `stg_helpdesk_alertas` depende de `raw.helpdesk_alertas`;
   ahora la tabla se reemplaza con `CASCADE` (como las bases anuales) y `transformar` recrea la vista.
 
+### Documentación
+- README reescrito con formato profesional: arquitectura, tecnologías, instalación, uso, tablero, entornos,
+  pruebas, documentación, contribución y licencia. Se quitan pendientes y notas de avance.
+- Nueva carpeta de documentación interna `docs/` con índice (`docs/README.md`): `modelo_datos.md` (capas, tablas y
+  reglas), `operacion.md` (entornos, seguridad, despliegue y operación) y `supabase_activar_manual.md`.
+  `fct_docentes_architecture.md` pasa de `dbt_project/models/marts/` a `docs/`.
+
 ### Corregido (latido de Supabase)
 - «Mantener Supabase activo» pasa de una vez por semana (viernes) a **dos veces al día** (6:17 a. m. y 6:17 p. m.,
   Colombia), con hasta 3 reintentos y límite de 10 minutos. Supabase avisó de inactividad: una consulta semanal
