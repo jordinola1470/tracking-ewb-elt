@@ -18,3 +18,29 @@ models:
     columns:
       - name: docente_id
         data_tests: [unique, not_null]
+
+  # Entregable SED · versión ancha: una fila por persona
+  - name: sed_entregable_ancho
+    columns:
+      - name: numero_documento
+        data_tests: [unique, not_null]
+      - name: "no"
+        data_tests: [unique, not_null]
+      - name: estado_finalizacion_2025
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Aprobado', 'Sin constancia', 'Retirado', 'Sin registro', 'No aplica']
+
+  # Entregable SED · versión larga: una fila por participación (mismas filas que consolidado_historico)
+  - name: sed_entregable_largo
+    columns:
+      - name: "no"
+        data_tests: [unique, not_null]
+      - name: anio
+        data_tests: [not_null]
+      - name: estado_finalizacion
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Aprobado', 'Sin constancia', 'Retirado', 'Sin registro']

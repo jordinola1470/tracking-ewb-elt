@@ -11,6 +11,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 ## [Sin publicar]
 
 ### Versión 2 · bases validadas con la SED (en curso)
+- **Entregable SED** (capa Diamante, ver `docs/entregable_sed.md`): `sed_entregable_ancho` (una fila por persona,
+  último dato disponible, columnas por año 2023-2026; en 2026 se descarta la fila de ewb_plus de los docentes que
+  están en dos programas) y `sed_entregable_largo` (una fila por persona y año). Con pruebas de unicidad y valores.
+- Staging y `consolidado_historico`: columnas nuevas `edad`, `nombres`, `apellidos`, `programa`, `aprobado_sed` y
+  `retirado_segun_base` (2023 `ESTADO`, 2024 `2024 EWB` = Deserción, 2025-2026 grupo «Retirados»). No cambian las
+  reglas del tablero.
+- Base 2026: se leen, si existen, `PROGRAMA`, `EDAD`, `SEXO`/`GENERO`, `Recibe Constancia?`, salida 2026 y
+  `Aprobado SED` (macro `columna_opcional`); mientras no existan quedan en NULL.
 - Base 2026: nuevo archivo `261126 Base 2026.xlsx` en `config/sources.yaml`.
 - Mapeo 2023 y 2024: el cargo se toma de `CATEGORIA DEL DOCENTE` (validado por la SED); `ROL QUE DESEMPEÑA` queda como
   `rol_desempena`, solo de referencia.

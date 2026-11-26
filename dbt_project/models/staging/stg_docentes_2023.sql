@@ -45,6 +45,16 @@ select
         when cast(de_asistencia as varchar) ~ '^[0-9]+(\.[0-9]+)?$' then cast(de_asistencia as numeric)
         else null 
     end as asistencia_porcentaje,
-    {{ si_no('recibe_constancia') }} as recibe_constancia
+    {{ si_no('recibe_constancia') }} as recibe_constancia,
+
+    -- ENTREGABLE SED (columnas nuevas de la base validada con la SED; NULL si el Excel no las trae)
+    {% set src = source('raw_tracking_ewb', 'base_docentes_2023') %}
+    cast({{ texto_opcional(src, 'edad') }} as numeric)            as edad,
+    cast(null as varchar)                                          as nombres,
+    cast(null as varchar)                                          as apellidos,
+    cast(null as varchar)                                          as programa,
+    cast(null as varchar)                                          as aprobado_sed,
+    -- Retirado según la base: en 2023 la columna ESTADO = 'RETIRADO'
+    coalesce(upper({{ texto_opcional(src, 'estado') }}) = 'RETIRADO', false) as retirado_segun_base
 
 from source

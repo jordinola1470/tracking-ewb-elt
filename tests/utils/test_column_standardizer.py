@@ -110,6 +110,17 @@ def test_standardizer_year_2025():
     assert "jornada_laboral" in columns
     assert "grado_dicta" in columns
 
+def test_standardizer_year_2026_columnas_v2():
+    """Columnas que se agregan a la hoja base 2026 para el entregable SED (datos ficticios)."""
+    df = pd.DataFrame({
+        "PROGRAMA": ["ewb_two"], "Recibe Constancia?": ["SI"], "ES SALIDA 2026 - NIVEL SCORE": [55],
+        "ES SALIDA 2026 - NIVEL MCER": ["A2"], "Aprobado SED": ["SI"], "SEXO": ["Femenino"], "EDAD": [40],
+    })
+    columns = list(ColumnStandardizer.standardize(df, 2026).columns)
+    assert columns == ["programa", "recibe_constancia", "english_score_salida_2026", "nivel_mcer_salida_2026",
+                       "aprobado_sed", "genero", "edad"]
+
+
 def test_standardizer_missing_year():
     # Arrange
     df = pd.DataFrame({"ID": [1]})

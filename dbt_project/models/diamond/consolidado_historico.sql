@@ -24,7 +24,9 @@ select
     mcer_entrada,
     score_salida,
     mcer_salida,
-    recibe_constancia
+    recibe_constancia,
+    -- Versión 2 (entregable SED)
+    edad, nombres, apellidos, programa, aprobado_sed, retirado_segun_base
 from {{ ref('stg_docentes_2023') }}
 
 union all
@@ -48,7 +50,9 @@ select
     mcer_entrada,
     score_salida,
     mcer_salida,
-    recibe_constancia
+    recibe_constancia,
+    -- Versión 2 (entregable SED)
+    edad, nombres, apellidos, programa, aprobado_sed, retirado_segun_base
 from {{ ref('stg_docentes_2024') }}
 
 union all
@@ -72,7 +76,9 @@ select
     mcer_entrada,
     score_salida,
     mcer_salida,
-    recibe_constancia
+    recibe_constancia,
+    -- Versión 2 (entregable SED)
+    edad, nombres, apellidos, programa, aprobado_sed, retirado_segun_base
 from {{ ref('stg_docentes_2025') }}
 
 union all
@@ -96,7 +102,9 @@ select
     mcer_entrada,
     score_salida,
     mcer_salida,
-    recibe_constancia
+    recibe_constancia,
+    -- Versión 2 (entregable SED)
+    edad, nombres, apellidos, programa, aprobado_sed, retirado_segun_base
 from {{ ref('stg_docentes_2026') }}
 
 ),
@@ -174,7 +182,8 @@ base as (
         ir.codigo_dane_final as codigo_dane,
         ir.colegio_final as colegio_nombre,
         u.cargo_rol, u.grupo_id, u.nivel_asignado, u.asistencia_porcentaje_fix,
-        u.score_entrada, u.mcer_entrada, u.score_salida, u.mcer_salida, u.recibe_constancia
+        u.score_entrada, u.mcer_entrada, u.score_salida, u.mcer_salida, u.recibe_constancia,
+        u.edad, u.nombres, u.apellidos, u.programa, u.aprobado_sed, u.retirado_segun_base
     from unioned u
     left join nombre_docente nd on nd.docente_id = u.docente_id
     left join ied_resuelta ir

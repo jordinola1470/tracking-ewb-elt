@@ -47,6 +47,16 @@ select
         when cast("de_participacion_ewb_2024" as varchar) ~ '^[0-9]+(\.[0-9]+)?%$' then round(cast(replace(cast("de_participacion_ewb_2024" as varchar), '%', '') as numeric) / 100, 4)
         else null 
     end as asistencia_porcentaje,
-    {{ si_no('recibe_constancia') }} as recibe_constancia
+    {{ si_no('recibe_constancia') }} as recibe_constancia,
+
+    -- ENTREGABLE SED (columnas nuevas de la base validada con la SED; NULL si el Excel no las trae)
+    {% set src = source('raw_tracking_ewb', 'base_docentes_2024') %}
+    cast({{ texto_opcional(src, 'edad') }} as numeric)            as edad,
+    cast(null as varchar)                                          as nombres,
+    cast(null as varchar)                                          as apellidos,
+    cast(null as varchar)                                          as programa,
+    cast(null as varchar)                                          as aprobado_sed,
+    -- Retirado según la base: en 2024 la columna "2024 EWB" = 'Deserción'
+    coalesce(lower({{ texto_opcional(src, '2024_ewb') }}) in ('deserción', 'desercion'), false) as retirado_segun_base
 
 from source
