@@ -10,6 +10,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Versión 2 · bases validadas con la SED (en curso)
+- Base 2026: nuevo archivo `261126 Base 2026.xlsx` en `config/sources.yaml`.
+- Mapeo 2023: el cargo se toma de `CATEGORIA DEL DOCENTE` (validado por la SED); `ROL QUE DESEMPEÑA` queda como
+  `rol_desempena`, solo de referencia.
+- `cargo_estandar`: unifica la nomenclatura original y la de la SED en 7 categorías. Nuevas equivalencias:
+  `Docente primaria` → Docente de Primaria, `Docente contenido` → Docente de Contenido, `Docente de inglés` →
+  Docente de Inglés, `Docente de Preescolar` → Docente de Preescolar y `Coordinadora` → Directivo Docente.
+- Corregido: recargar el helpdesk fallaba porque la vista `stg_helpdesk_alertas` depende de `raw.helpdesk_alertas`;
+  ahora la tabla se reemplaza con `CASCADE` (como las bases anuales) y `transformar` recrea la vista.
+
 ### Corregido (latido de Supabase)
 - «Mantener Supabase activo» pasa de una vez por semana (viernes) a **dos veces al día** (6:17 a. m. y 6:17 p. m.,
   Colombia), con hasta 3 reintentos y límite de 10 minutos. Supabase avisó de inactividad: una consulta semanal

@@ -282,7 +282,9 @@ class Ingestor:
             with get_connection() as conn:
                 with conn.begin():
                     if df is not None and len(df):
-                        conn.execute(text(f"DROP TABLE IF EXISTS {tabla}"))
+                        # CASCADE elimina la vista stg_helpdesk_alertas, que depende de esta tabla;
+                        # `transformar` la vuelve a crear (igual que con las bases anuales).
+                        conn.execute(text(f"DROP TABLE IF EXISTS {tabla} CASCADE"))
                         df.to_sql(name=self.TABLA_HELPDESK, con=conn, schema="raw", if_exists="fail", index=False)
                         return f"🛟 Helpdesk: {len(df)} alertas de {df['archivo'].nunique()} archivos cargadas"
                     conn.execute(text(

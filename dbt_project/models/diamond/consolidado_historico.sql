@@ -206,20 +206,24 @@ select
         else nivel_asignado
     end as nivel_estandar,
 
-    -- Regla Excel sobre cargo_rol
+    -- Regla sobre cargo_rol (sin distinguir mayúsculas ni tildes). Unifica la nomenclatura original de las bases
+    -- ("Docente primaria", "Docente contenido", "Directivo docente") con la de la SED ("Docente de aula",
+    -- "Coordinador", "Rector…") en 7 categorías.
     case
         when cargo_rol in ('-', 'No') then 'S/N'
         when lower(cargo_rol) in (
             'coordinador(a)', 'coordinador(a) encargado(a)', 'rector(a)', 'rector(a) encargado(a)',
-            'directivo docente', 'coordinador', 'rector institucion educativa completa', 'rector'
+            'directivo docente', 'coordinador', 'coordinadora', 'rector institucion educativa completa', 'rector'
         ) then 'Directivo Docente'
         when lower(cargo_rol) in (
             'docente', 'docente orientadora', 'docente de aula', 'docente orientador',
             'docente con funciones de apoyo'
         ) then 'Docente de Aula'
         when lower(cargo_rol) = 'psicologa' then 'Otro'
-        when lower(cargo_rol) = 'docente de primaria' then 'Docente de Primaria'
-        when lower(cargo_rol) = 'docente de contenido' then 'Docente de Contenido'
+        when lower(cargo_rol) in ('docente de primaria', 'docente primaria') then 'Docente de Primaria'
+        when lower(cargo_rol) in ('docente de contenido', 'docente contenido') then 'Docente de Contenido'
+        when lower(translate(cargo_rol, 'éÉ', 'eE')) = 'docente de ingles' then 'Docente de Inglés'
+        when lower(cargo_rol) = 'docente de preescolar' then 'Docente de Preescolar'
         else cargo_rol
     end as cargo_estandar
 
