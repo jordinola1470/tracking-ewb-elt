@@ -17,6 +17,7 @@ def test_standardizer_year_2023():
         "DANE": ["123", "456"],
         "NIVEL DE FORMACIÓN": ["Pregrado", "Posgrado"],
         "ROL QUE DESEMPEÑA": ["Docente", "Rector"],
+        "CATEGORIA DEL DOCENTE": ["Docente de aula", "Coordinador"],
         "TIPO DE NOMBRAMIENTO": ["Propiedad", "Provisional"],
         "JORNADA": ["Mañana", "Tarde"],
         "CURSO-NIVEL": ["11", "10"],
@@ -42,7 +43,10 @@ def test_standardizer_year_2023():
     assert "colegio_nombre" in columns
     assert "codigo_dane" in columns
     assert "nivel_formacion" in columns
+    # En 2023 el cargo es el validado por la SED (CATEGORIA DEL DOCENTE); el rol original queda aparte
     assert "cargo_rol" in columns
+    assert df_std["cargo_rol"].tolist() == ["Docente de aula", "Coordinador"]
+    assert "rol_desempena" in columns
     assert "tipo_nombramiento" in columns
     assert "jornada_laboral" in columns
     # En 2023 "CURSO-NIVEL" es el nivel asignado (2023 no trae grado_dicta) y "REMOTE" se mapea a rt_remoto
@@ -61,7 +65,8 @@ def test_standardizer_year_2023():
 
 def test_standardizer_year_2024():
     # Arrange
-    data = {"CLUSTER": ["A"], "NIVEL DICTA": ["11"], "NIVEL": ["A"]}
+    data = {"CLUSTER": ["A"], "NIVEL DICTA": ["11"], "NIVEL": ["A"],
+            "ROL QUE DESEMPEÑA": ["Docente de aula"], "CATEGORIA DEL DOCENTE": ["Docente de primaria"]}
     df = pd.DataFrame(data)
 
     # Act
@@ -72,6 +77,9 @@ def test_standardizer_year_2024():
     assert "ubicacion_geo" in columns
     assert "grado_dicta" in columns
     assert "nivel_asignado" in columns
+    # En 2024 el cargo también es el validado por la SED (CATEGORIA DEL DOCENTE)
+    assert df_std["cargo_rol"].tolist() == ["Docente de primaria"]
+    assert "rol_desempena" in columns
 
 
 def test_standardizer_year_2025():
@@ -101,6 +109,17 @@ def test_standardizer_year_2025():
     assert "tipo_nombramiento" in columns
     assert "jornada_laboral" in columns
     assert "grado_dicta" in columns
+
+def test_standardizer_year_2026_columnas_v2():
+    """Columnas que se agregan a la hoja base 2026 para el entregable SED (datos ficticios)."""
+    df = pd.DataFrame({
+        "PROGRAMA": ["ewb_two"], "Recibe Constancia?": ["SI"], "ES SALIDA 2026 - NIVEL SCORE": [55],
+        "ES SALIDA 2026 - NIVEL MCER": ["A2"], "Aprobado SED": ["SI"], "SEXO": ["Femenino"], "EDAD": [40],
+    })
+    columns = list(ColumnStandardizer.standardize(df, 2026).columns)
+    assert columns == ["programa", "recibe_constancia", "english_score_salida_2026", "nivel_mcer_salida_2026",
+                       "aprobado_sed", "genero", "edad"]
+
 
 def test_standardizer_missing_year():
     # Arrange

@@ -3,6 +3,10 @@
 mappings:
   2023:
     PARTICIPANTE: "docente_nombre"
+    NOMBRES: "nombres"
+    PRIMER APELLIDO: "primer_apellido"
+    SEGUNDO APELLIDO: "segundo_apellido"
+    APELLIDOS: "apellidos"
     ID: "docente_id"
     TIPO ID: "tipo_documento"
     GENERO: "genero"
@@ -12,7 +16,9 @@ mappings:
     IED: "colegio_nombre"
     DANE: "codigo_dane"
     NIVEL DE FORMACIÓN: "nivel_formacion"
-    ROL QUE DESEMPEÑA: "cargo_rol"
+    # Cargo validado por la SED (desde la base del 26/11/2026). El rol original queda aparte, solo de referencia.
+    CATEGORIA DEL DOCENTE: "cargo_rol"
+    ROL QUE DESEMPEÑA: "rol_desempena"
     TIPO DE NOMBRAMIENTO: "tipo_nombramiento"
     JORNADA: "jornada_laboral"
     CURSO-NIVEL: "nivel_asignado"
@@ -21,6 +27,10 @@ mappings:
 
   2024:
     PARTICIPANTE: "docente_nombre"
+    NOMBRES: "nombres"
+    PRIMER APELLIDO: "primer_apellido"
+    SEGUNDO APELLIDO: "segundo_apellido"
+    APELLIDOS: "apellidos"
     ID: "docente_id"
     TIPO ID: "tipo_documento"
     GENERO: "genero"
@@ -31,7 +41,9 @@ mappings:
     DANE: "codigo_dane"
     CLUSTER: "ubicacion_geo"
     NIVEL DE FORMACIÓN: "nivel_formacion"
-    ROL QUE DESEMPEÑA: "cargo_rol"
+    # Cargo validado por la SED (desde la base del 26/11/2026). El rol original queda aparte, solo de referencia.
+    CATEGORIA DEL DOCENTE: "cargo_rol"
+    ROL QUE DESEMPEÑA: "rol_desempena"
     TIPO DE NOMBRAMIENTO: "tipo_nombramiento"
     JORNADA: "jornada_laboral"
     NIVEL DICTA: "grado_dicta"
@@ -81,4 +93,15 @@ mappings:
     NIVEL_ASIGNADO: "nivel_asignado"
     ENGLISH_SCORE_ENTRADA_2026: "english_score_entrada_2026"
     NIVEL_MCER_ENTRADA_2026: "nivel_mcer_entrada_2026"
+    # Versión 2 (entregable SED). Columnas que se agregan a la hoja "base"; si aún no existen, dbt las deja en NULL.
+    PROGRAMA: "programa"
+    "Recibe Constancia?": "recibe_constancia"
+    RECIBE CONSTANCIA: "recibe_constancia"
+    "ES SALIDA 2026 - NIVEL SCORE": "english_score_salida_2026"
+    "ES SALIDA 2026 - NIVEL MCER": "nivel_mcer_salida_2026"
+    Aprobado SED: "aprobado_sed"
+    APROBADO SED: "aprobado_sed"
+    GENERO: "genero"
+    SEXO: "genero"
+    EDAD: "edad"
     PORCENTAJE_FINAL: "porcentaje_final"

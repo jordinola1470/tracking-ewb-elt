@@ -1,5 +1,6 @@
+{% set src = source('raw_tracking_ewb', 'base_docentes_2026') %}
 with source as (
-    select * from {{ source('raw_tracking_ewb', 'base_docentes_2026') }}
+    select * from {{ src }}
 )
 
 select
@@ -9,7 +10,8 @@ select
     {{ nombre_propio("concat_ws(' ', trim(cast(nombres as varchar)), trim(cast(apellidos as varchar)))") }} as docente_nombre,
     -- 2026 viene como 'CC - CEDULA DE CIUDADANIA'; se deja solo el código (CC, CE...) como en 2023/2024
     trim(split_part(cast(tipo_documento as varchar), ' - ', 1)) as tipo_documento,
-    cast(null as varchar) as genero,
+    -- Sexo: columna GENERO o SEXO del Excel (se agrega después); mientras no exista queda NULL
+    nullif({{ texto_opcional(src, 'genero') }}, '-') as genero,
     cast(null as varchar) as fecha_nacimiento,
     {{ correo('correo_electronico') }} as correo_electronico,
     trim(cast(telefono_celular as varchar)) as telefono_celular,
@@ -44,14 +46,33 @@ select
         else null
     end as mcer_entrada,
 
-    -- La salida 2026 aún no existe
-    cast(null as numeric) as score_salida,
-    cast(null as varchar) as mcer_salida,
+    -- Salida 2026: columnas ES SALIDA 2026 - NIVEL SCORE / NIVEL MCER (si existen en el Excel),
+    -- separadas por contenido igual que la entrada
+    case
+        when {{ texto_opcional(src, 'english_score_salida_2026') }} ~ '^[0-9]+(\.[0-9]+)?$' then cast({{ texto_opcional(src, 'english_score_salida_2026') }} as numeric)
+        when {{ texto_opcional(src, 'nivel_mcer_salida_2026') }} ~ '^[0-9]+(\.[0-9]+)?$' then cast({{ texto_opcional(src, 'nivel_mcer_salida_2026') }} as numeric)
+        else null
+    end as score_salida,
+    case
+        when upper({{ texto_opcional(src, 'nivel_mcer_salida_2026') }}) ~ '^(PRE[ -]*A1|[ABC][12]\+?)$' then {{ texto_opcional(src, 'nivel_mcer_salida_2026') }}
+        when upper({{ texto_opcional(src, 'english_score_salida_2026') }}) ~ '^(PRE[ -]*A1|[ABC][12]\+?)$' then {{ texto_opcional(src, 'english_score_salida_2026') }}
+        else null
+    end as mcer_salida,
 
     case
         when cast(porcentaje_final as varchar) ~ '^[0-9]+(\.[0-9]+)?$' then cast(porcentaje_final as numeric)
         else null
     end as asistencia_porcentaje,
-    cast(null as varchar) as recibe_constancia
+    -- Constancia: columna «Recibe Constancia?» (si existe en el Excel)
+    {{ si_no(texto_opcional(src, 'recibe_constancia')) }} as recibe_constancia,
+
+    -- ENTREGABLE SED (NULL mientras el Excel no traiga la columna)
+    cast({{ texto_opcional(src, 'edad') }} as numeric)            as edad,
+    {{ nombre_propio(texto_opcional(src, 'nombres')) }}           as nombres,
+    {{ nombre_propio(texto_opcional(src, 'apellidos')) }}         as apellidos,
+    lower({{ texto_opcional(src, 'programa') }})                  as programa,
+    {{ texto_opcional(src, 'aprobado_sed') }}                     as aprobado_sed,
+    -- Retirado según la base: grupo "Retirados …"
+    {{ es_retirado() }}                                           as retirado_segun_base
 
 from source

@@ -10,6 +10,35 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Versión 2 · bases validadas con la SED (en curso)
+- Tablero: la pestaña **Reporte** (fact sheet) se oculta hasta validar sus datos (`MOSTRAR_REPORTE = false` en
+  `Tablero.tsx`). Su código y los modelos `tab_fs_*` se conservan.
+- **Entregable SED** (capa Diamante, ver `docs/entregable_sed.md`): `sed_entregable_ancho` (una fila por persona,
+  último dato disponible, columnas por año 2023-2026; en 2026 se descarta la fila de ewb_plus de los docentes que
+  están en dos programas) y `sed_entregable_largo` (una fila por persona y año). Con pruebas de unicidad y valores.
+- Staging y `consolidado_historico`: columnas nuevas `edad`, `nombres`, `apellidos`, `programa`, `aprobado_sed` y
+  `retirado_segun_base` (2023 `ESTADO`, 2024 `2024 EWB` = Deserción, 2025-2026 grupo «Retirados»). No cambian las
+  reglas del tablero.
+- Entregable: el dato faltante se marca con `-` (antes «Sin registro»).
+- Bases 2023 y 2024: se leen `NOMBRES` y `APELLIDOS` (o primer y segundo apellido). Base 2026: sexo `-` = sin dato.
+- Base 2026: se leen, si existen, `PROGRAMA`, `EDAD`, `SEXO`/`GENERO`, `Recibe Constancia?`, salida 2026 y
+  `Aprobado SED` (macro `columna_opcional`); mientras no existan quedan en NULL.
+- Base 2026: nuevo archivo `261126 Base 2026.xlsx` en `config/sources.yaml`.
+- Mapeo 2023 y 2024: el cargo se toma de `CATEGORIA DEL DOCENTE` (validado por la SED); `ROL QUE DESEMPEÑA` queda como
+  `rol_desempena`, solo de referencia.
+- `cargo_estandar`: unifica la nomenclatura original y la de la SED en 7 categorías. Nuevas equivalencias:
+  `Docente primaria` → Docente de Primaria, `Docente contenido` → Docente de Contenido, `Docente de inglés` →
+  Docente de Inglés, `Docente de Preescolar` → Docente de Preescolar y `Coordinadora` → Directivo Docente.
+- Corregido: recargar el helpdesk fallaba porque la vista `stg_helpdesk_alertas` depende de `raw.helpdesk_alertas`;
+  ahora la tabla se reemplaza con `CASCADE` (como las bases anuales) y `transformar` recrea la vista.
+
+### Documentación
+- README reescrito con formato profesional: arquitectura, tecnologías, instalación, uso, tablero, entornos,
+  pruebas, documentación, contribución y licencia. Se quitan pendientes y notas de avance.
+- Nueva carpeta de documentación interna `docs/` con índice (`docs/README.md`): `modelo_datos.md` (capas, tablas y
+  reglas), `operacion.md` (entornos, seguridad, despliegue y operación) y `supabase_activar_manual.md`.
+  `fct_docentes_architecture.md` pasa de `dbt_project/models/marts/` a `docs/`.
+
 ### Corregido (latido de Supabase)
 - «Mantener Supabase activo» pasa de una vez por semana (viernes) a **dos veces al día** (6:17 a. m. y 6:17 p. m.,
   Colombia), con hasta 3 reintentos y límite de 10 minutos. Supabase avisó de inactividad: una consulta semanal
