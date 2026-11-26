@@ -17,6 +17,7 @@ def test_standardizer_year_2023():
         "DANE": ["123", "456"],
         "NIVEL DE FORMACIÓN": ["Pregrado", "Posgrado"],
         "ROL QUE DESEMPEÑA": ["Docente", "Rector"],
+        "CATEGORIA DEL DOCENTE": ["Docente de aula", "Coordinador"],
         "TIPO DE NOMBRAMIENTO": ["Propiedad", "Provisional"],
         "JORNADA": ["Mañana", "Tarde"],
         "CURSO-NIVEL": ["11", "10"],
@@ -42,7 +43,10 @@ def test_standardizer_year_2023():
     assert "colegio_nombre" in columns
     assert "codigo_dane" in columns
     assert "nivel_formacion" in columns
+    # En 2023 el cargo es el validado por la SED (CATEGORIA DEL DOCENTE); el rol original queda aparte
     assert "cargo_rol" in columns
+    assert df_std["cargo_rol"].tolist() == ["Docente de aula", "Coordinador"]
+    assert "rol_desempena" in columns
     assert "tipo_nombramiento" in columns
     assert "jornada_laboral" in columns
     # En 2023 "CURSO-NIVEL" es el nivel asignado (2023 no trae grado_dicta) y "REMOTE" se mapea a rt_remoto
