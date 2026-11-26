@@ -39,6 +39,11 @@
     end
 {%- endmacro %}
 
+{# Dato faltante del entregable → '-' (todas las columnas del entregable son texto) #}
+{% macro o_guion(col) -%}
+    coalesce(nullif(trim(cast({{ col }} as varchar)), ''), '-')
+{%- endmacro %}
+
 {# ¿La prueba tiene resultado? (puntaje, o nivel MCER válido) #}
 {% macro tiene_prueba(score, mcer) -%}
     ({{ score }} is not null or {{ orden_mcer(mcer) }} is not null)

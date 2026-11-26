@@ -69,15 +69,15 @@ pivote as (
 
 select
     row_number() over (order by n.apellidos, n.nombres, p.docente_id)::int as no,
-    p.dane,
-    p.ied,
-    p.tipo_documento,
+    {{ o_guion('p.dane') }}                                           as dane,
+    {{ o_guion('p.ied') }}                                            as ied,
+    {{ o_guion('p.tipo_documento') }}                                 as tipo_documento,
     p.docente_id                                                      as numero_documento,
-    n.nombres,
-    n.apellidos,
-    p.sexo,
-    p.cargo,
-    cast(p.edad as integer)                                           as edad,
+    {{ o_guion('n.nombres') }}                                        as nombres,
+    {{ o_guion('n.apellidos') }}                                      as apellidos,
+    {{ o_guion('p.sexo') }}                                           as sexo,
+    {{ o_guion('p.cargo') }}                                          as cargo,
+    {{ o_guion('cast(p.edad as integer)') }}                          as edad,
     p.total_anios_participando::int                                   as total_anios_participando,
     {{ puntaje_texto('e.score_entrada') }}                            as es_entrada,
     {{ puntaje_texto('s.score_salida') }}                             as es_salida,
@@ -87,9 +87,7 @@ select
     v.nivel_cursado_{{ a }},
     v.estado_finalizacion_{{ a }},
     v.es_salida_{{ a }}
-    {%- endfor %},
-    -- Control (no es parte del formato pedido): nombres y apellidos separados por posición
-    n.nombre_aproximado
+    {%- endfor %}
 from persona p
 join pivote v using (docente_id)
 left join {{ ref('int_sed_nombres') }} n using (docente_id)

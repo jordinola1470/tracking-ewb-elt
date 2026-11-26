@@ -9,23 +9,22 @@ with c as (
 select
     row_number() over (order by c.anio_lectivo, n.apellidos, n.nombres, c.docente_id, c.programa)::int as no,
     c.anio_lectivo                                                   as anio,
-    c.programa,
-    c.codigo_dane                                                    as dane,
-    c.colegio_nombre                                                 as ied,
-    c.tipo_documento,
+    {{ o_guion('c.programa') }}                                      as programa,
+    {{ o_guion('c.codigo_dane') }}                                   as dane,
+    {{ o_guion('c.colegio_nombre') }}                                as ied,
+    {{ o_guion('c.tipo_documento') }}                                as tipo_documento,
     c.docente_id                                                     as numero_documento,
-    n.nombres,
-    n.apellidos,
-    c.genero                                                         as sexo,
-    c.cargo_estandar                                                 as cargo,
-    cast(c.edad as integer)                                          as edad,
+    {{ o_guion('n.nombres') }}                                       as nombres,
+    {{ o_guion('n.apellidos') }}                                     as apellidos,
+    {{ o_guion('c.genero') }}                                        as sexo,
+    {{ o_guion('c.cargo_estandar') }}                                as cargo,
+    {{ o_guion('cast(c.edad as integer)') }}                         as edad,
     {{ nivel_cursado() }}                                            as nivel_cursado,
     {{ estado_finalizacion('c.retirado_segun_base', 'c.recibe_constancia') }} as estado_finalizacion,
     {{ puntaje_texto('c.score_entrada') }}                           as es_entrada,
     coalesce({{ mcer_etiqueta('c.mcer_entrada') }}, '-')  as nivel_mcer_entrada,
     {{ puntaje_texto('c.score_salida') }}                            as es_salida,
     coalesce({{ mcer_etiqueta('c.mcer_salida') }}, '-')   as nivel_mcer_salida,
-    c.aprobado_sed,
-    n.nombre_aproximado
+    {{ o_guion('c.aprobado_sed') }}                                  as aprobado_sed
 from c
 left join {{ ref('int_sed_nombres') }} n using (docente_id)
