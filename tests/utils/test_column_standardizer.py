@@ -65,7 +65,8 @@ def test_standardizer_year_2023():
 
 def test_standardizer_year_2024():
     # Arrange
-    data = {"CLUSTER": ["A"], "NIVEL DICTA": ["11"], "NIVEL": ["A"]}
+    data = {"CLUSTER": ["A"], "NIVEL DICTA": ["11"], "NIVEL": ["A"],
+            "ROL QUE DESEMPEÑA": ["Docente de aula"], "CATEGORIA DEL DOCENTE": ["Docente de primaria"]}
     df = pd.DataFrame(data)
 
     # Act
@@ -76,6 +77,9 @@ def test_standardizer_year_2024():
     assert "ubicacion_geo" in columns
     assert "grado_dicta" in columns
     assert "nivel_asignado" in columns
+    # En 2024 el cargo también es el validado por la SED (CATEGORIA DEL DOCENTE)
+    assert df_std["cargo_rol"].tolist() == ["Docente de primaria"]
+    assert "rol_desempena" in columns
 
 
 def test_standardizer_year_2025():

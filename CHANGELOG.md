@@ -12,7 +12,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ### Versión 2 · bases validadas con la SED (en curso)
 - Base 2026: nuevo archivo `261126 Base 2026.xlsx` en `config/sources.yaml`.
-- Mapeo 2023: el cargo se toma de `CATEGORIA DEL DOCENTE` (validado por la SED); `ROL QUE DESEMPEÑA` queda como
+- Mapeo 2023 y 2024: el cargo se toma de `CATEGORIA DEL DOCENTE` (validado por la SED); `ROL QUE DESEMPEÑA` queda como
   `rol_desempena`, solo de referencia.
 - `cargo_estandar`: unifica la nomenclatura original y la de la SED en 7 categorías. Nuevas equivalencias:
   `Docente primaria` → Docente de Primaria, `Docente contenido` → Docente de Contenido, `Docente de inglés` →

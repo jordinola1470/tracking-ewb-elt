@@ -33,7 +33,9 @@ mappings:
     DANE: "codigo_dane"
     CLUSTER: "ubicacion_geo"
     NIVEL DE FORMACIÓN: "nivel_formacion"
-    ROL QUE DESEMPEÑA: "cargo_rol"
+    # Cargo validado por la SED (desde la base del 26/11/2026). El rol original queda aparte, solo de referencia.
+    CATEGORIA DEL DOCENTE: "cargo_rol"
+    ROL QUE DESEMPEÑA: "rol_desempena"
     TIPO DE NOMBRAMIENTO: "tipo_nombramiento"
     JORNADA: "jornada_laboral"
     NIVEL DICTA: "grado_dicta"
