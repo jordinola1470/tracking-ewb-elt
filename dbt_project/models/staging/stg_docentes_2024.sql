@@ -52,8 +52,9 @@ select
     -- ENTREGABLE SED (columnas nuevas de la base validada con la SED; NULL si el Excel no las trae)
     {% set src = source('raw_tracking_ewb', 'base_docentes_2024') %}
     cast({{ texto_opcional(src, 'edad') }} as numeric)            as edad,
-    cast(null as varchar)                                          as nombres,
-    cast(null as varchar)                                          as apellidos,
+    -- Nombres y apellidos por separado: se leen cuando la base los trae (NOMBRES, PRIMER y SEGUNDO APELLIDO)
+    {{ nombre_propio(texto_opcional(src, 'nombres')) }}           as nombres,
+    {{ nombre_propio("nullif(concat_ws(' ', " ~ texto_opcional(src, 'primer_apellido') ~ ", " ~ texto_opcional(src, 'segundo_apellido') ~ "), '')") }} as apellidos,
     cast(null as varchar)                                          as programa,
     cast(null as varchar)                                          as aprobado_sed,
     -- Retirado según la base: en 2024 la columna "2024 EWB" = 'Deserción'

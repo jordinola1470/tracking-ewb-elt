@@ -81,8 +81,8 @@ select
     p.total_anios_participando::int                                   as total_anios_participando,
     {{ puntaje_texto('e.score_entrada') }}                            as es_entrada,
     {{ puntaje_texto('s.score_salida') }}                             as es_salida,
-    coalesce({{ mcer_etiqueta('e.mcer_entrada') }}, 'Sin registro')   as nivel_mcer_entrada,
-    coalesce({{ mcer_etiqueta('s.mcer_salida') }}, 'Sin registro')    as nivel_mcer_salida
+    coalesce({{ mcer_etiqueta('e.mcer_entrada') }}, '-')   as nivel_mcer_entrada,
+    coalesce({{ mcer_etiqueta('s.mcer_salida') }}, '-')    as nivel_mcer_salida
     {%- for a in anios %},
     v.nivel_cursado_{{ a }},
     v.estado_finalizacion_{{ a }},

@@ -23,9 +23,9 @@
     nullif(trim({{ columna_opcional(relacion, columna, 'varchar') }}), '')
 {%- endmacro %}
 
-{# Puntaje como texto para el entregable: entero sin decimales; NULL → 'Sin registro' #}
+{# Puntaje como texto para el entregable: entero sin decimales; sin dato → '-' #}
 {% macro puntaje_texto(col) -%}
-    coalesce(cast(round({{ col }}) as integer)::text, 'Sin registro')
+    coalesce(cast(round({{ col }}) as integer)::text, '-')
 {%- endmacro %}
 
 {# Nivel MCER de una prueba con una sola escritura: 'PRE - A1', 'Pre A1' → 'PRE A1'; A1…C2 igual;
@@ -44,19 +44,19 @@
     ({{ score }} is not null or {{ orden_mcer(mcer) }} is not null)
 {%- endmacro %}
 
-{# Nivel cursado en el año: nivel_estandar; '-' o vacío → 'Sin registro' #}
+{# Nivel cursado en el año: nivel_estandar; sin dato → '-' #}
 {% macro nivel_cursado(col='nivel_estandar') -%}
-    coalesce(nullif(nullif(trim({{ col }}), ''), '-'), 'Sin registro')
+    coalesce(nullif(trim({{ col }}), ''), '-')
 {%- endmacro %}
 
 {# Estado al cierre de la vigencia: Retirado (según la base del año) > Aprobado (constancia Sí) >
-   Sin constancia (constancia No) > Sin registro (sin dato de constancia) #}
+   Sin constancia (constancia No) > '-' (sin dato de constancia) #}
 {% macro estado_finalizacion(retirado='retirado_segun_base', constancia='recibe_constancia') -%}
     case
         when {{ retirado }} then 'Retirado'
         when upper(trim({{ constancia }})) in ('SI', 'SÍ') then 'Aprobado'
         when upper(trim({{ constancia }})) = 'NO' then 'Sin constancia'
-        else 'Sin registro'
+        else '-'
     end
 {%- endmacro %}
 

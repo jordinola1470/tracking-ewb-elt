@@ -3,6 +3,9 @@
 mappings:
   2023:
     PARTICIPANTE: "docente_nombre"
+    NOMBRES: "nombres"
+    PRIMER APELLIDO: "primer_apellido"
+    SEGUNDO APELLIDO: "segundo_apellido"
     ID: "docente_id"
     TIPO ID: "tipo_documento"
     GENERO: "genero"
@@ -23,6 +26,9 @@ mappings:
 
   2024:
     PARTICIPANTE: "docente_nombre"
+    NOMBRES: "nombres"
+    PRIMER APELLIDO: "primer_apellido"
+    SEGUNDO APELLIDO: "segundo_apellido"
     ID: "docente_id"
     TIPO ID: "tipo_documento"
     GENERO: "genero"

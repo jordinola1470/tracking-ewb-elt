@@ -52,7 +52,7 @@ Las mismas filas de `consolidado_historico` (incluye las dos filas de los docent
 | Valor | Significado |
 | :--- | :--- |
 | Puntaje | Puntaje de la prueba ES, entero |
-| `Sin registro` | No hay dato (puntaje, nivel MCER, nivel cursado o constancia) |
+| `-` | No hay dato en la base (puntaje, nivel MCER, nivel cursado, constancia). La base 2026 aún está por cerrarse |
 | `No aplica` | La persona no participó ese año (solo en la versión ancha) |
 | `Aprobado` | Recibió constancia |
 | `Sin constancia` | Finalizó sin constancia |
@@ -73,15 +73,15 @@ Las mismas filas de `consolidado_historico` (incluye las dos filas de los docent
 Esta regla solo la usa el entregable. El tablero (versión 1) sigue contando como retirados a los del grupo «Retirados …».
 
 **Nivel cursado de los retirados:** 2025 y 2026 se completan con el helpdesk; 2023 ya viene en la base (coincide con
-el helpdesk 2023); 2024 queda en `Sin registro` porque no hay helpdesk de ese año.
+el helpdesk 2023); 2024 queda en `-` porque no hay helpdesk de ese año.
 
 ---
 
 ## Nombres y apellidos
 
-1. Se toman de la base más reciente que los trae separados: 2026 (`NOMBRES`, `APELLIDOS`) o 2025 (`NOMBRES`,
-   `PRIMER APELLIDO`, `SEGUNDO APELLIDO`).
-2. Si la persona solo participó en 2023 o 2024 (nombre completo en una columna), se separa por posición: las dos
+1. Se toman de la base más reciente que los trae separados: 2026 (`NOMBRES`, `APELLIDOS`) o 2023-2025 (`NOMBRES`,
+   `PRIMER APELLIDO`, `SEGUNDO APELLIDO`; en 2023 y 2024 se leen en cuanto la base traiga esas columnas).
+2. Si ninguna base los trae separados (nombre completo en una columna), se separa por posición: las dos
    últimas palabras son los apellidos (3 palabras: 1 nombre y 2 apellidos; 2 palabras: 1 y 1). En esas bases el
    nombre completo empieza por los nombres. Estos casos quedan con `nombre_aproximado = true`.
 

@@ -22,9 +22,9 @@ select
     {{ nivel_cursado() }}                                            as nivel_cursado,
     {{ estado_finalizacion('c.retirado_segun_base', 'c.recibe_constancia') }} as estado_finalizacion,
     {{ puntaje_texto('c.score_entrada') }}                           as es_entrada,
-    coalesce({{ mcer_etiqueta('c.mcer_entrada') }}, 'Sin registro')  as nivel_mcer_entrada,
+    coalesce({{ mcer_etiqueta('c.mcer_entrada') }}, '-')  as nivel_mcer_entrada,
     {{ puntaje_texto('c.score_salida') }}                            as es_salida,
-    coalesce({{ mcer_etiqueta('c.mcer_salida') }}, 'Sin registro')   as nivel_mcer_salida,
+    coalesce({{ mcer_etiqueta('c.mcer_salida') }}, '-')   as nivel_mcer_salida,
     c.aprobado_sed,
     n.nombre_aproximado
 from c
