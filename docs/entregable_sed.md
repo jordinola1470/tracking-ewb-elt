@@ -79,8 +79,8 @@ el helpdesk 2023); 2024 queda en `-` porque no hay helpdesk de ese año.
 
 ## Nombres y apellidos
 
-1. Se toman de la base más reciente que los trae separados: 2026 (`NOMBRES`, `APELLIDOS`) o 2023-2025 (`NOMBRES`,
-   `PRIMER APELLIDO`, `SEGUNDO APELLIDO`; en 2023 y 2024 se leen en cuanto la base traiga esas columnas).
+1. Se toman de la base más reciente que los trae separados: 2023, 2024 y 2026 (`NOMBRES`, `APELLIDOS`) o 2025
+   (`NOMBRES`, `PRIMER APELLIDO`, `SEGUNDO APELLIDO`, que se unen en una sola columna de apellidos).
 2. Si ninguna base los trae separados (nombre completo en una columna), se separa por posición: las dos
    últimas palabras son los apellidos (3 palabras: 1 nombre y 2 apellidos; 2 palabras: 1 y 1). En esas bases el
    nombre completo empieza por los nombres. Estos casos quedan con `nombre_aproximado = true`.

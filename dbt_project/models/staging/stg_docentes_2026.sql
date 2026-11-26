@@ -11,7 +11,7 @@ select
     -- 2026 viene como 'CC - CEDULA DE CIUDADANIA'; se deja solo el código (CC, CE...) como en 2023/2024
     trim(split_part(cast(tipo_documento as varchar), ' - ', 1)) as tipo_documento,
     -- Sexo: columna GENERO o SEXO del Excel (se agrega después); mientras no exista queda NULL
-    trim({{ texto_opcional(src, 'genero') }}) as genero,
+    nullif({{ texto_opcional(src, 'genero') }}, '-') as genero,
     cast(null as varchar) as fecha_nacimiento,
     {{ correo('correo_electronico') }} as correo_electronico,
     trim(cast(telefono_celular as varchar)) as telefono_celular,

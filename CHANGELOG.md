@@ -18,7 +18,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   `retirado_segun_base` (2023 `ESTADO`, 2024 `2024 EWB` = Deserción, 2025-2026 grupo «Retirados»). No cambian las
   reglas del tablero.
 - Entregable: el dato faltante se marca con `-` (antes «Sin registro»).
-- Bases 2023 y 2024: se leen `NOMBRES`, `PRIMER APELLIDO` y `SEGUNDO APELLIDO` cuando la base los traiga.
+- Bases 2023 y 2024: se leen `NOMBRES` y `APELLIDOS` (o primer y segundo apellido). Base 2026: sexo `-` = sin dato.
 - Base 2026: se leen, si existen, `PROGRAMA`, `EDAD`, `SEXO`/`GENERO`, `Recibe Constancia?`, salida 2026 y
   `Aprobado SED` (macro `columna_opcional`); mientras no existan quedan en NULL.
 - Base 2026: nuevo archivo `261126 Base 2026.xlsx` en `config/sources.yaml`.
