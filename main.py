@@ -23,6 +23,7 @@ def _cargar(anio: int | None, forzar: bool) -> None:
         print(f"   {resultado}")
     print(f"   {ingestor_pipeline.cargar_referencia_ied()}")
     print(f"   {ingestor_pipeline.cargar_helpdesk()}")
+    print(f"   {ingestor_pipeline.cargar_helpdesk_matricula()}")
     print("✅ Carga terminada. Ejecuta `transformar` para actualizar las tablas finales.")
 
 

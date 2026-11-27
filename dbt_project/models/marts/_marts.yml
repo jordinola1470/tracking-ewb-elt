@@ -57,3 +57,16 @@ models:
           - accepted_values:
               arguments:
                 values: ['PRE_A1', 'A1', 'A1+', 'A2', 'A2+', 'B1', 'B1+', 'B2', 'B2+', 'C1', 'C1+']
+
+  # Nivel del curso de matrícula (helpdesk): una fila por docente y año
+  - name: fct_helpdesk_matricula
+    data_tests:
+      - unique:
+          column_name: "docente_id || '-' || anio_lectivo"
+    columns:
+      - name: nivel_matricula
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['PRE_A1', 'A1', 'A2', 'A2+', 'B1', 'B1+', 'B2', 'C1']

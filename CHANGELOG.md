@@ -10,6 +10,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado (helpdesk 2024: nivel de los desertores)
+- `cargar` lee también los Excel `data/helpdesk_data/helpdesk_<año>_*.xlsx` (listas de matrícula: 2023 hoja
+  `nivel_inicial`, 2024 hoja `help_desk`) y reemplaza `raw.helpdesk_matricula` solo con documento, grupo, curso y
+  nivel (sin nombres, correos ni teléfonos).
+- dbt: `stg_helpdesk_matricula`, macro `nivel_de_curso` (Entry, Fundamentals 2, Progress 2, Connections 2/4,
+  Evolution 2…) y `fct_helpdesk_matricula` (gold, nivel de matrícula por docente y año), con pruebas.
+- `consolidado_historico`: los retirados o desertores sin nivel y sin alerta de retiro reciben el nivel del curso
+  en que se matricularon. 2024: 360 de 375 desertores con nivel; «Sin nivel registrado» del tablero baja de 278 a 17.
+
 ### Versión 2 · bases validadas con la SED (en curso)
 - Tablero: la pestaña **Reporte** (fact sheet) se oculta hasta validar sus datos (`MOSTRAR_REPORTE = false` en
   `Tablero.tsx`). Su código y los modelos `tab_fs_*` se conservan.

@@ -1,4 +1,5 @@
 import hashlib
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -296,6 +297,78 @@ class Ingestor:
             raise
         except Exception as e:
             raise DatabaseLoadError(f"Error al cargar las alertas del helpdesk: {self._mensaje_seguro(e)}") from e
+
+    # ------------------------------------------------------------------ helpdesk (listas de matrícula)
+    # Excel helpdesk_<año>_<grupo>.xlsx con la lista de docentes matriculados y el curso en que se matricularon
+    # (2023: hoja nivel_inicial; 2024: hoja help_desk). Sirve para el nivel de quienes desertaron.
+    # Solo se guardan documento, grupo, curso y nivel: nombres, correos y teléfonos se descartan.
+    TABLA_MATRICULA = "helpdesk_matricula"
+    COLUMNAS_MATRICULA = {
+        "docente_id": ("documentid", "id"),
+        "grupo": ("group", "grupo ewb", "grupo"),
+        "curso": ("curso inicial", "nivel"),
+        "nivel": ("nivel inicial",),
+    }
+
+    @staticmethod
+    def _documento_texto(valor) -> str | None:
+        """Documento como texto sin decimales (1234.0 -> '1234')."""
+        if valor is None or (isinstance(valor, float) and pd.isna(valor)):
+            return None
+        texto = str(valor).strip()
+        texto = texto[:-2] if texto.endswith(".0") and texto[:-2].isdigit() else texto
+        return texto or None
+
+    def leer_helpdesk_matricula(self, carpeta: Path | None = None) -> pd.DataFrame:
+        """Lee los Excel helpdesk_<año>_*.xlsx (primera hoja): archivo, anio_lectivo, docente_id, grupo, curso, nivel."""
+        carpeta = carpeta or self.CARPETA_HELPDESK
+        columnas = ["archivo", "anio_lectivo", *self.COLUMNAS_MATRICULA]
+        partes = []
+        for ruta in sorted(carpeta.glob("helpdesk_*.xlsx")):
+            anio = re.search(r"helpdesk_(\d{4})_", ruta.name)
+            if not anio:
+                raise DatabaseLoadError(f"Helpdesk: el archivo {ruta.name} no sigue el nombre helpdesk_<año>_<grupo>.xlsx")
+            df = pd.read_excel(ruta, sheet_name=0, dtype=object)
+            encabezados = {str(c).strip().lower(): c for c in df.columns}
+            salida = pd.DataFrame(index=df.index)
+            for destino, opciones in self.COLUMNAS_MATRICULA.items():
+                origen = next((encabezados[o] for o in opciones if o in encabezados), None)
+                if origen is None and destino in ("docente_id", "curso"):
+                    raise DatabaseLoadError(f"Helpdesk: al archivo {ruta.name} le falta la columna de {destino}")
+                salida[destino] = df[origen] if origen is not None else None
+            salida["docente_id"] = salida["docente_id"].map(self._documento_texto)
+            for c in ("grupo", "curso", "nivel"):
+                salida[c] = salida[c].map(lambda v: None if v is None or pd.isna(v) else str(v).strip() or None)
+            salida.insert(0, "anio_lectivo", int(anio.group(1)))
+            salida.insert(0, "archivo", ruta.name)
+            partes.append(salida.dropna(subset=["docente_id"]))
+        return pd.concat(partes, ignore_index=True)[columnas] if partes else pd.DataFrame(columns=columnas)
+
+    def cargar_helpdesk_matricula(self) -> str:
+        """
+        Carga (reemplaza) raw.helpdesk_matricula con los Excel de data/helpdesk_data.
+        Si no hay archivos, deja la tabla creada (vacía si no existía) para que dbt funcione igual.
+        """
+        tabla = f"raw.{self.TABLA_MATRICULA}"
+        try:
+            df = self.leer_helpdesk_matricula() if self.CARPETA_HELPDESK.exists() else None
+            with get_connection() as conn:
+                with conn.begin():
+                    if df is not None and len(df):
+                        # CASCADE: la vista de staging depende de la tabla; `transformar` la recrea
+                        conn.execute(text(f"DROP TABLE IF EXISTS {tabla} CASCADE"))
+                        df.to_sql(name=self.TABLA_MATRICULA, con=conn, schema="raw", if_exists="fail", index=False)
+                        anios = ", ".join(str(a) for a in sorted(df["anio_lectivo"].unique()))
+                        return f"🛟 Helpdesk (matrícula): {len(df)} docentes de {anios} cargados"
+                    conn.execute(text(
+                        f"CREATE TABLE IF NOT EXISTS {tabla} (archivo text, anio_lectivo bigint, docente_id text, "
+                        "grupo text, curso text, nivel text)"
+                    ))
+                    return "🛟 Helpdesk (matrícula): no se encontraron archivos Excel"
+        except BaseProjectException:
+            raise
+        except Exception as e:
+            raise DatabaseLoadError(f"Error al cargar la matrícula del helpdesk: {self._mensaje_seguro(e)}") from e
 
     def cargar(self, anio: int | None = None, forzar: bool = False) -> list[str]:
         """

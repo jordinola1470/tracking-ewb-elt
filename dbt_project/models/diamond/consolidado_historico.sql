@@ -199,6 +199,10 @@ select
     case
         when {{ es_retirado('base.grupo_id') }} and hr.nivel_retiro is not null
             and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', '')) then hr.nivel_retiro
+        -- Retirados o desertores sin nivel y sin alerta de retiro: nivel del curso en que se matricularon según la
+        -- lista de matrícula del helpdesk (fct_helpdesk_matricula; p. ej., desertores de 2024)
+        when ({{ es_retirado('base.grupo_id') }} or base.retirado_segun_base) and hm.nivel_matricula is not null
+            and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', '')) then hm.nivel_matricula
         -- Eximidos que ya acreditan el nivel (grupo "Eximido C1"): toman el nivel del nombre del grupo
         when substring(upper(base.grupo_id) from '^EXIMID[OA]S?\s+([ABC][12]\+?)\s*$') is not null
             and (nivel_asignado is null or nivel_asignado in ('0', 'NULL', '-', ''))
@@ -239,3 +243,5 @@ select
 from base
 left join {{ ref('fct_helpdesk_retiros') }} hr
     on hr.docente_id = base.docente_id and hr.anio_lectivo = base.anio_lectivo
+left join {{ ref('fct_helpdesk_matricula') }} hm
+    on hm.docente_id = base.docente_id and hm.anio_lectivo = base.anio_lectivo
