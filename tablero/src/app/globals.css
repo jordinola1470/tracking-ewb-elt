@@ -762,3 +762,5 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 
 /* Perfiles: columnas de nivel MCER (entrada / salida), tal cual vienen en la base */
 .mk-td-mcer{font-weight:600;white-space:nowrap;color:var(--marca-negro)}
+/* Encabezado en dos líneas («MCER» / «entrada»): sin recorte y con interlineado ajustado al texto */
+[data-componente="per_tabla_docentes"] .mk-table-fija th.mk-th-2l{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;vertical-align:middle}

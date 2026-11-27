@@ -88,7 +88,7 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
             <col style={{ width: "8%" }} /><col style={{ width: "10%" }} />
           </colgroup>
           <thead>
-            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>MCER entrada</th><th>MCER salida</th><th>Permanencia</th></tr>
+            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />entrada</th><th className="mk-th-2l">MCER<br />salida</th><th>Permanencia</th></tr>
           </thead>
           <tbody>
             {visibles.map((r) => (
