@@ -764,3 +764,14 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-td-mcer{font-weight:600;white-space:nowrap;color:var(--marca-negro)}
 /* Encabezado en dos líneas («MCER» / «entrada»): sin recorte y con interlineado ajustado al texto */
 [data-componente="per_tabla_docentes"] .mk-table-fija th.mk-th-2l{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;vertical-align:middle}
+/* Tabla de docentes: ancho fijo por columna; si no cabe, barra de desplazamiento horizontal abajo */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada{overflow-x:auto}
+[data-componente="per_tabla_docentes"] .mk-table-fija{width:1380px;min-width:100%}
+/* La tarjeta de la tabla no debe crecer más que el panel: así aparece la barra horizontal de la tabla */
+.mk-perf > .mk-card{min-width:0}
+/* Barra horizontal siempre visible (macOS oculta las barras por defecto) con la paleta del tablero */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar{height:10px}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-track{background:#E9EDEE;border-radius:0 0 16px 16px}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-thumb{background:#56676D;border-radius:999px;border:2px solid #E9EDEE}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-thumb:hover{background:#22333B}
+@supports not selector(::-webkit-scrollbar){[data-componente="per_tabla_docentes"] .mk-tw-paginada{scrollbar-width:thin;scrollbar-color:#56676D #E9EDEE}}

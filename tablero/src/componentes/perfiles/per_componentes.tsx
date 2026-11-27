@@ -83,9 +83,9 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
         <table className="mk-table mk-table-fija">
           <caption className="mk-sr">{filas.length} docentes</caption>
           <colgroup>
-            <col style={{ width: "10%" }} /><col style={{ width: "19%" }} /><col style={{ width: "12%" }} />
-            <col style={{ width: "19%" }} /><col style={{ width: "14%" }} /><col style={{ width: "8%" }} />
-            <col style={{ width: "8%" }} /><col style={{ width: "10%" }} />
+            <col style={{ width: 120 }} /><col style={{ width: 240 }} /><col style={{ width: 160 }} />
+            <col style={{ width: 260 }} /><col style={{ width: 190 }} /><col style={{ width: 100 }} />
+            <col style={{ width: 100 }} /><col style={{ width: 210 }} />
           </colgroup>
           <thead>
             <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />Entrada</th><th className="mk-th-2l">MCER<br />Salida</th><th>Permanencia</th></tr>
