@@ -88,7 +88,7 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
             <col style={{ width: "8%" }} /><col style={{ width: "10%" }} />
           </colgroup>
           <thead>
-            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />entrada</th><th className="mk-th-2l">MCER<br />salida</th><th>Permanencia</th></tr>
+            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />Entrada</th><th className="mk-th-2l">MCER<br />Salida</th><th>Permanencia</th></tr>
           </thead>
           <tbody>
             {visibles.map((r) => (
@@ -178,15 +178,14 @@ export function PerTablaHistorial({ filas }: { filas: Historial[] }) {
       <div className="mk-tw mk-tw-marco">
         <table className="mk-table">
           <thead>
-            <tr><th>Año</th><th>Grupo</th><th>Nivel de formación</th><th>Entrada</th><th>MCER entrada</th><th>Salida</th><th>MCER salida</th><th>Constancia</th></tr>
+            <tr><th>Año</th><th>Grupo</th><th>Nivel de formación</th><th>MCER Entrada</th><th>MCER Salida</th><th>Constancia</th></tr>
           </thead>
           <tbody>
             {filas.map((x, i) => (
               <tr key={`${x.anio_lectivo}-${i}`} style={{ cursor: "default" }}>
                 <td>{x.anio_lectivo}</td><td style={{ whiteSpace: "nowrap" }}>{x.grupo}</td>
                 <td style={{ fontWeight: 600 }}>{x.nivel_formacion}</td>
-                <td><Estado v={x.prueba_entrada} /></td><td className="mk-td-mcer">{x.mcer_entrada ?? "-"}</td>
-                <td><Estado v={x.prueba_salida} /></td><td className="mk-td-mcer">{x.mcer_salida ?? "-"}</td>
+                <td className="mk-td-mcer">{x.mcer_entrada ?? "-"}</td><td className="mk-td-mcer">{x.mcer_salida ?? "-"}</td>
                 <td><Estado v={x.constancia} /></td>
               </tr>
             ))}
