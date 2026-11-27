@@ -83,23 +83,26 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
         <table className="mk-table mk-table-fija">
           <caption className="mk-sr">{filas.length} docentes</caption>
           <colgroup>
-            <col style={{ width: "11%" }} /><col style={{ width: "22%" }} /><col style={{ width: "13%" }} />
-            <col style={{ width: "24%" }} /><col style={{ width: "16%" }} /><col style={{ width: "14%" }} />
+            <col style={{ width: "10%" }} /><col style={{ width: "19%" }} /><col style={{ width: "12%" }} />
+            <col style={{ width: "19%" }} /><col style={{ width: "14%" }} /><col style={{ width: "8%" }} />
+            <col style={{ width: "8%" }} /><col style={{ width: "10%" }} />
           </colgroup>
           <thead>
-            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>Permanencia</th></tr>
+            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th>Nivel de formación por año</th><th>MCER entrada</th><th>MCER salida</th><th>Permanencia</th></tr>
           </thead>
           <tbody>
             {visibles.map((r) => (
               <tr key={r.docente_id} className={r.docente_id === seleccionado ? "sel" : undefined} onClick={() => elegir(r.docente_id)}>
                 <td className="mk-td-codigo" title={r.docente_id}>{r.docente_id}</td><td className="mk-td-nombre" title={r.docente_nombre ?? undefined}>{r.docente_nombre}</td>
                 <td title={r.cargo ?? undefined}>{r.cargo}</td><td title={r.colegio ?? undefined}>{r.colegio}</td>
-                <td title={r.niveles_por_anio ?? undefined}>{r.niveles_por_anio}</td><td title={r.permanencia ?? undefined}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
+                <td title={r.niveles_por_anio ?? undefined}>{r.niveles_por_anio}</td>
+                <td className="mk-td-mcer">{r.mcer_entrada ?? "-"}</td><td className="mk-td-mcer">{r.mcer_salida ?? "-"}</td>
+                <td title={r.permanencia ?? undefined}><span className="mk-pill mk-pill-verde">{r.permanencia}</span></td>
               </tr>
             ))}
             {/* Filas vacías para que la última página mida lo mismo que las demás */}
             {Array.from({ length: filas.length > 0 ? POR_PAGINA - visibles.length : 0 }, (_, i) => (
-              <tr key={`vacia-${i}`} className="mk-fila-vacia" aria-hidden><td colSpan={6} /></tr>
+              <tr key={`vacia-${i}`} className="mk-fila-vacia" aria-hidden><td colSpan={8} /></tr>
             ))}
           </tbody>
         </table>
@@ -175,14 +178,16 @@ export function PerTablaHistorial({ filas }: { filas: Historial[] }) {
       <div className="mk-tw mk-tw-marco">
         <table className="mk-table">
           <thead>
-            <tr><th>Año</th><th>Grupo</th><th>Nivel de formación</th><th>Entrada</th><th>Salida</th><th>Constancia</th></tr>
+            <tr><th>Año</th><th>Grupo</th><th>Nivel de formación</th><th>Entrada</th><th>MCER entrada</th><th>Salida</th><th>MCER salida</th><th>Constancia</th></tr>
           </thead>
           <tbody>
             {filas.map((x, i) => (
               <tr key={`${x.anio_lectivo}-${i}`} style={{ cursor: "default" }}>
                 <td>{x.anio_lectivo}</td><td style={{ whiteSpace: "nowrap" }}>{x.grupo}</td>
                 <td style={{ fontWeight: 600 }}>{x.nivel_formacion}</td>
-                <td><Estado v={x.prueba_entrada} /></td><td><Estado v={x.prueba_salida} /></td><td><Estado v={x.constancia} /></td>
+                <td><Estado v={x.prueba_entrada} /></td><td className="mk-td-mcer">{x.mcer_entrada ?? "-"}</td>
+                <td><Estado v={x.prueba_salida} /></td><td className="mk-td-mcer">{x.mcer_salida ?? "-"}</td>
+                <td><Estado v={x.constancia} /></td>
               </tr>
             ))}
           </tbody>

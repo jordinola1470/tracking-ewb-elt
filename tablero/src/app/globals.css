@@ -759,3 +759,6 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 [data-componente="per_tabla_docentes"] .mk-table-fija th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 [data-componente="per_tabla_docentes"] .mk-table-fija .mk-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
 [data-componente="per_tabla_docentes"] .mk-fila-vacia,[data-componente="per_tabla_docentes"] .mk-fila-vacia:hover{cursor:default;background:transparent}
+
+/* Perfiles: columnas de nivel MCER (entrada / salida), tal cual vienen en la base */
+.mk-td-mcer{font-weight:600;white-space:nowrap;color:var(--marca-negro)}

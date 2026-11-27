@@ -20,12 +20,14 @@ export type CargoAnio = {
 export type Permanencia = { permanencia: string; anios_participados: number; es_continuo: boolean; docentes: number };
 export type Perfil = {
   docente_id: string; docente_nombre: string | null; genero: string | null; cargo: string | null; colegio: string | null;
-  ultimo_nivel_formacion: string | null; anios: string; niveles_por_anio: string; permanencia: string;
+  ultimo_nivel_formacion: string | null; mcer_entrada: string | null; mcer_salida: string | null;
+  anios: string; niveles_por_anio: string; permanencia: string;
   es_continuo: boolean; asistencia: number | null;
 };
 export type Historial = {
   docente_id: string; anio_lectivo: number; grupo: string | null; nivel_formacion: string; orden_nivel: number;
-  prueba_entrada: string; prueba_salida: string; constancia: string; asistencia: number | null; es_retirado: boolean;
+  prueba_entrada: string; prueba_salida: string; constancia: string; asistencia: number | null;
+  mcer_entrada: string | null; mcer_salida: string | null; es_retirado: boolean;
 };
 export type Totales = { ied_total: number; docentes_total: number; participaciones_total: number };
 export type CargoDocentes = { cargo: string; docentes: number };
@@ -131,12 +133,12 @@ async function leerTablas(): Promise<DatosTablero> {
              primer_anio::int, ultimo_anio::int
       from public.tab_fs_resumen`;
   const perfiles = await sql<Perfil[]>`
-      select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, anios,
+      select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, mcer_entrada, mcer_salida, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia::float8
       from public.tab_perfiles order by docente_nombre nulls last`;
   const historial = await sql<Historial[]>`
       select docente_id, anio_lectivo, grupo, nivel_formacion, orden_nivel, prueba_entrada,
-             prueba_salida, constancia, asistencia::float8, es_retirado
+             prueba_salida, constancia, asistencia::float8, mcer_entrada, mcer_salida, es_retirado
       from public.tab_historial order by docente_id, anio_lectivo`;
 
   const datos: DatosTablero = {

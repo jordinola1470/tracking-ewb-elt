@@ -10,6 +10,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [Sin publicar]
 
+### Agregado (Perfiles · nivel MCER)
+- Tabla de docentes: columnas **MCER entrada** (primera prueba de entrada con nivel) y **MCER salida** (última prueba
+  de salida con nivel). Historial por año: **MCER entrada** y **MCER salida** de cada año. Solo el nivel, tal cual viene
+  en la base (sin puntaje); sin dato → «-». dbt: `mcer_entrada` y `mcer_salida` en `tab_perfiles` y `tab_historial`.
+
 ### Agregado (helpdesk 2024: nivel de los desertores)
 - `cargar` lee también los Excel `data/helpdesk_data/helpdesk_<año>_*.xlsx` (listas de matrícula: 2023 hoja
   `nivel_inicial`, 2024 hoja `help_desk`) y reemplaza `raw.helpdesk_matricula` solo con documento, grupo, curso y
