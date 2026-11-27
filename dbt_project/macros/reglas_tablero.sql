@@ -36,3 +36,17 @@
         when 'PREA1' then 0 when 'A1' then 1 when 'A2' then 2
         when 'B1' then 3 when 'B2' then 4 when 'C1' then 5 end
 {%- endmacro %}
+
+{# Nivel (PRE_A1…B2) a partir del nombre del curso. Incluye los nombres largos de 2023 ("Entry - Pre A1",
+   "Evolution/Specialist - B2/C1") y los cortos del helpdesk 2024 ("Entry", "Fundamentals 2", "Connections 4"),
+   con las mismas equivalencias que nivel_estandar. Otro valor → NULL. #}
+{% macro nivel_de_curso(col) -%}
+    case
+        when lower(trim({{ col }})) in ('evolution/specialist - b2/c1', 'evolution 2 - b2.2', 'evolution 2') then 'B2'
+        when lower(trim({{ col }})) like 'entry%' then 'PRE_A1'
+        when lower(trim({{ col }})) like 'fundamentals%' then 'A1'
+        when lower(trim({{ col }})) like 'progress%' then 'A2'
+        when lower(trim({{ col }})) like 'connections%' then 'B1'
+        when lower(trim({{ col }})) like 'evolution/specialist - b1%' then 'B1'
+    end
+{%- endmacro %}
