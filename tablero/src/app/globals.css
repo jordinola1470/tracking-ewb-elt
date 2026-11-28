@@ -30,7 +30,7 @@
   --cds-chart-reference: #7F9498; --cds-text-secondary: #4F6468;
   --cds-surface-popover: #ffffff; --cds-border: var(--principal-claro); --cds-shadow-popover: 0 4px 14px rgba(12, 52, 61, .12);
 
-  max-width: 1440px; margin: 0 auto; padding: 20px; color: var(--color-fg); background: var(--color-fondo);
+  max-width: 2560px; margin: 0 auto; padding: 20px; /* ocupa toda la ventana hasta un monitor de 27" (2560 px) */ color: var(--color-fg); background: var(--color-fondo);
   font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-body); line-height: 1.45;
 }
 html, body { margin: 0; background: #D5DCDE; color-scheme: light; }
@@ -42,7 +42,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 
 .mk{font-family:var(--font-anthropic-sans);color:var(--color-fg)}
 .mk-head{margin:var(--cds-gap-lg) 0 var(--cds-gap-lg)}
-.mk-head h1{font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--color-acento);font-size:34px;line-height:1.1;margin:0}
+.mk-head h1{font-family:var(--font-anthropic-sans);font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--color-acento);font-size:34px;line-height:1.1;margin:0}
 .mk-sub{color:var(--color-fg-muted);margin:var(--cds-gap-xs) 0 var(--cds-gap-md)}
 .mk-user{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);display:flex;gap:var(--cds-gap-sm);align-items:center;min-width:0}
 .mk-btn{font:inherit;font-size:var(--cds-font-size-caption);font-weight:600;padding:8px 14px;border:var(--borde) solid var(--color-border-line);border-radius:var(--radio-pildora);background:var(--color-panel);color:var(--color-fg);cursor:pointer}
@@ -85,7 +85,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 
 /* Secciones de la vista Analítica: Histórico (sin filtro) arriba, Por año (con filtro) abajo */
 .mk-seccion{margin-bottom:var(--cds-gap-xl)}
-.mk-seccion-titulo{font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:var(--cds-font-size-heading);color:var(--color-acento);margin:0 0 var(--cds-gap-md);padding-bottom:var(--cds-pad-sm);border-bottom:var(--borde) solid var(--marca-verde)}
+.mk-seccion-titulo{font-family:var(--font-anthropic-sans);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:var(--cds-font-size-heading);color:var(--color-acento);margin:0 0 var(--cds-gap-md);padding-bottom:var(--cds-pad-sm);border-bottom:var(--borde) solid var(--marca-verde)}
 
 /* ── Estilo inspirado en el ejemplo de referencia (misma paleta) ─────────────────── */
 /* Barra superior: marca · pestañas · usuario */
@@ -337,6 +337,8 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-filtros-pie{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:var(--cds-font-size-caption);font-weight:700;color:var(--marca-principal)}
 /* Histórico: 4 gráficos en cuadrícula de 2 x 2; filtros de Perfiles en una fila */
 @media (min-width:1100px){.mk-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Pantallas grandes (27"): los 4 gráficos pequeños del Histórico en una sola fila */
+@media (min-width:2200px){.mk-grid-2{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
 
 /* ── Página de inicio de sesión (mismo estilo del tablero) ─────────────────────────
@@ -347,7 +349,7 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .login-marca{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:44px 40px;border-radius:28px;color:#fff;background:linear-gradient(120deg,var(--marca-principal) 0%,#145160 60%,var(--mezcla) 100%);box-shadow:0 2px 0 rgba(0,0,0,.12),0 10px 24px rgba(12,52,61,.28)}
 .login-marca::after{content:"";position:absolute;right:-80px;bottom:-110px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(64,152,76,.5),rgba(64,152,76,0) 70%);pointer-events:none}
 .login-logo{align-self:flex-start;display:inline-grid;place-items:center;padding:10px 22px;border-radius:var(--radio-pildora);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-weight:800;letter-spacing:.04em}
-.login-marca h1{position:relative;z-index:1;margin:0;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:34px;line-height:1.1;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;gap:14px}
+.login-marca h1{position:relative;z-index:1;margin:0;font-family:var(--font-anthropic-sans);font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:34px;line-height:1.1;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;gap:14px}
 .login-marca h1::before{content:"";flex:none;width:6px;border-radius:3px;background:var(--marca-verde);box-shadow:0 0 0 3px rgba(64,152,76,.25)}
 .login-marca p{position:relative;z-index:1;margin:0;max-width:380px;color:rgba(255,255,255,.82);font-size:15px}
 .login-card{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:40px 36px;border-radius:28px;background:var(--color-panel);box-shadow:var(--sombra-suave);text-align:left;max-width:none}
@@ -462,13 +464,13 @@ html { scrollbar-gutter: stable; overflow-y: scroll; }
 .mk-fs-boton:hover{transform:translateY(-1px)}
 .mk-fs-hoja{padding:28px 32px}
 .mk-fs-portada{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 26px;border-radius:20px;color:#fff;background:linear-gradient(120deg,var(--marca-principal) 0%,#145160 60%,var(--mezcla) 100%)}
-.mk-fs-portada h1{margin:2px 0 4px;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:28px;color:#fff}
+.mk-fs-portada h1{margin:2px 0 4px;font-family:var(--font-anthropic-sans);font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:28px;color:#fff}
 .mk-fs-portada p{margin:0;color:rgba(255,255,255,.85);font-size:13px}
 .mk-fs-eyebrow{font-size:11px !important;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--verde-medio) !important}
 .mk-fs-logo{display:inline-grid;place-items:center;padding:10px 18px;border-radius:var(--radio-pildora);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-weight:800}
 .mk-fs-convenciones{margin:14px 0 4px;padding:10px 14px;border-radius:12px;background:var(--principal-suave);border-left:4px solid var(--marca-verde);font-size:11.5px;color:var(--color-fg-muted)}
 .mk-fs-seccion{margin-top:22px}
-.mk-fs-h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--principal-claro);font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--marca-principal)}
+.mk-fs-h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--principal-claro);font-family:var(--font-anthropic-sans);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--marca-principal)}
 .mk-fs-h2 span{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--marca-verde);color:#fff;font-size:13px}
 .mk-fs-dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:900px){.mk-fs-dos{grid-template-columns:1fr}}
@@ -735,7 +737,7 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 .mk-lateral-toggle:active svg{transform:scale(.85)}
 @media (prefers-reduced-motion:reduce){.mk-app{transition:none}.mk-lateral .mk-tab-txt,.mk-lateral .mk-sello{animation:none}}
 /* Logo EwB pequeño junto al botón de menú, sin burbuja, en gris pizarra */
-.mk-marca-ewb{flex:1;text-align:center;font-family:Arial,"Arial Bold",Helvetica,sans-serif;font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--marca-negro);animation:mk-fundido .28s ease .08s both}
+.mk-marca-ewb{flex:1;text-align:center;font-family:var(--font-anthropic-sans);font-size:17px;font-weight:800;letter-spacing:.04em;color:var(--marca-negro);animation:mk-fundido .28s ease .08s both}
 .mk-app-contraida .mk-marca-ewb{display:none}
 @media (prefers-reduced-motion:reduce){.mk-marca-ewb{animation:none}}
 /* El bloque del botón de menú mide lo mismo que la barra de la derecha (Histórico / Por año): 68 px */
@@ -759,3 +761,49 @@ button.mk-perfil-usuario{font:inherit;color:inherit;cursor:pointer;text-align:le
 [data-componente="per_tabla_docentes"] .mk-table-fija th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 [data-componente="per_tabla_docentes"] .mk-table-fija .mk-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
 [data-componente="per_tabla_docentes"] .mk-fila-vacia,[data-componente="per_tabla_docentes"] .mk-fila-vacia:hover{cursor:default;background:transparent}
+
+/* Perfiles: columnas de nivel MCER (entrada / salida), tal cual vienen en la base */
+.mk-td-mcer{font-weight:600;white-space:nowrap;color:var(--marca-negro)}
+/* Encabezado en dos líneas («MCER» / «entrada»): sin recorte y con interlineado ajustado al texto */
+[data-componente="per_tabla_docentes"] .mk-table-fija th.mk-th-2l{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;vertical-align:middle}
+/* Tabla de docentes: ancho fijo por columna; si no cabe, barra de desplazamiento horizontal abajo */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada{overflow-x:auto}
+[data-componente="per_tabla_docentes"] .mk-table-fija{width:1380px;min-width:100%}
+/* La tarjeta de la tabla no debe crecer más que el panel: así aparece la barra horizontal de la tabla */
+.mk-perf > .mk-card{min-width:0}
+/* Barra horizontal siempre visible (macOS oculta las barras por defecto) con la paleta del tablero */
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar{height:10px}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-track{background:#E9EDEE;border-radius:0 0 16px 16px}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-thumb{background:#56676D;border-radius:999px;border:2px solid #E9EDEE}
+[data-componente="per_tabla_docentes"] .mk-tw-paginada::-webkit-scrollbar-thumb:hover{background:#22333B}
+@supports not selector(::-webkit-scrollbar){[data-componente="per_tabla_docentes"] .mk-tw-paginada{scrollbar-width:thin;scrollbar-color:#56676D #E9EDEE}}
+
+/* ── Acento de color e ícono por tema en las tarjetas de Analítica (el fondo sigue neutro) ── */
+.mk-card[data-tema]{position:relative}
+.mk-card[data-tema="constancia"]{--tema:var(--marca-verde)}
+.mk-card[data-tema="niveles"]{--tema:var(--marca-principal)}
+.mk-card[data-tema="docentes"]{--tema:var(--mezcla)}
+.mk-card[data-tema="ied"]{--tema:var(--principal-medio)}
+.mk-card[data-tema]::before{content:"";position:absolute;top:0;left:20px;width:56px;height:4px;border-radius:0 0 4px 4px;background:var(--tema)}
+.mk-titulo-icono{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;flex:none;margin-right:4px;background:var(--tema);color:#fff;box-shadow:var(--sombra)}
+
+/* Perfiles: 5 filtros (con Constancia) en una fila cuando caben; si no, pasan a la siguiente. Buscadores sin recorte del texto */
+.mk-filtros-perfil{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+[data-componente^="per_buscador"]{min-width:280px}
+
+/* Etiquetas por nivel (Nivel por cargo): funcionan como botones que filtran el mapa de calor */
+.mk-kpi-boton{all:unset;display:block;cursor:pointer;border-radius:var(--cds-radius);transition:opacity .15s ease,transform .15s ease}
+.mk-kpi-boton > .mk-card{height:100%;box-sizing:border-box}
+.mk-kpi-boton:focus-visible{outline:3px solid var(--marca-verde);outline-offset:3px}
+.mk-kpi-boton.activo{outline:3px solid var(--marca-verde);outline-offset:3px}
+.mk-kpi-boton.apagado{opacity:.5}
+.mk-kpi-boton:hover{transform:translateY(-2px)}
+@media (prefers-reduced-motion:reduce){.mk-kpi-boton{transition:none}.mk-kpi-boton:hover{transform:none}}
+
+/* Descargas en Excel (Perfiles y Reporte) */
+.mk-filtros-acciones{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mk-descarga{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mk-btn-descarga{display:inline-flex;align-items:center;gap:6px;background:var(--marca-verde);color:#fff;border-color:var(--marca-verde)}
+.mk-btn-descarga:disabled{opacity:.65;cursor:progress}
+.mk-descarga-error{color:var(--color-bad);font-weight:600}
+.mk-ficha-descarga{display:flex;justify-content:flex-end;margin-top:10px}

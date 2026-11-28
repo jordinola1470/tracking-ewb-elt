@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
 
-// Fuente del texto general (el título principal usa Arial Bold, ver globals.css)
-const cuerpo = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-cuerpo", display: "swap" });
+// Fuente de todo el tablero (texto y títulos)
+const cuerpo = Quicksand({ subsets: ["latin"], variable: "--font-cuerpo", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Formación docente en inglés",

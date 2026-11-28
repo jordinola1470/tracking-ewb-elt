@@ -29,12 +29,20 @@ ultimo as (
         docente_id,
         (array_agg(docente_nombre order by anio_lectivo desc) filter (where docente_nombre is not null))[1] as docente_nombre,
         (array_agg(genero         order by anio_lectivo desc) filter (where genero is not null))[1]         as genero,
-        (array_agg(cargo_estandar order by anio_lectivo desc) filter (where cargo_estandar is not null))[1] as cargo,
+        (array_agg(cargo_rol order by anio_lectivo desc) filter (where cargo_rol is not null))[1] as cargo,  -- cargo: CARGO_ROL tal cual en la base
         (array_agg(colegio_nombre order by anio_lectivo desc) filter (where colegio_nombre is not null))[1] as colegio,
         -- Último nivel de formación: el del año más reciente. Los retirados cuentan con el nivel del curso
         -- del que se retiraron (helpdesk); si ese año también tiene una fila activa, se usa la activa.
         (array_agg(nivel_estandar order by anio_lectivo desc, {{ es_retirado() }} asc)
             filter (where nivel_estandar is not null and (not {{ es_retirado() }} or nivel_estandar <> '-')))[1] as ultimo_nivel_formacion,
+        -- Nivel MCER (tal cual viene en la base): el de la primera prueba de entrada con nivel y el de la
+        -- última prueba de salida con nivel
+        (array_agg(nullif(trim(mcer_entrada), '') order by anio_lectivo asc)
+            filter (where {{ orden_mcer('mcer_entrada') }} is not null))[1]                              as mcer_entrada,
+        (array_agg(nullif(trim(mcer_salida), '') order by anio_lectivo desc)
+            filter (where {{ orden_mcer('mcer_salida') }} is not null))[1]                               as mcer_salida,
+        -- Constancia: "Sí" si la recibió en al menos un año; "No" si hay dato y nunca la recibió; si no, "Sin dato"
+        case max({{ tiene_constancia() }}) when 1 then 'Sí' when 0 then 'No' else 'Sin dato' end            as constancia,
         -- Asistencia de la última participación sin retirarse (no es un promedio)
         (array_agg(asistencia_porcentaje_fix order by anio_lectivo desc)
             filter (where nivel_estandar is not null and not {{ es_retirado() }}))[1]                      as asistencia
@@ -49,6 +57,9 @@ select
     u.cargo,
     u.colegio,
     u.ultimo_nivel_formacion,
+    u.mcer_entrada,
+    u.mcer_salida,
+    u.constancia,
     r.anios,
     r.niveles_por_anio,
     p.permanencia,

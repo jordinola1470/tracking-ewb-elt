@@ -2,6 +2,8 @@
 -- Cálculo propio de este gráfico (no cambia la ficha de Perfiles): el nivel del año más reciente en que
 -- el docente participó; los retirados cuentan con el nivel del curso del que se retiraron (helpdesk) y, si ese
 -- año también tiene una fila activa, se usa la activa. "-" (sin nivel asignado) no cuenta como nivel cursado.
+-- Los docentes sin ningún nivel cursado válido cuentan como "Sin nivel registrado": el % es sobre TODOS los docentes
+-- (el gráfico puede no dibujar esa barra, pero esos docentes existen y forman parte del total).
 -- Componente: ana_graf_nivel_ultimo
 with ultimo as (
     select

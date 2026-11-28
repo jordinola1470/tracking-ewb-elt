@@ -188,10 +188,12 @@ base as (
     left join nombre_docente nd on nd.docente_id = u.docente_id
     left join ied_resuelta ir
         on ir.dane_original is not distinct from u.codigo_dane::text and ir.colegio_nombre is not distinct from u.colegio_nombre
-)
+),
 
+paso1 as (
 select
     base.*,
+    hr.nivel_retiro as nivel_helpdesk_retiro,
 
     -- Regla Excel sobre nivel_asignado (comparaciones sin distinguir mayúsculas, como en Excel; los NULL se conservan; el trim se aplica en staging)
     -- Retirados sin nivel ('-', 'NULL', '0' o vacío): se completa con el nivel del curso del que se retiró
@@ -245,3 +247,39 @@ left join {{ ref('fct_helpdesk_retiros') }} hr
     on hr.docente_id = base.docente_id and hr.anio_lectivo = base.anio_lectivo
 left join {{ ref('fct_helpdesk_matricula') }} hm
     on hm.docente_id = base.docente_id and hm.anio_lectivo = base.anio_lectivo
+),
+
+-- Docentes en más de un programa el mismo año (2026: ewb_plus, ewb_two, ewb_presencial): nivel válido de su OTRO programa.
+-- Si se retiró (o quedó sin nivel) en un programa pero sigue en otro, su nivel final es el del otro programa.
+otro_programa as (
+    select p.docente_id, p.anio_lectivo, p.programa,
+        (array_agg(o.nivel_estandar order by {{ orden_nivel('o.nivel_estandar') }} desc))[1] as nivel_otro_programa
+    from paso1 p
+    join paso1 o
+        on o.docente_id = p.docente_id and o.anio_lectivo = p.anio_lectivo
+        and o.programa is distinct from p.programa
+        and {{ orden_nivel('o.nivel_estandar') }} between 1 and 8
+    group by 1, 2, 3
+)
+
+select
+    p.docente_id, p.tipo_documento, p.docente_nombre, p.genero, p.fecha_nacimiento, p.correo_electronico, p.anio_lectivo,
+    p.nivel_formacion, p.codigo_dane, p.colegio_nombre, p.cargo_rol, p.grupo_id, p.nivel_asignado, p.asistencia_porcentaje_fix,
+    p.score_entrada, p.mcer_entrada, p.score_salida, p.mcer_salida, p.recibe_constancia,
+    p.edad, p.nombres, p.apellidos, p.programa, p.aprobado_sed, p.retirado_segun_base,
+    -- Nivel final de las filas sin nivel en la base ("-", vacío, "0", "NULL"), en este orden:
+    --  1) el nivel de su otro programa del mismo año (2026: se movió de programa);
+    --  2) el curso del que se retiró según el helpdesk, aunque el grupo de la base no diga "Retirados";
+    --  3) la regla anterior (paso1: helpdesk de retiro de los retirados, matrícula, eximidos, cursos de 2023).
+    -- Si nada aplica, queda "-": son los retiros sin otro programa y sin helpdesk (hay que pedir su curso inicial).
+    case
+        when (p.nivel_asignado is null or p.nivel_asignado in ('0', 'NULL', '-', '')) and op.nivel_otro_programa is not null
+            then op.nivel_otro_programa
+        when (p.nivel_estandar is null or p.nivel_estandar in ('-', '')) and p.nivel_helpdesk_retiro is not null
+            then p.nivel_helpdesk_retiro
+        else p.nivel_estandar
+    end as nivel_estandar,
+    p.cargo_estandar
+from paso1 p
+left join otro_programa op
+    on op.docente_id = p.docente_id and op.anio_lectivo = p.anio_lectivo and op.programa is not distinct from p.programa
