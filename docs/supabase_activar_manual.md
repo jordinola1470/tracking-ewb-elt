@@ -84,8 +84,6 @@ Si sale ❌ con «la consulta falló 3 veces», usa la opción B.
 - Revisa en GitHub → **Settings → Secrets and variables → Actions** que existan los secretos
   `TABLERO_STAGING_USER`, `TABLERO_STAGING_PASS`, `TABLERO_PROD_USER` y `TABLERO_PROD_PASS`. **Nunca** copies sus
   valores en un chat, correo o archivo.
-- Para problemas de acceso o seguridad, crea un ticket en el Centro de Ayuda de Informática:
-  <https://clac-comerciojusto.atlassian.net/servicedesk/customer/portal/42>.
 
 ---
 

@@ -8,19 +8,20 @@ import { AnaFiltroAnio, AnaTextoResumen } from "./analitica/ana_encabezado";
 import { AnaKpis } from "./analitica/ana_kpis";
 import {
   AnaGrafConstanciaAnio, AnaGrafConstanciaCargo, AnaGrafConstanciaNivel,
-  AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelFormacion, AnaGrafNivelUltimo, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
+  AnaGrafCargoDocentes, AnaGrafIedAtendidas, AnaGrafNivelCargoTabla, AnaGrafNivelFormacion, AnaGrafNivelUltimo, AnaGrafPermanencia, AnaGrafPruebasPresentadas,
 } from "./analitica/ana_graficos";
 import { RepFactSheet } from "./reporte/rep_fact_sheet";
+import { RepDescargas } from "./reporte/rep_descargas";
 import { BarraAvisos } from "./comunes/barra_avisos";
 import { MenuPerfil } from "./comunes/menu_perfil";
 import { FILTROS_VACIOS, PerBuscador, PerFichaDocente, PerFiltros, PerTablaDocentes, type FiltrosPerfil } from "./perfiles/per_componentes";
 
 type Pestana = "analitica" | "perfiles" | "reporte";
 
-// Pestaña Reporte (fact sheet) oculta por ahora: sus datos deben validarse antes de volver a publicarla.
-// El código se conserva (componentes/reporte/ y modelos tab_fs_* de dbt); para mostrarla, cambiar a true.
-const MOSTRAR_REPORTE = false;
-const PESTANAS: Pestana[] = MOSTRAR_REPORTE ? ["analitica", "perfiles", "reporte"] : ["analitica", "perfiles"];
+// Fact sheet desactivado por ahora: sus datos deben validarse antes de volver a publicarlo.
+// El código se conserva (componentes/reporte/rep_fact_sheet.tsx y modelos tab_fs_* de dbt); para mostrarlo, cambiar a true.
+// Mientras tanto, la pestaña Reporte solo tiene la descarga del entregable SED (correos autorizados).
+const MOSTRAR_FACT_SHEET = false;
 type VistaAnalitica = "historico" | "por_anio";
 
 /** Preferencia de la barra lateral guardada en el navegador (si no hay almacenamiento, queda abierta) */
@@ -32,12 +33,18 @@ function suscribirBarra(aviso: () => void) {
   return () => { window.removeEventListener("storage", aviso); window.removeEventListener(CLAVE_BARRA, aviso); };
 }
 
-export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero; usuario: string; salir: () => Promise<void> }) {
+export default function Tablero({ datos, usuario, salir, puedeDescargar }: {
+  datos: DatosTablero; usuario: string; salir: () => Promise<void>; puedeDescargar: boolean;
+}) {
+  // Reporte se ve si el fact sheet está activo o si la cuenta puede descargar el entregable SED
+  const mostrarReporte = MOSTRAR_FACT_SHEET || puedeDescargar;
+  const PESTANAS: Pestana[] = mostrarReporte ? ["analitica", "perfiles", "reporte"] : ["analitica", "perfiles"];
   const anios = useMemo(() => datos.kpis.map((k) => k.anio_lectivo), [datos.kpis]);
   const [pestana, setPestana] = useState<Pestana>("analitica");
   const [vista, setVista] = useState<VistaAnalitica>("historico");
   const [anio, setAnio] = useState<number>(anios[anios.length - 1]);
   const [busqueda, setBusqueda] = useState("");
+  const [busquedaDoc, setBusquedaDoc] = useState("");
   const [filtros, setFiltros] = useState<FiltrosPerfil>(FILTROS_VACIOS);
   // Barra lateral contraída (solo íconos): la elige cada persona y se recuerda en su navegador
   const contraida = useSyncExternalStore(suscribirBarra, leerBarra, () => false);
@@ -69,19 +76,19 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
     const aplicar = () => {
       const q = new URLSearchParams(window.location.search);
       const pe = q.get("pestana"), vi = q.get("vista"), an = Number(q.get("anio"));
-      const p: Pestana = pe === "perfiles" || (MOSTRAR_REPORTE && pe === "reporte") ? pe : "analitica";
+      const p: Pestana = pe === "perfiles" || (mostrarReporte && pe === "reporte") ? pe : "analitica";
       const v: VistaAnalitica = vi === "por_anio" ? "por_anio" : "historico";
       navegacion.current = `${p}|${v}`;
       setPestana(p);
       setVista(v);
       if (anios.includes(an)) setAnio(an);
-      setFiltros({ nivel: q.get("nivel") ?? "", cargo: q.get("cargo") ?? "", ied: q.get("ied") ?? "", permanencia: q.get("permanencia") ?? "" });
+      setFiltros({ nivel: q.get("nivel") ?? "", cargo: q.get("cargo") ?? "", ied: q.get("ied") ?? "", permanencia: q.get("permanencia") ?? "", constancia: q.get("constancia") ?? "" });
       setEnlaceLeido(true);
     };
     aplicar();
     window.addEventListener("popstate", aplicar);
     return () => window.removeEventListener("popstate", aplicar);
-  }, [anios]);
+  }, [anios, mostrarReporte]);
   useEffect(() => {
     if (!enlaceLeido) return; // primero se aplica lo que dice el enlace; recién entonces se escribe
     const q = new URLSearchParams();
@@ -102,13 +109,16 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
   // Buscar y filtrar docentes (sin cálculos: solo se comparan los valores que ya trae tab_perfiles)
   const perfilesFiltrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
+    const doc = busquedaDoc.replace(/\D/g, "");  // N° Documento: solo dígitos (ignora puntos y espacios)
     return datos.perfiles.filter((p) =>
-      (!q || `${p.docente_nombre ?? ""} ${p.colegio ?? ""} ${p.docente_id}`.toLowerCase().includes(q)) &&
+      (!q || `${p.docente_nombre ?? ""} ${p.colegio ?? ""}`.toLowerCase().includes(q)) &&
+      (!doc || p.docente_id.replace(/\D/g, "").includes(doc)) &&
       (!filtros.nivel || (p.ultimo_nivel_formacion ?? "Sin dato") === filtros.nivel) &&
       (!filtros.cargo || (p.cargo ?? "Sin dato") === filtros.cargo) &&
       (!filtros.ied || (p.colegio ?? "Sin dato") === filtros.ied) &&
-      (!filtros.permanencia || p.permanencia === filtros.permanencia));
-  }, [datos.perfiles, busqueda, filtros]);
+      (!filtros.permanencia || p.permanencia === filtros.permanencia) &&
+      (!filtros.constancia || p.constancia === filtros.constancia));
+  }, [datos.perfiles, busqueda, busquedaDoc, filtros]);
   const perfil = datos.perfiles.find((p) => p.docente_id === seleccionado);
   const historial = useMemo(() => datos.historial.filter((h) => h.docente_id === seleccionado), [datos.historial, seleccionado]);
 
@@ -196,6 +206,7 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
                 <AnaGrafIedAtendidas totales={datos.totales} kpis={datos.kpis} />
                 <AnaGrafCargoDocentes cargos={datos.cargoDocentes} />
                 <AnaGrafNivelUltimo niveles={datos.nivelUltimo} />
+                <AnaGrafNivelCargoTabla filas={datos.nivelCargo} />
               </div>
             </section>
           )}
@@ -221,21 +232,25 @@ export default function Tablero({ datos, usuario, salir }: { datos: DatosTablero
         </>
       )}
 
-      {MOSTRAR_REPORTE && pestana === "reporte" && <RepFactSheet fs={datos.factSheet} />}
+      {mostrarReporte && pestana === "reporte" && (MOSTRAR_FACT_SHEET ? <RepFactSheet fs={datos.factSheet} /> : <RepDescargas />)}
 
       {pestana === "perfiles" && (
         <section className="mk-panel">
           <div className="mk-perf">
             <div className="mk-card">
               <h2>Docentes</h2>
-              <p className="mk-note">Busca por nombre, colegio o código y selecciona una fila para ver su ficha.</p>
-              <PerBuscador texto={busqueda} cambiar={setBusqueda} />
-              <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length} />
+              <p className="mk-note">Busca por nombre, colegio o N° Documento y selecciona una fila para ver su ficha.</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                <PerBuscador texto={busqueda} cambiar={setBusqueda} />
+                <PerBuscador texto={busquedaDoc} cambiar={setBusquedaDoc} placeholder="Buscar por N° Documento…" nombre="per_buscador_documento" />
+              </div>
+              <PerFiltros perfiles={datos.perfiles} filtros={filtros} cambiar={setFiltros} total={perfilesFiltrados.length}
+                descarga={puedeDescargar ? () => ({ tipo: "perfiles", ids: perfilesFiltrados.map((p) => p.docente_id) }) : undefined} />
               <PerTablaDocentes filas={perfilesFiltrados} seleccionado={seleccionado} elegir={setSeleccionado} />
             </div>
             <div className="mk-card">
               <h2>Ficha del docente</h2>
-              <PerFichaDocente perfil={perfil} historial={historial} />
+              <PerFichaDocente perfil={perfil} historial={historial} puedeDescargar={puedeDescargar} />
             </div>
           </div>
         </section>

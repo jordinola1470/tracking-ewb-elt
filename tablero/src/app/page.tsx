@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { obtenerSesion, signOut } from "@/auth";
 import { cargarDatosTablero } from "@/lib/datos";
+import { puedeDescargar } from "@/lib/permisos";
 import Tablero from "@/componentes/Tablero";
 
 // Lee la sesión en cada visita: la página espera en el servidor (nada se muestra sin login).
@@ -31,7 +32,8 @@ export default async function Inicio() {
 
   return (
     <main className="tablero">
-      <Tablero datos={datos} usuario={sesion.user?.email ?? sesion.user?.name ?? ""} salir={salir} />
+      <Tablero datos={datos} usuario={sesion.user?.email ?? sesion.user?.name ?? ""} salir={salir}
+        puedeDescargar={puedeDescargar(sesion.user?.email)} />
     </main>
   );
 }

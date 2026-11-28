@@ -5,23 +5,26 @@ import { useState } from "react";
 import type { Historial, Perfil } from "@/lib/datos";
 import { pct } from "../comunes/graficos";
 import { FiltroPildora } from "../comunes/filtro_pildora";
+import { BotonDescarga } from "../comunes/boton_descarga";
 
-/** per_buscador */
-export function PerBuscador({ texto, cambiar }: { texto: string; cambiar: (t: string) => void }) {
+/** per_buscador (nombre o colegio) y per_buscador_documento (N° Documento) */
+export function PerBuscador({ texto, cambiar, placeholder = "Buscar docente o colegio…", nombre = "per_buscador" }: {
+  texto: string; cambiar: (t: string) => void; placeholder?: string; nombre?: string;
+}) {
   return (
-    <label className="mk-search-caja" data-componente="per_buscador">
+    <label className="mk-search-caja" data-componente={nombre}>
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
         <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
       </svg>
-      <input className="mk-search" type="search" placeholder="Buscar docente…" aria-label="Buscar docente"
-        value={texto} onChange={(e) => cambiar(e.target.value)} />
+      <input className="mk-search" type="search" placeholder={placeholder} aria-label={placeholder.replace("…", "")}
+        inputMode={nombre === "per_buscador_documento" ? "numeric" : undefined} value={texto} onChange={(e) => cambiar(e.target.value)} />
     </label>
   );
 }
 
 /** Filtros de la lista de docentes ("" = todos) */
-export type FiltrosPerfil = { nivel: string; cargo: string; ied: string; permanencia: string };
-export const FILTROS_VACIOS: FiltrosPerfil = { nivel: "", cargo: "", ied: "", permanencia: "" };
+export type FiltrosPerfil = { nivel: string; cargo: string; ied: string; permanencia: string; constancia: string };
+export const FILTROS_VACIOS: FiltrosPerfil = { nivel: "", cargo: "", ied: "", permanencia: "", constancia: "" };
 
 // Orden de los niveles de formación (los demás valores van al final, en orden alfabético)
 const ORDEN_NIVEL = ["PRE_A1", "A1", "A2", "A2+", "B1", "B1+", "B2", "C1"];
@@ -34,15 +37,18 @@ const opciones = (valores: (string | null)[], orden?: string[]) => {
   });
 };
 
-/** per_filtros · nivel de formación (último), cargo (último), IED y permanencia — fuente: tab_perfiles */
-export function PerFiltros({ perfiles, filtros, cambiar, total }: {
+/** per_filtros · nivel de formación (último), cargo (último), IED, permanencia y constancia (Sí si la recibió algún año) — fuente: tab_perfiles */
+export function PerFiltros({ perfiles, filtros, cambiar, total, descarga }: {
   perfiles: Perfil[]; filtros: FiltrosPerfil; cambiar: (f: FiltrosPerfil) => void; total: number;
+  /** Solo para correos autorizados: arma la solicitud de descarga de los docentes filtrados */
+  descarga?: () => object;
 }) {
   const campos: { clave: keyof FiltrosPerfil; etiqueta: string; icono: string; valores: string[] }[] = [
     { clave: "nivel", etiqueta: "Nivel de formación", icono: "nivel", valores: opciones(perfiles.map((p) => p.ultimo_nivel_formacion), ORDEN_NIVEL) },
     { clave: "cargo", etiqueta: "Cargo", icono: "cargo", valores: opciones(perfiles.map((p) => p.cargo)) },
     { clave: "ied", etiqueta: "IED", icono: "ied", valores: opciones(perfiles.map((p) => p.colegio)) },
     { clave: "permanencia", etiqueta: "Permanencia", icono: "permanencia", valores: opciones(perfiles.map((p) => p.permanencia)) },
+    { clave: "constancia", etiqueta: "Constancia", icono: "constancia", valores: opciones(perfiles.map((p) => p.constancia), ["Sí", "No"]) },
   ];
   const activos = Object.values(filtros).some(Boolean);
   return (
@@ -55,7 +61,10 @@ export function PerFiltros({ perfiles, filtros, cambiar, total }: {
       ))}
       <div className="mk-filtros-pie">
         <span>{total.toLocaleString("es-CO")} {total === 1 ? "docente" : "docentes"}</span>
-        {activos && <button type="button" className="mk-btn" onClick={() => cambiar(FILTROS_VACIOS)}>Quitar filtros</button>}
+        <span className="mk-filtros-acciones">
+          {descarga && total > 0 && <BotonDescarga nombre="per_boton_descarga" texto="Descargar Excel" cuerpo={descarga} />}
+          {activos && <button type="button" className="mk-btn" onClick={() => cambiar(FILTROS_VACIOS)}>Quitar filtros</button>}
+        </span>
       </div>
     </div>
   );
@@ -88,7 +97,7 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
             <col style={{ width: 100 }} /><col style={{ width: 210 }} />
           </colgroup>
           <thead>
-            <tr><th>Código</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />Entrada</th><th className="mk-th-2l">MCER<br />Salida</th><th>Permanencia</th></tr>
+            <tr><th>N° Documento</th><th>Nombre</th><th>Cargo</th><th>Colegio</th><th className="mk-th-2l">Nivel de formación<br />por año</th><th className="mk-th-2l">MCER<br />Entrada</th><th className="mk-th-2l">MCER<br />Salida</th><th>Permanencia</th></tr>
           </thead>
           <tbody>
             {visibles.map((r) => (
@@ -125,10 +134,10 @@ export function PerTablaDocentes({ filas, seleccionado, elegir }: { filas: Perfi
 }
 
 /** per_ficha_docente */
-export function PerFichaDocente({ perfil, historial }: { perfil?: Perfil; historial: Historial[] }) {
+export function PerFichaDocente({ perfil, historial, puedeDescargar }: { perfil?: Perfil; historial: Historial[]; puedeDescargar?: boolean }) {
   if (!perfil) return <div data-componente="per_ficha_docente">—</div>;
   const datos: [string, string][] = [
-    ["Código", perfil.docente_id],
+    ["N° Documento", perfil.docente_id],
     ["Género", perfil.genero ?? "—"],
     ["Colegio", perfil.colegio ?? "—"],
     ["Años cursados", perfil.anios],
@@ -148,6 +157,11 @@ export function PerFichaDocente({ perfil, historial }: { perfil?: Perfil; histor
           </div>
         </div>
       </div>
+      {puedeDescargar && (
+        <div className="mk-ficha-descarga">
+          <BotonDescarga nombre="per_boton_ficha" texto="Descargar ficha" cuerpo={() => ({ tipo: "ficha", id: perfil.docente_id })} />
+        </div>
+      )}
       <h3 className="mk-ficha-titulo">Datos generales</h3>
       <dl className="mk-dl">
         {datos.map(([etiqueta, v]) => (<div key={etiqueta} className="mk-dato"><dt>{etiqueta}</dt><dd>{v}</dd></div>))}

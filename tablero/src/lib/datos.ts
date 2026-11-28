@@ -20,7 +20,7 @@ export type CargoAnio = {
 export type Permanencia = { permanencia: string; anios_participados: number; es_continuo: boolean; docentes: number };
 export type Perfil = {
   docente_id: string; docente_nombre: string | null; genero: string | null; cargo: string | null; colegio: string | null;
-  ultimo_nivel_formacion: string | null; mcer_entrada: string | null; mcer_salida: string | null;
+  ultimo_nivel_formacion: string | null; mcer_entrada: string | null; mcer_salida: string | null; constancia: string;
   anios: string; niveles_por_anio: string; permanencia: string;
   es_continuo: boolean; asistencia: number | null;
 };
@@ -50,9 +50,10 @@ export type FsResumen = {
 export type FactSheet = { anios: FsAnio[]; dist: FsDist[]; resumen: FsResumen | null };
 export type Actualizacion = { transformado_en: string; cargado_en: string | null; ultimo_anio: number; registros: number };
 export type NivelUltimo = { nivel: string; orden_nivel: number; docentes: number; pct_docentes: number };
+export type NivelCargo = { anio_corte: number; cargo: string; nivel: string; orden_nivel: number; docentes: number };
 export type DatosTablero = {
   kpis: KpiAnio[]; niveles: NivelAnio[]; cargos: CargoAnio[]; permanencia: Permanencia[];
-  perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[]; nivelUltimo: NivelUltimo[];
+  perfiles: Perfil[]; historial: Historial[]; totales: Totales | null; cargoDocentes: CargoDocentes[]; nivelUltimo: NivelUltimo[]; nivelCargo: NivelCargo[];
   factSheet: FactSheet; actualizacion: Actualizacion | null;
 };
 
@@ -107,6 +108,9 @@ async function leerTablas(): Promise<DatosTablero> {
       select cargo, docentes::int from public.tab_cargo_docentes order by docentes desc, cargo`;
   const nivelUltimo = await sql<NivelUltimo[]>`
       select nivel, orden_nivel::int, docentes::int, pct_docentes::float8 from public.tab_nivel_ultimo order by orden_nivel, nivel`;
+  const nivelCargo = await sql<NivelCargo[]>`
+      select anio_corte::int, cargo, nivel, orden_nivel::int, docentes::int
+      from public.tab_nivel_cargo order by anio_corte, cargo, orden_nivel`;
   // Fechas de actualización (hora de Colombia, como texto ISO sin zona)
   const actualizacion = await sql<Actualizacion[]>`
       select to_char(transformado_en at time zone 'America/Bogota', 'YYYY-MM-DD"T"HH24:MI') as transformado_en,
@@ -133,7 +137,7 @@ async function leerTablas(): Promise<DatosTablero> {
              primer_anio::int, ultimo_anio::int
       from public.tab_fs_resumen`;
   const perfiles = await sql<Perfil[]>`
-      select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, mcer_entrada, mcer_salida, anios,
+      select docente_id, docente_nombre, genero, cargo, colegio, ultimo_nivel_formacion, mcer_entrada, mcer_salida, constancia, anios,
              niveles_por_anio, permanencia, es_continuo, asistencia::float8
       from public.tab_perfiles order by docente_nombre nulls last`;
   const historial = await sql<Historial[]>`
@@ -144,7 +148,7 @@ async function leerTablas(): Promise<DatosTablero> {
   const datos: DatosTablero = {
     kpis: [...kpis], niveles: [...niveles], cargos: [...cargos],
     permanencia: [...permanencia], perfiles: [...perfiles], historial: [...historial],
-    totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes], nivelUltimo: [...nivelUltimo],
+    totales: totales[0] ?? null, cargoDocentes: [...cargoDocentes], nivelUltimo: [...nivelUltimo], nivelCargo: [...nivelCargo],
     factSheet: { anios: [...fsAnios], dist: [...fsDist], resumen: fsResumen[0] ?? null },
     actualizacion: actualizacion[0] ?? null,
   };

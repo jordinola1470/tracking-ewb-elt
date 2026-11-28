@@ -13,12 +13,13 @@ const ICONOS: Record<string, React.ReactNode> = {
   ied: <><path d="M3 21h18M5 21V10l7-5 7 5v11" /><path d="M10 21v-5h4v5M9 12h.01M15 12h.01" /></>,
   constancia: <><circle cx="12" cy="9" r="5" /><path d="M9 13.5 8 21l4-2 4 2-1-7.5" /></>,
   asistencia: <><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4" /></>,
+  nivel: <path d="M4 20V15h5v-5h5V5h6v15H4z" />,
 };
 
 /** Color de la tarjeta (todos de la paleta institucional; ver globals.css "mk-kpi-tono-*") */
-type Tono = "principal" | "verde" | "mezcla" | "medio" | "verde-oscuro";
+export type Tono = "principal" | "verde" | "mezcla" | "medio" | "verde-oscuro";
 
-function Kpi({ nombre, icono, titulo, texto, pie, tono }: {
+export function Kpi({ nombre, icono, titulo, texto, pie, tono }: {
   nombre: string; icono: string; titulo: string; texto: string; pie?: React.ReactNode; tono: Tono;
 }) {
   return (

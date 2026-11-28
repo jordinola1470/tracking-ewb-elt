@@ -11,6 +11,7 @@ const ICONOS: Record<string, React.ReactNode> = {
   cargo: <><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" /></>,
   ied: <><path d="M3 21h18M5 21V10l7-5 7 5v11" /><path d="M10 21v-5h4v5" /></>,
   permanencia: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+  constancia: <><circle cx="12" cy="9" r="5" /><path d="m9 13.5-1.5 7.5 4.5-2.5 4.5 2.5-1.5-7.5" /></>,
 };
 
 export function FiltroPildora({ etiqueta, icono, valor, opciones, cambiar, tamano = "pequeno", nombre }: {

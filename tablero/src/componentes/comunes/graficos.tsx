@@ -3,7 +3,10 @@
 import { useEffect, useId, useRef } from "react";
 import * as d3 from "d3";
 
-export const pct = d3.format(".0%");
+/** Todos los porcentajes con dos decimales (así ningún valor pequeño aparece como 0 %) */
+export const pct = d3.format(".2%");
+/** Solo para las marcas de la escala de los ejes (0 %, 5 %, 10 %…) */
+export const pctEje = d3.format(".0%");
 export const entero = d3.format(",d");
 export const COLORES = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 /** Colores en orden para series categóricas (dona y su leyenda) */
@@ -74,13 +77,23 @@ export function BarrasHorizontales<T>(props: {
   estilo?: (d: T) => { color?: string; rayado?: Rayado };
   /** Opcional: texto a la derecha de la barra (por defecto, el valor con `formato`) */
   etiquetaValor?: (d: T) => string;
+  /** Opcional: texto pegado al final de cada barra (ej. el %) */
+  etiquetaBarra?: (d: T) => string;
+  /** Opcional: ejes X e Y visibles con marcas, escala abajo y cuadrícula punteada (como «Constancia, año por año») */
+  ejes?: boolean;
+  /** Opcional: formato de la escala del eje X (por defecto, `formato`) */
+  formatoEje?: (v: number) => string;
+  /** Opcional: encabezado de la columna de la derecha (ej. "Total"); con él, los valores se alinean a la derecha */
+  encabezadoValor?: string;
 }) {
-  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0], estilo, etiquetaValor } = props;
+  const { filas, categoria, valor, formato, max, alto, etiqueta, color = COLORES[0], estilo, etiquetaValor, etiquetaBarra, ejes, formatoEje, encabezadoValor } = props;
   const id = limpiarId(useId());
   const ref = useDibujo((el) => {
     const datos = filas.filter((d) => valor(d) != null);
     if (!datos.length) return sinDatos(el);
-    const bh = 22, gap = 12, W = el.clientWidth || 320, H = alto ?? datos.length * (bh + gap) + 8;
+    // Con ejes: barras más gruesas y menos separadas, y un pequeño espacio entre las barras y los ejes
+    const bh = ejes ? 28 : 22, gap = ejes ? 9 : 12, sep = ejes ? 6 : 0, W = el.clientWidth || 320, arriba = encabezadoValor ? 22 : 0,
+      H = (alto ?? datos.length * (bh + gap) + 8) + (ejes ? 24 : 0) + arriba;
     const svg = d3.select(el).append("svg").attr("width", "100%").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", etiqueta);
     datos.forEach((d, i) => { const r = estilo?.(d).rayado; if (r) definirRayado(svg, `${id}b${i}`, r); });
     const relleno = (d: T, i: number) => { const e = estilo?.(d); return e?.rayado ? rayado(`${id}b${i}`) : (e?.color ?? color); };
@@ -88,18 +101,38 @@ export function BarrasHorizontales<T>(props: {
     const med = svg.append("g"); datos.forEach((d) => med.append("text").attr("font-size", 12).text(categoria(d)));
     const lw = d3.max(med.selectAll<SVGTextElement, unknown>("text").nodes(), (n) => n.getComputedTextLength()) || 60; med.remove();
     const L = lw + 14, R = etiquetaValor ? 92 : 52;
-    const y = d3.scaleBand(datos.map(categoria), [4, H - 4]).paddingInner(0.35);
-    const x = d3.scaleLinear([0, max ?? (d3.max(datos, (d) => valor(d) as number) || 1)], [L, W - R]);
+    const abajo = H - 4 - (ejes ? 24 : 0);
+    const y = d3.scaleBand(datos.map(categoria), [4 + arriba + sep, abajo - sep]).paddingInner(ejes ? 0.25 : 0.35);
+    // Con texto al final de la barra, se deja espacio para que la barra más larga no lo tape
+    const x = d3.scaleLinear([0, max ?? (d3.max(datos, (d) => valor(d) as number) || 1)], [L + sep, W - R - (etiquetaBarra ? 60 : 0)]);
     svg.append("g").selectAll("text").data(datos).join("text").attr("x", L - 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
       .attr("dy", ".35em").attr("text-anchor", "end").attr("font-size", 12).style("fill", "var(--color-fg)").text(categoria);
     if (max != null) svg.selectAll("rect.pista").data(datos).join("rect").attr("x", L).attr("y", (d) => y(categoria(d)) ?? 0)
       .attr("width", W - R - L).attr("height", y.bandwidth()).attr("rx", RADIO).style("fill", "var(--principal-suave)");
-    svg.selectAll("rect.b").data(datos).join("rect").attr("x", L).attr("y", (d) => y(categoria(d)) ?? 0).attr("height", y.bandwidth())
-      .attr("width", (d) => Math.max(RADIO, x(valor(d) as number) - L)).attr("rx", RADIO).style("fill", (d, i) => relleno(d, i))
+    if (ejes) {
+      // Cuadrícula punteada y ejes X e Y visibles (línea sólida con marcas), igual que «Constancia, año por año»
+      svg.append("g").attr("transform", `translate(0,${abajo})`).call(d3.axisBottom(x).ticks(10).tickSize(-(abajo - 2)).tickFormat(() => ""))
+        .call((a) => { a.select(".domain").remove(); a.selectAll(".tick line").style("stroke", "var(--cds-chart-grid)").style("stroke-dasharray", "3 4"); });
+      svg.append("g").attr("class", "eje").attr("transform", `translate(0,${abajo})`)
+        .call(d3.axisBottom(x).ticks(10).tickSize(4).tickPadding(6).tickFormat((v) => (formatoEje ?? formato)(v as number)))
+        .call((a) => a.select(".domain").attr("d", `M${L},4V0H${x.range()[1] + 12}V4`));  // arranca en el eje Y y termina con una marca, como «Constancia, año por año»
+      svg.append("g").attr("class", "eje").attr("transform", `translate(${L},0)`).call(d3.axisLeft(y).tickSize(4).tickFormat(() => ""))
+        .call((a) => a.select(".domain").attr("d", `M-4,${6 + arriba}H0V${abajo}`));  // termina arriba con una marca
+      svg.selectAll(".eje .domain, .eje .tick line").style("stroke", "var(--principal-medio)").style("stroke-width", 1.5);
+      svg.selectAll(".eje text").attr("font-size", 11).style("fill", "var(--color-fg-muted)");
+    }
+    svg.selectAll("rect.b").data(datos).join("rect").attr("x", L + sep).attr("y", (d) => y(categoria(d)) ?? 0).attr("height", y.bandwidth())
+      .attr("width", (d) => Math.max(RADIO, x(valor(d) as number) - L - sep)).attr("rx", RADIO).style("fill", (d, i) => relleno(d, i))
       .on("pointermove", (ev, d) => tip.mostrar(ev, `${categoria(d)}: ${formato(valor(d) as number)}`)).on("pointerleave", tip.ocultar);
-    svg.selectAll("text.v").data(datos).join("text").attr("x", W - R + 8).attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
+    if (etiquetaBarra) svg.selectAll("text.p").data(datos).join("text").attr("x", (d) => Math.max(L + sep + RADIO, x(valor(d) as number)) + 6)
+      .attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2).attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700)
+      .style("fill", "var(--color-fg-muted)").text(etiquetaBarra);
+    // Columna de la derecha: con encabezado, los valores van alineados a la derecha bajo el título
+    if (encabezadoValor) svg.append("text").attr("x", W - 8).attr("y", 12).attr("text-anchor", "end").attr("font-size", 12)
+      .attr("font-weight", 700).style("fill", "var(--color-fg-muted)").text(encabezadoValor);
+    svg.selectAll("text.v").data(datos).join("text").attr("x", encabezadoValor ? W - 8 : W - R + 8).attr("text-anchor", encabezadoValor ? "end" : "start").attr("y", (d) => (y(categoria(d)) ?? 0) + y.bandwidth() / 2)
       .attr("dy", ".35em").attr("font-size", 12).attr("font-weight", 700).style("fill", "var(--color-fg)").text((d) => (etiquetaValor ? etiquetaValor(d) : formato(valor(d) as number)));
-  }, [filas, max, alto, color, estilo, etiquetaValor]);
+  }, [filas, max, alto, color, estilo, etiquetaValor, etiquetaBarra, ejes, formatoEje, encabezadoValor]);
   return <div className="mk-chart" ref={ref} />;
 }
 
